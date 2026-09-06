@@ -3,8 +3,8 @@ module aiki
 go 1.24.0
 
 require (
-	github.com/gofrs/flock v0.12.1
 	github.com/chzyer/readline v1.5.1
+	github.com/gofrs/flock v0.12.1
 	github.com/hajimehoshi/ebiten/v2 v2.9.8
 )
 
