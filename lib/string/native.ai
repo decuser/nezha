@@ -1,7 +1,6 @@
 package "string/native"
 
 # Import dependencies from lib
-let _list = import("list")
 let _case = import("string/case_table")
 let _math = import("math/native")
 
@@ -27,9 +26,13 @@ let join = (list, delim) {
 	if empty(list) {
 		return ""
 	}
-	_list.reduce(rest(list), first(list), (acc, x) {
-		acc + delim + x
-	})
+	let result = first(list)
+	let i = 1
+	while i < length(list) {
+		result = result + delim + list[i]
+		i = i + 1
+	}
+	return result
 }
 
 # split(s, delim) - split string by delimiter into list
@@ -152,7 +155,13 @@ let repeat = (s, n) {
 
 # reverse_string(s) - reverse a string
 let reverse_string = (s) {
-	join(_list.map(_list.reverse(chars(s)), to_str), "")
+	let result = ""
+	let i = length(s) - 1
+	while i >= 0 {
+		result = result + to_str(s[i])
+		i = i - 1
+	}
+	return result
 }
 
 # insert(s, pos, sub) - insert substring at position
@@ -259,9 +268,16 @@ let lines = (s) {
 
 # words(s) - split string into words (by whitespace)
 let words = (s) {
-	_list.filter(split(trim(s), " "), (w) {
-		not equal(w, "")
-	})
+	let parts = split(trim(s), " ")
+	let result = []
+	let i = 0
+	while i < length(parts) {
+		if not equal(parts[i], "") {
+			result = append(result, parts[i])
+		}
+		i = i + 1
+	}
+	return result
 }
 
 # Character Classes
@@ -298,7 +314,14 @@ let is_numeric = (s) {
 	if equal(length(s), 0) {
 		return false
 	}
-	_list.all(chars(s), is_digit)
+	let i = 0
+	while i < length(s) {
+		if not is_digit(s[i]) {
+			return false
+		}
+		i = i + 1
+	}
+	return true
 }
 
 # is_alphabetic(s) - check if string contains only letters
@@ -306,7 +329,14 @@ let is_alphabetic = (s) {
 	if equal(length(s), 0) {
 		return false
 	}
-	_list.all(chars(s), is_alpha)
+	let i = 0
+	while i < length(s) {
+		if not is_alpha(s[i]) {
+			return false
+		}
+		i = i + 1
+	}
+	return true
 }
 
 # Comparison
@@ -384,7 +414,17 @@ let capitalize = (s) {
 
 # title(s) - title case each word
 let title = (s) {
-	join(_list.map(words(s), capitalize), " ")
+	let ws = words(s)
+	if empty(ws) {
+		return ""
+	}
+	let result = capitalize(first(ws))
+	let i = 1
+	while i < length(ws) {
+		result = result + " " + capitalize(ws[i])
+		i = i + 1
+	}
+	return result
 }
 
 # equal_ignore_case(a, b) - case-insensitive equality

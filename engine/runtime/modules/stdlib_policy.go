@@ -54,7 +54,6 @@ var stdlibModulePolicies = []StdlibModulePolicy{
 	{Module: "bytes/ffi", Role: RolePortable, Realization: RealizationFFI, SemanticAuthority: "bytes/native"},
 	{Module: "hash/native", Role: RolePortable, Realization: RealizationNative},
 	{Module: "hash/ffi", Role: RolePortable, Realization: RealizationFFI, SemanticAuthority: "hash/native"},
-	{Module: "list", Role: RolePortable, Realization: RealizationNative},
 	{Module: "math/native", Role: RolePortable, Realization: RealizationNative},
 	{Module: "math/ffi", Role: RolePortable, Realization: RealizationFFI, SemanticAuthority: "math/native", AccelerationSurface: []string{"floor", "ceil", "modulo"}},
 	{Module: "math/approx", Role: RoleInterop, Realization: RealizationFFI},
