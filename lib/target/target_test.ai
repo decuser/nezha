@@ -1,0 +1,61 @@
+let test = import("test")
+let target = import("target")
+let file = import("file")
+let path = import("path")
+
+let make_tree = () {
+	let root = file.temp_dir()
+	file.mkdir_all(path.join(root, "src/sub"))
+	file.mkdir_all(path.join(root, "experiments/demo"))
+	file.write_all(path.join(root, "src/a.ai"), "let a = 1\n")
+	file.write_all(path.join(root, "src/sub/b.ai"), "let b = 2\n")
+	file.write_all(path.join(root, "experiments/demo/e_test.ai"), "let e = 3\n")
+	file.write_all(path.join(root, ".aikiignore"), "[test]\nexperiments/**\n")
+	return root
+}
+
+test.run("recursive targets are ordered and deduplicated", () {
+	let root = make_tree()
+	let got = target.resolve(root, "test", ["src/...", "src/a.ai"], true)
+	test.not_error(got)
+	test.equal(got[0], ["src/a.ai", "src/sub/b.ai"])
+	file.remove_all(root)
+})
+
+
+test.run("test policy prunes experiments from broad recursion", () {
+	let root = make_tree()
+	let got = target.resolve(root, "test", ["./..."], true)
+	test.not_error(got)
+	test.equal(got[0], [".aikiignore", "src/a.ai", "src/sub/b.ai"])
+	file.remove_all(root)
+})
+
+
+test.run("explicit recursive target wins over repository policy", () {
+	let root = make_tree()
+	let got = target.resolve(root, "test", ["experiments/..."], true)
+	test.not_error(got)
+	test.equal(got[0], ["experiments/demo/e_test.ai"])
+	file.remove_all(root)
+})
+
+
+test.run("plain directory behavior is caller controlled", () {
+	let root = make_tree()
+	let accepted = target.resolve(root, "lint", ["src"], true)
+	test.not_error(accepted)
+	test.equal(accepted[0], ["src/a.ai", "src/sub/b.ai"])
+	let rejected = target.resolve(root, "lint", ["src"], false)
+	test.is_true(is_error(rejected))
+	file.remove_all(root)
+})
+
+
+test.run("exhaustive resolution bypasses repository policy", () {
+	let root = make_tree()
+	let got = target.resolve_all(root, "test", ["./..."], true)
+	test.not_error(got)
+	test.equal(got[0], [".aikiignore", "experiments/demo/e_test.ai", "src/a.ai", "src/sub/b.ai"])
+	file.remove_all(root)
+})

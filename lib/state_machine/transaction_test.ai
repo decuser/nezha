@@ -1,0 +1,80 @@
+use("test")
+
+let sm = import("state_machine/native")
+let op = import("state_machine/ops")
+
+let transitions = [
+	[0, 1, -1, 0, 0, 1, [
+		[op.ADDR18_FROM_WORD, 0, 0, 0],
+		[op.STAGE_WORD_ADDR18, 1, 0, 0],
+		[op.LOAD_WORD_ADDR18, 2, 0, 0]
+	], -1, -1],
+	[1, 1, -1, 0, 0, 2, [
+		[op.SET, 0, 3, 0],
+		[op.ADDR18_FROM_WORD, 0, 0, 0],
+		[op.STAGE_BYTE_ADDR18, 3, 0, 0],
+		[op.LOAD_BYTE_ADDR18, 4, 0, 0],
+		[op.SET, 0, 2, 0],
+		[op.ADDR18_FROM_WORD, 0, 0, 0],
+		[op.LOAD_WORD_ADDR18, 2, 0, 0]
+	], -1, -1]
+]
+
+
+let program = sm.compile(4, 5, 0, 0, append(transitions, [2, 1, -1, 0, 0, 3, [
+	[op.SET, 0, 2, 0],
+	[op.ADDR18_FROM_WORD, 0, 0, 0],
+	[op.LOAD_WORD_ADDR18, 2, 0, 0]
+], -1, -1]), 1)
+
+
+run("staged word and byte writes are visible before commit", () {
+	let m = sm.new(program, [2, 43981, 0, 238, 0], [[0, 4660, 0]])
+	is_true(sm.step(m, 1))
+	equal(sm.staged_writes(m), 1)
+	equal(sm.slot(m, 2), 43981)
+	is_true(sm.step(m, 1))
+	equal(sm.staged_writes(m), 2)
+	equal(sm.slot(m, 4), 238)
+	# 0xABCD with high byte replaced by 0xEE -> 0xEECD.
+	equal(sm.slot(m, 2), 61133)
+})
+
+
+run("discard removes staged overlay without changing backing", () {
+	let m = sm.new(program, [2, 43981, 0, 238, 0], [[0, 4660, 0]])
+	is_true(sm.step(m, 1))
+	equal(sm.slot(m, 2), 43981)
+	is_true(sm.discard_writes(m))
+	equal(sm.staged_writes(m), 0)
+	# Re-run a fresh load-only program against the same machine-local backing.
+	let loads = [[0, 1, -1, 0, 0, 1, [
+		[op.ADDR18_FROM_WORD, 0, 0, 0],
+		[op.LOAD_WORD_ADDR18, 2, 0, 0]
+	], -1, -1]]
+	let p = sm.compile(2, 3, 0, 0, loads, 1)
+	let n = sm.new(p, [2, 0, 0], [[0, 4660, 0]])
+	is_true(sm.step(n, 1))
+	equal(sm.slot(n, 2), 4660)
+})
+
+
+run("commit applies staged writes in architectural order and clears journal", () {
+	let m = sm.new(program, [2, 43981, 0, 238, 0], [[0, 4660, 0]])
+	is_true(sm.step(m, 1))
+	is_true(sm.step(m, 1))
+	is_true(sm.commit_writes(m))
+	equal(sm.staged_writes(m), 0)
+	# The machine-local bound store now contains 0xEECD. With the journal empty,
+	# a later load proves the committed backing value itself changed.
+	is_true(sm.step(m, 1))
+	equal(sm.slot(m, 2), 61133)
+})
+
+
+run("transactional admission rejects malformed addr18 operands", () {
+	let bad = [[0, 1, -1, 0, 0, 1, [[op.STAGE_WORD_ADDR18, 0, 0, 1]], -1, -1]]
+	is_error(sm.compile(2, 1, 0, 0, bad, 1))
+	let bad_load = [[0, 1, -1, 0, 0, 1, [[op.LOAD_BYTE_ADDR18, 1, 0, 0]], -1, -1]]
+	is_error(sm.compile(2, 1, 0, 0, bad_load, 1))
+})

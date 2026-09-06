@@ -1,0 +1,710 @@
+// Package value defines the core value types for Aiki.
+package value
+
+import (
+	"fmt"
+	"os"
+	"strings"
+	"sync"
+	"sync/atomic"
+)
+
+// Type identifies value kinds.
+type Type string
+
+const (
+	NumberType        Type = "number"
+	BooleanType       Type = "boolean"
+	RuneType          Type = "rune"
+	StringType        Type = "string"
+	BytesType         Type = "bytes"
+	OpaqueType        Type = "opaque"
+	SymbolType        Type = "symbol"
+	ListType          Type = "list"
+	FunctionType      Type = "function"
+	FaultType         Type = "fault"
+	ReturnType        Type = "return"
+	FileType          Type = "file"
+	FileLockType      Type = "file_lock"
+	ChannelType       Type = "channel"
+	ModuleType        Type = "module"
+	CanvasType        Type = "canvas"
+	StoreType         Type = "store"
+	ProcessType       Type = "process"
+	EndpointType      Type = "endpoint"
+	ListenerType      Type = "listener"
+	DatagramType      Type = "datagram"
+	TerminalStateType Type = "terminal_state"
+)
+
+// Value is the interface all Aiki values implement.
+type Value interface {
+	Type() Type
+	Inspect() string
+}
+
+// Boolean
+type Boolean struct {
+	Val bool
+}
+
+func (b *Boolean) Type() Type { return BooleanType }
+func (b *Boolean) Inspect() string {
+	if b.Val {
+		return "true"
+	}
+	return "false"
+}
+
+var (
+	TRUE  = &Boolean{Val: true}
+	FALSE = &Boolean{Val: false}
+)
+
+// Rune
+type Rune struct {
+	Val rune
+}
+
+func (r *Rune) Type() Type      { return RuneType }
+func (r *Rune) Inspect() string { return fmt.Sprintf("'%c'", r.Val) }
+
+// String
+type String struct {
+	Val string
+}
+
+func (s *String) Type() Type      { return StringType }
+func (s *String) Inspect() string { return fmt.Sprintf("%q", s.Val) }
+
+// Bytes is an immutable sequence of bytes (0-255).
+type Bytes struct {
+	Val []byte
+}
+
+func (b *Bytes) Type() Type { return BytesType }
+func (b *Bytes) Inspect() string {
+	if len(b.Val) <= 20 {
+		return fmt.Sprintf("<bytes:%d %v>", len(b.Val), b.Val)
+	}
+	return fmt.Sprintf("<bytes:%d [%v...]>", len(b.Val), b.Val[:20])
+}
+
+// Opaque is a provider-owned value whose representation and operations are not
+// part of Aiki's language semantics. Providers may distinguish private kinds,
+// but ordinary Aiki code sees only an opaque capability value.
+type Opaque struct {
+	Provider string
+	Kind     string
+	Bits     uint32
+}
+
+func (o *Opaque) Type() Type      { return OpaqueType }
+func (o *Opaque) Inspect() string { return "<opaque>" }
+
+// FixedStore is provider-backed mutable fixed-width storage. Unlike Store,
+// cells are not arbitrary Aiki values. Width is provider policy, not an Aiki
+// numeric type.
+type FixedStore struct {
+	mu       sync.RWMutex
+	Kind     string
+	Bytes    []uint8
+	Words    []uint16
+	Addrs    []uint32
+	Counters []uint64
+}
+
+func (s *FixedStore) Type() Type { return StoreType }
+func (s *FixedStore) Inspect() string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return fmt.Sprintf("<store/ffi %d>", s.fixedLen())
+}
+func (s *FixedStore) fixedLen() int {
+	switch s.Kind {
+	case "byte":
+		return len(s.Bytes)
+	case "word":
+		return len(s.Words)
+	case "addr18":
+		return len(s.Addrs)
+	case "counter":
+		return len(s.Counters)
+	default:
+		return 0
+	}
+}
+func (s *FixedStore) FixedLen() int { s.mu.RLock(); defer s.mu.RUnlock(); return s.fixedLen() }
+func (s *FixedStore) FixedGet(i int) uint32 {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	switch s.Kind {
+	case "byte":
+		return uint32(s.Bytes[i])
+	case "word":
+		return uint32(s.Words[i])
+	case "addr18":
+		return s.Addrs[i]
+	default:
+		return uint32(s.Counters[i])
+	}
+}
+func (s *FixedStore) FixedSet(i int, v uint32) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	switch s.Kind {
+	case "byte":
+		s.Bytes[i] = uint8(v)
+	case "word":
+		s.Words[i] = uint16(v)
+	case "addr18":
+		s.Addrs[i] = v & 0x3ffff
+	default:
+		s.Counters[i] = uint64(v)
+	}
+}
+func (s *FixedStore) FixedSnapshot(count int) []uint32 {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := make([]uint32, count)
+	for i := 0; i < count; i++ {
+		switch s.Kind {
+		case "byte":
+			out[i] = uint32(s.Bytes[i])
+		case "word":
+			out[i] = uint32(s.Words[i])
+		case "addr18":
+			out[i] = s.Addrs[i]
+		default:
+			out[i] = uint32(s.Counters[i])
+		}
+	}
+	return out
+}
+
+func (s *FixedStore) CounterGet(i int) uint64 {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.Counters[i]
+}
+func (s *FixedStore) CounterSet(i int, v uint64) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.Counters[i] = v
+}
+func (s *FixedStore) CounterAdd(i int, delta uint64) uint64 {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.Counters[i] += delta
+	return s.Counters[i]
+}
+
+// Symbol
+type Symbol struct {
+	Val string
+}
+
+func (s *Symbol) Type() Type      { return SymbolType }
+func (s *Symbol) Inspect() string { return ":" + s.Val }
+
+// List
+//
+// Elements is the immutable logical-prefix view retained for compatibility
+// with existing runtime readers. Adaptive append ownership is private: only
+// List methods may extend frontier backing. Callers must not reslice Elements
+// beyond len(Elements) or mutate it in place.
+type List struct {
+	Elements []Value
+	Shape    string // empty for raw list, shape name for shaped list
+
+	backing *listBacking
+}
+
+type listBacking struct {
+	mu       sync.Mutex
+	elements []Value // len == allocated slot count
+	used     int     // published frontier
+}
+
+// ListAppendRealization describes one physical append realization. It is an
+// internal profiling fact, not an Aiki semantic kind.
+type ListAppendRealization struct {
+	Promoted       bool
+	Extended       bool
+	Grown          bool
+	Forked         bool
+	ElementsCopied int
+	SlotsAllocated int
+}
+
+func (l *List) Type() Type { return ListType }
+
+// Len returns the logical list length.
+func (l *List) Len() int { return len(l.Elements) }
+
+// At returns the logical element at i. Bounds behavior intentionally matches
+// ordinary Go indexing because evaluator/substrate callers already guard it.
+func (l *List) At(i int) Value { return l.Elements[i] }
+
+// LogicalElements returns the immutable logical-prefix view. The returned
+// slice is read-only by runtime invariant; it does not grant mutation authority.
+func (l *List) LogicalElements() []Value { return l.Elements }
+
+// Append returns a persistent successor list. Flat lists promote by copying
+// their logical prefix into runtime-owned frontier storage. A frontier list may
+// extend in place only when its logical length equals the published frontier;
+// appending from a historical prefix forks to a new backing.
+func (l *List) Append(v Value) (*List, ListAppendRealization) {
+	if l == nil {
+		return &List{Elements: []Value{v}}, ListAppendRealization{Promoted: true, SlotsAllocated: 1}
+	}
+	if l.backing == nil {
+		return promoteListAppend(l, v, false)
+	}
+
+	b := l.backing
+	b.mu.Lock()
+	defer b.mu.Unlock()
+
+	logical := len(l.Elements)
+	if logical != b.used {
+		return promoteListAppend(l, v, true)
+	}
+
+	if b.used < len(b.elements) {
+		b.elements[b.used] = v
+		b.used++
+		return &List{Elements: b.elements[:b.used], Shape: l.Shape, backing: b}, ListAppendRealization{Extended: true}
+	}
+
+	newCap := listGrowthCapacity(b.used + 1)
+	if doubled := len(b.elements) * 2; doubled > newCap {
+		newCap = doubled
+	}
+	if newCap < 1 {
+		newCap = 1
+	}
+	newElems := make([]Value, newCap)
+	copy(newElems, b.elements[:b.used])
+	newElems[b.used] = v
+	copied := b.used
+	b.elements = newElems
+	b.used++
+	return &List{Elements: b.elements[:b.used], Shape: l.Shape, backing: b}, ListAppendRealization{
+		Extended:       true,
+		Grown:          true,
+		ElementsCopied: copied,
+		SlotsAllocated: newCap,
+	}
+}
+
+func promoteListAppend(l *List, v Value, fork bool) (*List, ListAppendRealization) {
+	logical := len(l.Elements)
+	capacity := listGrowthCapacity(logical + 1)
+	elements := make([]Value, capacity)
+	copy(elements, l.Elements)
+	elements[logical] = v
+	b := &listBacking{elements: elements, used: logical + 1}
+	r := ListAppendRealization{
+		Promoted:       !fork,
+		Forked:         fork,
+		ElementsCopied: logical,
+		SlotsAllocated: capacity,
+	}
+	return &List{Elements: elements[:logical+1], Shape: l.Shape, backing: b}, r
+}
+
+func listGrowthCapacity(need int) int {
+	capacity := 4
+	for capacity < need {
+		capacity *= 2
+	}
+	return capacity
+}
+
+func (l *List) Inspect() string {
+	var parts []string
+	if l.Shape != "" {
+		parts = append(parts, "@"+l.Shape)
+	}
+	for _, e := range l.Elements {
+		parts = append(parts, e.Inspect())
+	}
+	return "[" + strings.Join(parts, ", ") + "]"
+}
+
+// Function
+type Function struct {
+	Name            string
+	Params          []string
+	Rest            string      // rest parameter name, empty if none
+	Body            interface{} // *syntax.Node, but we don't import syntax here
+	Env             interface{} // *Env, set at runtime
+	TailEnvReusable bool        // body cannot create a closure capturing its call env
+
+	// Profile source identity is captured when the function literal is created.
+	// The packed binding is observation-only cache state: high 32 bits are a
+	// node-registry token and low 32 bits are the NodeID in that identity space.
+	ProfileFile     string
+	ProfileLine     int
+	ProfileCol      int
+	profileBinding  atomic.Uint64
+	profileInstance atomic.Uint64
+}
+
+var nextFunctionProfileInstance atomic.Uint64
+
+// ProfileNodeBinding returns a cached profiling NodeID for one identity space.
+func (f *Function) ProfileNodeBinding(registryToken uint32) (uint32, bool) {
+	if f == nil || registryToken == 0 {
+		return 0, false
+	}
+	packed := f.profileBinding.Load()
+	if uint32(packed>>32) != registryToken {
+		return 0, false
+	}
+	id := uint32(packed)
+	return id, id != 0
+}
+
+// SetProfileNodeBinding installs the current identity-space binding. Competing
+// profiling identity spaces may overwrite this cache, but callers always check
+// the registry token before using the ID, so this can affect cache hit rate but
+// not accounting correctness.
+func (f *Function) SetProfileNodeBinding(registryToken, nodeID uint32) {
+	if f == nil || registryToken == 0 || nodeID == 0 {
+		return
+	}
+	f.profileBinding.Store((uint64(registryToken) << 32) | uint64(nodeID))
+}
+
+// ProfileInstanceID supplies identity only for synthetic/manual functions that
+// have no source location. Source-defined functions are identified by source.
+func (f *Function) ProfileInstanceID() uint64 {
+	if f == nil {
+		return 0
+	}
+	if id := f.profileInstance.Load(); id != 0 {
+		return id
+	}
+	id := nextFunctionProfileInstance.Add(1)
+	if f.profileInstance.CompareAndSwap(0, id) {
+		return id
+	}
+	return f.profileInstance.Load()
+}
+
+func (f *Function) Type() Type { return FunctionType }
+func (f *Function) Inspect() string {
+	if f.Name != "" {
+		return fmt.Sprintf("<fn %s>", f.Name)
+	}
+	return "<fn>"
+}
+
+// Callable is implemented by values that can be called as functions.
+type Callable interface {
+	Value
+	Call(args []Value) Value
+}
+
+// EMPTY is the empty list singleton, used as "no value".
+var EMPTY = &List{Elements: []Value{}}
+
+// Return wraps a return value (internal use).
+type Return struct {
+	Val Value
+}
+
+func (r *Return) Type() Type      { return ReturnType }
+func (r *Return) Inspect() string { return r.Val.Inspect() }
+
+// File wraps an open file handle.
+type File struct {
+	Path string
+	F    *os.File
+	Mode string // "read", "write", "append"
+}
+
+func (f *File) Type() Type      { return FileType }
+func (f *File) Inspect() string { return fmt.Sprintf("<file %s %s>", f.Mode, f.Path) }
+
+// Store is explicit mutable indexed storage for systems work.
+// It is an opaque capability: ordinary Aiki lists remain immutable.
+// A store may be shared explicitly across spawned evaluations; the mutex
+// protects concurrent access inside the Go implementation.
+type Store struct {
+	mu    sync.RWMutex
+	Cells []Value
+}
+
+func (s *Store) Type() Type { return StoreType }
+func (s *Store) Inspect() string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return fmt.Sprintf("<store %d>", len(s.Cells))
+}
+
+// StoreLen returns the number of cells.
+func (s *Store) StoreLen() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return len(s.Cells)
+}
+
+// StoreGet returns a cell value. The caller must bounds-check first.
+func (s *Store) StoreGet(i int) Value {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.Cells[i]
+}
+
+// StoreSet replaces a cell value. The caller must bounds-check first.
+func (s *Store) StoreSet(i int, v Value) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.Cells[i] = v
+}
+
+// StoreSnapshot returns an immutable copy of the first count cells.
+// The caller must validate count against StoreLen before calling.
+func (s *Store) StoreSnapshot(count int) []Value {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	out := make([]Value, count)
+	copy(out, s.Cells[:count])
+	return out
+}
+
+// Channel for concurrency.
+type Channel struct {
+	C        chan Value
+	sendable bool
+}
+
+func (c *Channel) Type() Type      { return ChannelType }
+func (c *Channel) Inspect() string { return "<channel>" }
+
+// CanSend reports whether user code may send on the channel.
+// Ordinary channels are sendable; system event sources may be receive-only.
+func (c *Channel) CanSend() bool { return c.sendable }
+
+// NewChannel creates a new unbuffered, sendable channel.
+func NewChannel() *Channel {
+	return &Channel{C: make(chan Value), sendable: true}
+}
+
+// NewEventChannel creates an internal one-event receive-only channel.
+// The capacity prevents an abandoned event source from stranding its producer.
+// General buffered channels are not part of Aiki's language semantics.
+func NewEventChannel() *Channel {
+	return &Channel{C: make(chan Value, 1), sendable: false}
+}
+
+// Module holds a loaded package's exports.
+type Module struct {
+	Name    string           // package name
+	Exports map[string]Value // exported bindings
+}
+
+func (m *Module) Type() Type      { return ModuleType }
+func (m *Module) Inspect() string { return "<module " + m.Name + ">" }
+
+// Get retrieves an exported value by name.
+func (m *Module) Get(name string) (Value, bool) {
+	v, ok := m.Exports[name]
+	return v, ok
+}
+
+// NewModule creates a module with the given name and exports.
+func NewModule(name string, exports map[string]Value) *Module {
+	return &Module{Name: name, Exports: exports}
+}
+
+// ExitSignal signals REPL to exit.
+type ExitSignal struct{}
+
+func (e *ExitSignal) Type() Type      { return "exit" }
+func (e *ExitSignal) Inspect() string { return "" }
+
+var EXIT = &ExitSignal{}
+
+// ProgramExitSignal requests immediate termination of the current Aiki program
+// with a portable process exit status. It is evaluator control flow, not an
+// ordinary Aiki value.
+type ProgramExitSignal struct {
+	Code int
+}
+
+func (e *ProgramExitSignal) Type() Type      { return "program_exit" }
+func (e *ProgramExitSignal) Inspect() string { return fmt.Sprintf("<exit:%d>", e.Code) }
+
+// ResetSignal signals REPL to reset environment.
+type ResetSignal struct{}
+
+func (r *ResetSignal) Type() Type      { return "reset" }
+func (r *ResetSignal) Inspect() string { return "<reset>" }
+
+var RESET = &ResetSignal{}
+
+// ShapeDef defines a shaped list structure.
+type ShapeDef struct {
+	Name   string
+	Fields []string
+}
+
+// Helper functions
+
+func IsTruthy(v Value) bool {
+	switch val := v.(type) {
+	case *Boolean:
+		return val.Val
+	case *List:
+		// Shaped errors are falsy
+		if val.Shape == "error" {
+			return false
+		}
+		return len(val.Elements) > 0
+	default:
+		return true
+	}
+}
+
+// Fault represents an internal evaluation failure that halts execution.
+// Fault is not an ordinary Aiki value - evaluation halts immediately when one occurs.
+// For recoverable errors, use shaped lists: [@error, :kind, "message"]
+type Fault struct {
+	Message string
+	File    string
+	Line    int
+	Source  string // source line for context
+	Stack   []StackFrame
+}
+
+func (f *Fault) Type() Type { return FaultType }
+
+// Inspect returns Ruby-style error format matching Error.Inspect.
+func (f *Fault) Inspect() string {
+	var sb strings.Builder
+
+	// Find the innermost visible frame for the header
+	funcName := "<main>"
+	if len(f.Stack) > 0 {
+		funcName = f.Stack[len(f.Stack)-1].Name
+	}
+
+	// First line: file:line:in 'func': message
+	if f.File != "" && f.Line > 0 {
+		sb.WriteString(fmt.Sprintf("%s:%d:in '%s': %s", f.File, f.Line, funcName, f.Message))
+	} else if f.Line > 0 {
+		sb.WriteString(fmt.Sprintf("line %d:in '%s': %s", f.Line, funcName, f.Message))
+	} else {
+		sb.WriteString(f.Message)
+	}
+
+	// Second line: source code (indented)
+	if f.Source != "" {
+		sb.WriteString(fmt.Sprintf("\n    %s", strings.TrimSpace(f.Source)))
+	}
+
+	// Stack trace: from file:line:in 'func' (skip innermost, shown above)
+	for i := len(f.Stack) - 2; i >= 0; i-- {
+		frame := f.Stack[i]
+		if frame.File != "" {
+			sb.WriteString(fmt.Sprintf("\n        from %s:%d:in '%s'", frame.File, frame.Line, frame.Name))
+		} else {
+			sb.WriteString(fmt.Sprintf("\n        from line %d:in '%s'", frame.Line, frame.Name))
+		}
+	}
+
+	return sb.String()
+}
+
+func NewFault(format string, args ...interface{}) *Fault {
+	return &Fault{Message: fmt.Sprintf(format, args...)}
+}
+
+func NewFaultAt(file string, line int, source string, stack []StackFrame, format string, args ...interface{}) *Fault {
+	return &Fault{
+		Message: fmt.Sprintf(format, args...),
+		File:    file,
+		Line:    line,
+		Source:  source,
+		Stack:   stack,
+	}
+}
+
+// IsFault returns true only for internal halting failures.
+func IsFault(v Value) bool {
+	_, ok := v.(*Fault)
+	return ok
+}
+
+// IsShapedError returns true for shaped recoverable errors: [@error, :kind, "message"]
+func IsShapedError(v Value) bool {
+	list, ok := v.(*List)
+	if !ok || list.Shape != "error" {
+		return false
+	}
+	// Must have exactly 2 elements: :kind and "message"
+	if len(list.Elements) != 2 {
+		return false
+	}
+	_, kindOk := list.Elements[0].(*Symbol)
+	_, msgOk := list.Elements[1].(*String)
+	return kindOk && msgOk
+}
+
+// NewShapedError creates a shaped recoverable error: [@error, :kind, "message"]
+func NewShapedError(kind string, format string, args ...interface{}) *List {
+	return &List{
+		Shape: "error",
+		Elements: []Value{
+			&Symbol{Val: kind},
+			&String{Val: fmt.Sprintf(format, args...)},
+		},
+	}
+}
+
+// DeepEqual returns true if two values are structurally equal.
+// Numbers are compared by value, strings/symbols/runes/booleans by content,
+// and lists recursively element-by-element including shape.
+func DeepEqual(a, b Value) bool {
+	if a.Type() != b.Type() {
+		return false
+	}
+	switch av := a.(type) {
+	case *Number:
+		bv := b.(*Number)
+		return av.Equal(bv)
+	case *String:
+		bv := b.(*String)
+		return av.Val == bv.Val
+	case *Symbol:
+		bv := b.(*Symbol)
+		return av.Val == bv.Val
+	case *Boolean:
+		bv := b.(*Boolean)
+		return av.Val == bv.Val
+	case *Rune:
+		bv := b.(*Rune)
+		return av.Val == bv.Val
+	case *List:
+		bv := b.(*List)
+		if av.Shape != bv.Shape {
+			return false
+		}
+		if len(av.Elements) != len(bv.Elements) {
+			return false
+		}
+		for i := range av.Elements {
+			if !DeepEqual(av.Elements[i], bv.Elements[i]) {
+				return false
+			}
+		}
+		return true
+	default:
+		// Functions, channels, modules, canvases — identity only.
+		return a == b
+	}
+}

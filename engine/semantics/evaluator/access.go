@@ -1,0 +1,115 @@
+package evaluator
+
+import (
+	"aiki/engine"
+	"aiki/engine/semantics/value"
+	"aiki/engine/syntax"
+)
+
+func (e *Evaluator) evalIndex(val value.Value, node *syntax.Node, env *value.Env) value.Value {
+	e.semanticHit(engine.SemanticIndex, node, env)
+	list, ok := val.(*value.List)
+	if !ok {
+		if s, ok := val.(*value.String); ok {
+			return e.evalStringIndex(s, node, env)
+		}
+		return e.makeFault(node, env, "cannot index %s", val.Type())
+	}
+
+	for _, child := range node.Children {
+		if child.Type != "TERMINAL" {
+			idx := e.Eval(child, env)
+			if shouldHalt(idx) {
+				return idx
+			}
+			num, ok := idx.(*value.Number)
+			if !ok {
+				return e.makeFault(node, env, "index must be a number")
+			}
+			if !num.IsInt() {
+				return e.makeFault(node, env, "index must be an integer")
+			}
+			iv, ok := num.Int64()
+			if !ok {
+				return e.makeFault(node, env, "index must fit machine integer range")
+			}
+			i := int(iv)
+			if i < 0 || i >= len(list.Elements) {
+				return e.makeFault(node, env, "index out of bounds: %d", i)
+			}
+			return list.Elements[i]
+		}
+	}
+
+	return value.EMPTY
+}
+
+func (e *Evaluator) evalStringIndex(s *value.String, node *syntax.Node, env *value.Env) value.Value {
+	for _, child := range node.Children {
+		if child.Type != "TERMINAL" {
+			idx := e.Eval(child, env)
+			if shouldHalt(idx) {
+				return idx
+			}
+			num, ok := idx.(*value.Number)
+			if !ok {
+				return e.makeFault(node, env, "index must be a number")
+			}
+			if !num.IsInt() {
+				return e.makeFault(node, env, "index must be an integer")
+			}
+			iv, ok := num.Int64()
+			if !ok {
+				return e.makeFault(node, env, "index must fit machine integer range")
+			}
+			i := int(iv)
+			r, ok := s.RuneAt(i)
+			if !ok {
+				return e.makeFault(node, env, "index out of bounds: %d", i)
+			}
+			return &value.Rune{Val: r}
+		}
+	}
+	return value.EMPTY
+}
+
+func (e *Evaluator) evalAccess(val value.Value, node *syntax.Node, env *value.Env) value.Value {
+	// Check for module access first
+	if mod, ok := val.(*value.Module); ok {
+		for _, child := range node.Children {
+			if child.Type == "NAME" {
+				fieldName := child.Value
+				v, ok := mod.Get(fieldName)
+				if !ok {
+					return e.makeFault(node, env, "'%s' not exported by module '%s'", fieldName, mod.Name)
+				}
+				return v
+			}
+		}
+		return value.EMPTY
+	}
+
+	// Shape field access
+	list, ok := val.(*value.List)
+	if !ok || list.Shape == "" {
+		return e.makeFault(node, env, "cannot access field on %s", val.Type())
+	}
+
+	for _, child := range node.Children {
+		if child.Type == "NAME" {
+			fieldName := child.Value
+			shapeDef, ok := env.GetShape(list.Shape)
+			if !ok {
+				return e.makeFault(node, env, "unknown shape: %s", list.Shape)
+			}
+			for i, f := range shapeDef.Fields {
+				if f == fieldName && i < len(list.Elements) {
+					return list.Elements[i]
+				}
+			}
+			return e.makeFault(node, env, "no field %s in @%s", fieldName, list.Shape)
+		}
+	}
+
+	return value.EMPTY
+}

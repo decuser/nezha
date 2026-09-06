@@ -1,0 +1,12 @@
+# Aiki CLI recursive-target policy.
+[lint]
+**/.*
+
+[fmt]
+**/.*
+
+[distfmt]
+**/.*
+
+[tags]
+.git/**

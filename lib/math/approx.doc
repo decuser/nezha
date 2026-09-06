@@ -1,0 +1,30 @@
+@preamble use("math/approx")
+sin
+Returns an approximation of the sine of x, where x is in radians.
+The approximation strategy and physical numeric representation are implementation
+details rather than part of the module contract.
+
+sin(x)
+
+sin(0)           # 0
+sin(3.14159/2)   # approximately 1
+===
+cos
+Returns an approximation of the cosine of x, where x is in radians.
+The approximation strategy and physical numeric representation are implementation
+details rather than part of the module contract.
+
+cos(x)
+
+cos(0)           # 1
+cos(3.14159)     # approximately -1
+===
+sqrt
+Returns an approximation of the square root of x. Negative inputs fault.
+The approximation strategy and physical numeric representation are implementation
+details rather than part of the module contract.
+
+sqrt(x)
+
+sqrt(4)     # 2
+sqrt(2)     # approximately 1.414

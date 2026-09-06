@@ -1,0 +1,155 @@
+program 3:1
+  statement 3:1
+    let_stmt 3:1
+      TERMINAL 3:1 "let"
+      NAME 3:5 "msg"
+      TERMINAL 3:9 "="
+      expr 3:11
+        pipe_expr 3:11
+          infix_expr 3:11
+            unary_expr 3:11
+              postfix_expr 3:11
+                primary 3:11
+                  list_literal 3:11
+                    TERMINAL 3:11 "["
+                    SHAPE 3:12 "@ok"
+                    TERMINAL 3:15 ","
+                    expr 3:17
+                      pipe_expr 3:17
+                        infix_expr 3:17
+                          unary_expr 3:17
+                            postfix_expr 3:17
+                              primary 3:17
+                                STRING 3:17 "\"hi\""
+                    TERMINAL 3:21 ","
+                    expr 3:23
+                      pipe_expr 3:23
+                        infix_expr 3:23
+                          unary_expr 3:23
+                            postfix_expr 3:23
+                              primary 3:23
+                                NUMBER 3:23 "1"
+                    TERMINAL 3:24 ","
+                    expr 3:26
+                      pipe_expr 3:26
+                        infix_expr 3:26
+                          unary_expr 3:26
+                            postfix_expr 3:26
+                              primary 3:26
+                                NUMBER 3:26 "2/1"
+                    TERMINAL 3:29 "]"
+  TERMINAL 3:30 ";"
+  statement 4:1
+    expr_stmt 4:1
+      expr 4:1
+        pipe_expr 4:1
+          infix_expr 4:1
+            unary_expr 4:1
+              postfix_expr 4:1
+                primary 4:1
+                  NAME 4:1 "print"
+                call 4:6
+                  TERMINAL 4:6 "("
+                  expr 4:7
+                    pipe_expr 4:7
+                      infix_expr 4:7
+                        unary_expr 4:7
+                          postfix_expr 4:7
+                            primary 4:7
+                              NAME 4:7 "shape"
+                            call 4:12
+                              TERMINAL 4:12 "("
+                              expr 4:13
+                                pipe_expr 4:13
+                                  infix_expr 4:13
+                                    unary_expr 4:13
+                                      postfix_expr 4:13
+                                        primary 4:13
+                                          NAME 4:13 "msg"
+                              TERMINAL 4:16 ")"
+                  TERMINAL 4:17 ","
+                  expr 4:19
+                    pipe_expr 4:19
+                      infix_expr 4:19
+                        unary_expr 4:19
+                          postfix_expr 4:19
+                            primary 4:19
+                              STRING 4:19 "\"\\n\""
+                  TERMINAL 4:23 ")"
+  TERMINAL 4:24 ";"
+  statement 5:1
+    expr_stmt 5:1
+      expr 5:1
+        pipe_expr 5:1
+          infix_expr 5:1
+            unary_expr 5:1
+              postfix_expr 5:1
+                primary 5:1
+                  NAME 5:1 "print"
+                call 5:6
+                  TERMINAL 5:6 "("
+                  expr 5:7
+                    pipe_expr 5:7
+                      infix_expr 5:7
+                        unary_expr 5:7
+                          postfix_expr 5:7
+                            primary 5:7
+                              NAME 5:7 "first"
+                            call 5:12
+                              TERMINAL 5:12 "("
+                              expr 5:13
+                                pipe_expr 5:13
+                                  infix_expr 5:13
+                                    unary_expr 5:13
+                                      postfix_expr 5:13
+                                        primary 5:13
+                                          NAME 5:13 "msg"
+                              TERMINAL 5:16 ")"
+                  TERMINAL 5:17 ","
+                  expr 5:19
+                    pipe_expr 5:19
+                      infix_expr 5:19
+                        unary_expr 5:19
+                          postfix_expr 5:19
+                            primary 5:19
+                              STRING 5:19 "\"\\n\""
+                  TERMINAL 5:23 ")"
+  TERMINAL 5:24 ";"
+  statement 6:1
+    expr_stmt 6:1
+      expr 6:1
+        pipe_expr 6:1
+          infix_expr 6:1
+            unary_expr 6:1
+              postfix_expr 6:1
+                primary 6:1
+                  NAME 6:1 "print"
+                call 6:6
+                  TERMINAL 6:6 "("
+                  expr 6:7
+                    pipe_expr 6:7
+                      infix_expr 6:7
+                        unary_expr 6:7
+                          postfix_expr 6:7
+                            primary 6:7
+                              NAME 6:7 "rest"
+                            call 6:11
+                              TERMINAL 6:11 "("
+                              expr 6:12
+                                pipe_expr 6:12
+                                  infix_expr 6:12
+                                    unary_expr 6:12
+                                      postfix_expr 6:12
+                                        primary 6:12
+                                          NAME 6:12 "msg"
+                              TERMINAL 6:15 ")"
+                  TERMINAL 6:16 ","
+                  expr 6:18
+                    pipe_expr 6:18
+                      infix_expr 6:18
+                        unary_expr 6:18
+                          postfix_expr 6:18
+                            primary 6:18
+                              STRING 6:18 "\"\\n\""
+                  TERMINAL 6:22 ")"
+  TERMINAL 6:23 ";"

@@ -1,0 +1,162 @@
+# Prelude - minimal core
+# This file has explicit runtime authority for only the _prefixed primitives it uses.
+# Only evaluator-privileged and irreducible primitives belong here.
+# Everything else lives in lib/.
+# Evaluator-privileged intrinsics
+let apply = (fn, args) {
+	_apply(fn, args)
+}
+
+let load = (path) {
+	_load(path)
+}
+
+let stack_limit = (n) {
+	_stack_limit(n)
+}
+
+# Concurrency (requires runtime)
+let spawn = (fn, ...args) {
+	_apply(_spawn, _prepend(args, fn))
+}
+
+let channel = () {
+	_channel()
+}
+
+let send = (ch, val) {
+	_send(ch, val)
+}
+
+let recv = (ch) {
+	_recv(ch)
+}
+
+# I/O (irreducible)
+let print = (...args) {
+	apply(_print, args)
+}
+
+let println = (...args) {
+	apply(_print, args)
+	_print("\n")
+}
+
+let read = () {
+	_read()
+}
+
+let input = () {
+	_read()
+}
+
+# List intrinsics (wrappers over _ builtins)
+let first = (list) {
+	_first(list)
+}
+
+let rest = (list) {
+	_rest(list)
+}
+
+let length = (list) {
+	_length(list)
+}
+
+let prepend = (list, val) {
+	_prepend(list, val)
+}
+
+let append = (list, val) {
+	_append(list, val)
+}
+
+let empty = (list) {
+	_empty(list)
+}
+
+# Type system intrinsics
+let type = (val) {
+	_type(val)
+}
+
+let inspect = (val) {
+	_inspect(val)
+}
+
+let equal = (a, b) {
+	_equal(a, b)
+}
+
+let ord = (r) {
+	_ord(r)
+}
+
+let chr = (n) {
+	_chr(n)
+}
+
+let shape = (val) {
+	_shape(val)
+}
+
+let is_error = (val) {
+	_equal(_shape(val), :error)
+}
+
+let to_str = (val) {
+	_to_str(val)
+}
+
+let to_decimal = (n, places) {
+	_to_decimal(n, places)
+}
+
+let to_number = (s) {
+	_to_number(s)
+}
+
+let to_symbol = (s) {
+	_to_symbol(s)
+}
+
+let shaped = (sym, elements) {
+	_make_shaped_list(sym, elements)
+}
+
+# REPL control (evaluator-privileged)
+let quit = () {
+	_quit()
+}
+
+let reset = () {
+	_reset()
+}
+
+let delete = (name) {
+	_delete(name)
+}
+
+let abs = (x) {
+	if x < 0 {
+		0 - x
+	} else {
+		x
+	}
+}
+
+let truncate = (x) {
+	_truncate(x)
+}
+
+let help = (...args) {
+	if empty(args) {
+		_help("")
+	} else {
+		_help(first(args))
+	}
+}
+
+let doc = (name) {
+	_doc(name)
+}

@@ -1,0 +1,53 @@
+@preamble use("regex/ffi")
+matches
+Returns true if the pattern matches anywhere in the string.
+The pattern need not match the entire string unless its expression requires it.
+
+matches(s, pattern)
+
+matches("123", "[0-9]+")         # true
+matches("abc123", "[0-9]+")      # true
+matches("abc", "[0-9]+")         # false
+matches("hello world", "^hello") # true
+===
+find
+Returns the first match as a shaped value [@match, start, end, text].
+start and end are rune indexes into s, so they may be used directly with
+string indexing and with the string module.
+Returns [@error, :regex, "no match"] if the pattern does not match.
+
+find(s, pattern)
+
+find("abc123def", "[0-9]+")    # [@match, 3, 6, "123"]
+find("abcdef", "[0-9]+")       # [@error, :regex, "no match"]
+===
+find_all
+Returns a list of all non-overlapping matches, each as [@match, start, end, text].
+Returns [] if the pattern does not match.
+
+find_all(s, pattern)
+
+find_all("a1b2c3", "[0-9]+")   # [[@match, 1, 2, "1"], [@match, 3, 4, "2"], [@match, 5, 6, "3"]]
+===
+replace
+Replaces all matches of the pattern with the replacement string.
+Capture groups may be referenced in the replacement as $1, $2, and so forth.
+
+replace(s, pattern, replacement)
+
+replace("a1b2c3", "[0-9]", "X")    # "aXbXcX"
+===
+replace_first
+Replaces only the first match of the pattern.
+The replacement is inserted literally; capture references are not expanded.
+
+replace_first(s, pattern, replacement)
+
+replace_first("a1b2c3", "[0-9]", "X")    # "aXb2c3"
+===
+split
+Splits the string at matches of the pattern and returns the parts as a list.
+
+split(s, pattern)
+
+split("a, b, c", ",\\s*")    # ["a", "b", "c"]

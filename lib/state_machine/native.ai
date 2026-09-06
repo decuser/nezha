@@ -1,0 +1,478 @@
+package "state_machine/native"
+
+let store = import("store")
+let math = import("math/native")
+let bits = import("bits/native")
+let op = import("state_machine/ops")
+
+# Reference realization. This intentionally uses ordinary Aiki values and
+# control flow so differential tests have an independent semantic oracle.
+# Transition rows may use the legacy 8-field form or the masked 9-field form:
+# [state,event,guard_slot,guard_mask,guard_value,next,ops,emit_code,emit_slot].
+# Ops may use the legacy [kind,slot,arg] form or [kind,a,b,c].
+let _op4 = (op) {
+	if equal(length(op), 3) {
+		return [op[0], op[1], op[2], 0]
+	}
+	return op
+}
+
+let _slot_ok = (slot, count) {
+	return equal(type(slot), :number) and equal(slot, truncate(slot)) and (slot >= 0) and (slot < count)
+}
+
+let _validate_extended_ops = (slot_count, addr18_slots, transitions) {
+	let ti = 0
+	while ti < length(transitions) {
+		let t = transitions[ti]
+		let ops_index = 5
+		if equal(length(t), 9) {
+			ops_index = 6
+		}
+		let machine_ops = t[ops_index]
+		let oi = 0
+		while oi < length(machine_ops) {
+			let current = _op4(machine_ops[oi])
+			let kind = current[0]
+			if (kind < 0) or (kind > op.LOAD_BYTE_ADDR18) {
+				return [@error, :state_machine, "operation id out of range"]
+			}
+			let a = current[1]
+			let b = current[2]
+			let c = current[3]
+			if equal(kind, op.ADDR18_FROM_WORD) or equal(kind, op.ADDR18_ADD_WORD) {
+				if not _slot_ok(a, addr18_slots) or not _slot_ok(c, slot_count) {
+					return [@error, :state_machine, "addr18/word slot out of range"]
+				}
+			} else if equal(kind, op.ADDR18_SHL) {
+				if not _slot_ok(a, addr18_slots) or (b < 0) or (b > 31) {
+					return [@error, :state_machine, "addr18 shift operand out of range"]
+				}
+			} else if equal(kind, op.LOAD_WORD_ADDR18) or equal(kind, op.LOAD_BYTE_ADDR18) {
+				if not _slot_ok(a, slot_count) or not _slot_ok(c, addr18_slots) {
+					return [@error, :state_machine, "addr18 load slot out of range"]
+				}
+			} else if equal(kind, op.STAGE_WORD_ADDR18) or equal(kind, op.STAGE_BYTE_ADDR18) {
+				if not _slot_ok(a, slot_count) or not _slot_ok(c, addr18_slots) {
+					return [@error, :state_machine, "addr18 staged-store slot out of range"]
+				}
+			} else if (kind >= op.ADD_WORD) and (kind <= op.SUB_OVERFLOW_WORD) {
+				if not _slot_ok(a, slot_count) or not _slot_ok(b, slot_count) or not _slot_ok(c, slot_count) {
+					return [@error, :state_machine, "word ALU slot out of range"]
+				}
+			}
+			oi = oi + 1
+		}
+		ti = ti + 1
+	}
+	return true
+}
+
+let compile = (state_count, slot_count, initial_state, emit_capacity, transitions, ...args) {
+	let addr18_slots = 0
+	if not empty(args) {
+		if not empty(rest(args)) {
+			return [@error, :arity, "compile expects five arguments and optional addr18 slot count"]
+		}
+		addr18_slots = first(args)
+	}
+	let admitted = _validate_extended_ops(slot_count, addr18_slots, transitions)
+	if is_error(admitted) {
+		return admitted
+	}
+	[state_count, slot_count, initial_state, emit_capacity, transitions, addr18_slots]
+}
+
+let new = (program, initial_slots, ...args) {
+	let bindings = []
+	if not empty(args) {
+		if not empty(rest(args)) {
+			return [@error, :arity, "new expects program, slots, and optional bindings"]
+		}
+		bindings = first(args)
+	}
+	let m = store.new(8)
+	store.set(m, 0, program)
+	store.set(m, 1, program[2])
+	store.set(m, 2, initial_slots)
+	store.set(m, 3, [])
+	store.set(m, 4, 0)
+	store.set(m, 5, bindings)
+	let addr18_slots = 0
+	if length(program) > 5 {
+		addr18_slots = program[5]
+	}
+	let wide = []
+	let wi = 0
+	while wi < addr18_slots {
+		wide = append(wide, 0)
+		wi = wi + 1
+	}
+	store.set(m, 6, wide)
+	# Machine-local write journal: [binding, byte_address, value, byte_write].
+	store.set(m, 7, [])
+	m
+}
+
+let _wrap16 = (n) {
+	math.modulo(n, 65536)
+}
+
+let _publish = (m, code, val) {
+	let program = store.get(m, 0)
+	let cap = program[3]
+	let out = store.get(m, 3)
+	if equal(cap, 0) or length(out) >= cap {
+		store.set(m, 4, store.get(m, 4) + 1)
+		return []
+	}
+	store.set(m, 3, append(out, [code, val]))
+	[]
+}
+
+let _replace = (xs, index, val) {
+	let out = []
+	let i = 0
+	while i < length(xs) {
+		if equal(i, index) {
+			out = append(out, val)
+		} else {
+			out = append(out, xs[i])
+		}
+		i = i + 1
+	}
+	out
+}
+
+let _byte_odd = (address) {
+	return not equal(address, (truncate(address / 2) * 2))
+}
+
+let _word_with_byte = (word, address, value) {
+	let byte = bits.bit_and(value, 255)
+	if _byte_odd(address) {
+		return bits.bit_or(bits.bit_and(word, 255), bits.shl(byte, 8))
+	}
+	return bits.bit_or(bits.bit_and(word, 65280), byte)
+}
+
+# Read the effective word after applying staged writes in journal order. This is
+# the reference transaction overlay used by both word and byte loads.
+let _overlay_word = (bindings, journal, binding, address) {
+	let index = truncate(address / 2)
+	if (binding < 0) or (binding >= length(bindings)) or (index < 0) or (index >= length(bindings[binding])) {
+		return [@error, :state_machine, "transactional load out of range"]
+	}
+	let word = bindings[binding][index]
+	let i = 0
+	while i < length(journal) {
+		let write = journal[i]
+		if equal(write[0], binding) and equal(truncate(write[1] / 2), index) {
+			if write[3] {
+				word = _word_with_byte(word, write[1], write[2])
+			} else {
+				word = _wrap16(write[2])
+			}
+		}
+		i = i + 1
+	}
+	return _wrap16(word)
+}
+
+let _stage_write = (m, binding, address, value, byte_write) {
+	let bindings = store.get(m, 5)
+	let index = truncate(address / 2)
+	if (binding < 0) or (binding >= length(bindings)) or (index < 0) or (index >= length(bindings[binding])) {
+		return [@error, :state_machine, "transactional store out of range"]
+	}
+	if (not byte_write) and _byte_odd(address) {
+		return [@error, :state_machine, "odd transactional word store"]
+	}
+	let journal = store.get(m, 7)
+	store.set(m, 7, append(journal, [binding, address, _wrap16(value), byte_write]))
+	return true
+}
+
+let _masked_guard = (slots, t) {
+	let gs = t[2]
+	if gs < 0 {
+		return true
+	}
+	if equal(length(t), 8) {
+		return equal(slots[gs], t[3])
+	}
+	return equal(bits.bit_and(slots[gs], t[3]), t[4])
+}
+
+let _next_index = (t) {
+	if equal(length(t), 8) {
+		return 4
+	}
+	return 5
+}
+
+let _ops_index = (t) {
+	if equal(length(t), 8) {
+		return 5
+	}
+	return 6
+}
+
+let _emit_code_index = (t) {
+	if equal(length(t), 8) {
+		return 6
+	}
+	return 7
+}
+
+let _emit_slot_index = (t) {
+	if equal(length(t), 8) {
+		return 7
+	}
+	return 8
+}
+
+let step = (m, event) {
+	let program = store.get(m, 0)
+	let state_now = store.get(m, 1)
+	let slots = store.get(m, 2)
+	let bindings = store.get(m, 5)
+	let addr18 = store.get(m, 6)
+	let journal = store.get(m, 7)
+	let transitions = program[4]
+	let i = 0
+	while i < length(transitions) {
+		let t = transitions[i]
+		if equal(t[0], state_now) and equal(t[1], event) and _masked_guard(slots, t) {
+			let ops = t[_ops_index(t)]
+			let j = 0
+			while j < length(ops) {
+				let op = _op4(ops[j])
+				let kind = op[0]
+				let a = op[1]
+				let b = op[2]
+				let c = op[3]
+				if equal(kind, 0) {
+					slots = _replace(slots, a, b)
+				} else if equal(kind, 1) {
+					slots = _replace(slots, a, _wrap16(slots[a] + b))
+				} else if equal(kind, 2) {
+					slots = _replace(slots, a, slots[c])
+				} else if equal(kind, 3) {
+					slots = _replace(slots, a, bits.bit_and(slots[a], b))
+				} else if equal(kind, 4) {
+					slots = _replace(slots, a, bits.bit_or(slots[a], b))
+				} else if equal(kind, 5) {
+					slots = _replace(slots, a, bits.bit_xor(slots[a], b))
+				} else if equal(kind, 6) {
+					slots = _replace(slots, a, _wrap16(bits.shl(slots[a], b)))
+				} else if equal(kind, 7) {
+					slots = _replace(slots, a, bits.shr(slots[a], b))
+				} else if equal(kind, 8) {
+					let loaded = _overlay_word(bindings, journal, b, slots[c] * 2)
+					if is_error(loaded) {
+						return loaded
+					}
+					slots = _replace(slots, a, loaded)
+				} else if equal(kind, 9) {
+					let changed = _replace(bindings[b], slots[c], slots[a])
+					bindings = _replace(bindings, b, changed)
+					store.set(m, 5, bindings)
+				} else if equal(kind, 10) {
+					addr18 = _replace(addr18, a, slots[c])
+				} else if equal(kind, 11) {
+					addr18 = _replace(addr18, a, bits.low(bits.shl(addr18[a], b), 18))
+				} else if equal(kind, 12) {
+					addr18 = _replace(addr18, a, bits.low(addr18[a] + slots[c], 18))
+				} else if equal(kind, 13) {
+					let address = addr18[c]
+					if _byte_odd(address) {
+						return [@error, :state_machine, "odd addr18 word load"]
+					}
+					let loaded = _overlay_word(bindings, journal, b, address)
+					if is_error(loaded) {
+						return loaded
+					}
+					slots = _replace(slots, a, loaded)
+				} else if equal(kind, 14) {
+					slots = _replace(slots, a, _wrap16(slots[b] + slots[c]))
+				} else if equal(kind, 15) {
+					slots = _replace(slots, a, _wrap16(slots[b] - slots[c]))
+				} else if equal(kind, 16) {
+					slots = _replace(slots, a, bits.bit_and(slots[b], slots[c]))
+				} else if equal(kind, 17) {
+					slots = _replace(slots, a, bits.bit_or(slots[b], slots[c]))
+				} else if equal(kind, 18) {
+					slots = _replace(slots, a, bits.bit_xor(slots[b], slots[c]))
+				} else if equal(kind, 19) {
+					let carry = 0
+					if (slots[b] + slots[c]) > 65535 {
+						carry = 1
+					}
+					slots = _replace(slots, a, carry)
+				} else if equal(kind, 20) {
+					let borrow = 0
+					if slots[b] < slots[c] {
+						borrow = 1
+					}
+					slots = _replace(slots, a, borrow)
+				} else if equal(kind, 21) {
+					let left = slots[b]
+					let right = slots[c]
+					if left >= 32768 {
+						left = left - 65536
+					}
+					if right >= 32768 {
+						right = right - 65536
+					}
+					let sum = left + right
+					let overflow = 0
+					if (sum < -32768) or (sum > 32767) {
+						overflow = 1
+					}
+					slots = _replace(slots, a, overflow)
+				} else if equal(kind, 22) {
+					let left = slots[b]
+					let right = slots[c]
+					if left >= 32768 {
+						left = left - 65536
+					}
+					if right >= 32768 {
+						right = right - 65536
+					}
+					let difference = left - right
+					let overflow = 0
+					if (difference < -32768) or (difference > 32767) {
+						overflow = 1
+					}
+					slots = _replace(slots, a, overflow)
+				} else if equal(kind, 23) {
+					let staged = _stage_write(m, b, addr18[c], slots[a], false)
+					if is_error(staged) {
+						return staged
+					}
+					journal = store.get(m, 7)
+				} else if equal(kind, 24) {
+					let staged = _stage_write(m, b, addr18[c], slots[a], true)
+					if is_error(staged) {
+						return staged
+					}
+					journal = store.get(m, 7)
+				} else if equal(kind, 25) {
+					let address = addr18[c]
+					let loaded = _overlay_word(bindings, journal, b, address)
+					if is_error(loaded) {
+						return loaded
+					}
+					let byte = bits.bit_and(loaded, 255)
+					if _byte_odd(address) {
+						byte = bits.bit_and(bits.shr(loaded, 8), 255)
+					}
+					slots = _replace(slots, a, byte)
+				} else {
+					return [@error, :state_machine, "unknown operation"]
+				}
+				j = j + 1
+			}
+			store.set(m, 2, slots)
+			store.set(m, 6, addr18)
+			store.set(m, 1, t[_next_index(t)])
+			let ec = t[_emit_code_index(t)]
+			let es = t[_emit_slot_index(t)]
+			if ec >= 0 {
+				_publish(m, ec, slots[es])
+			}
+			return true
+		}
+		i = i + 1
+	}
+	return [@error, :transition, "no admitted transition"]
+}
+
+let run = (m, event, count) {
+	let i = 0
+	while i < count {
+		let r = step(m, event)
+		if is_error(r) {
+			return r
+		}
+		i = i + 1
+	}
+	count
+}
+
+let run_until = (m, event, count, stop_state) {
+	let i = 0
+	while (i < count) and not equal(state(m), stop_state) {
+		let r = step(m, event)
+		if is_error(r) {
+			return r
+		}
+		i = i + 1
+	}
+	return i
+}
+
+let state = (m) {
+	store.get(m, 1)
+}
+
+let slot = (m, i) {
+	store.get(m, 2)[i]
+}
+
+let outputs = (m) {
+	store.get(m, 3)
+}
+
+let dropped = (m) {
+	store.get(m, 4)
+}
+
+let staged_writes = (m) {
+	return length(store.get(m, 7))
+}
+
+let discard_writes = (m) {
+	store.set(m, 7, [])
+	return true
+}
+
+let commit_writes = (m) {
+	let bindings = store.get(m, 5)
+	let journal = store.get(m, 7)
+	let i = 0
+	while i < length(journal) {
+		let write = journal[i]
+		let binding = write[0]
+		let address = write[1]
+		let index = truncate(address / 2)
+		let word = bindings[binding][index]
+		if write[3] {
+			word = _word_with_byte(word, address, write[2])
+		} else {
+			word = _wrap16(write[2])
+		}
+		let changed = _replace(bindings[binding], index, word)
+		bindings = _replace(bindings, binding, changed)
+		i = i + 1
+	}
+	store.set(m, 5, bindings)
+	store.set(m, 7, [])
+	return true
+}
+
+export(
+	:compile,
+	:new,
+	:step,
+	:run,
+	:run_until,
+	:state,
+	:slot,
+	:outputs,
+	:dropped,
+	:staged_writes,
+	:commit_writes,
+	:discard_writes
+)

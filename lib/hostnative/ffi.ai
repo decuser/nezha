@@ -1,0 +1,8 @@
+package "hostnative/ffi"
+
+# Generic one-time binding from a declarative host-native implementation/operation identity to a
+# resolved callable. Implementation-specific names remain module data; execution of
+# the returned callable performs no name lookup.
+let bind = _hostnative_bind
+
+export(:bind)

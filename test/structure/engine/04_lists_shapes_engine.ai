@@ -1,0 +1,6 @@
+# 04_lists_shapes_engine.ai
+# List literals, shapes, and list ops.
+let msg = [@ok, "hi", 1, 2/1]
+print(shape(msg), "\n")
+print(first(msg), "\n")
+print(rest(msg), "\n")

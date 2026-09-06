@@ -1,0 +1,323 @@
+apply
+Applies a function to a list of arguments.
+
+apply(fn, args)
+
+let add = (a, b) { a + b }
+apply(add, [1, 2])  # 3
+===
+load
+@unchecked
+Loads and evaluates an aiki source file.
+
+load(path)
+
+load("utils.ai")
+load("lib/helpers.ai")
+===
+stack_limit
+@unchecked
+
+Sets the maximum non tail call depth for evaluation. Tail calls do not consume stack.
+
+stack_limit(n)
+
+n must be an integer >= 1.
+
+Example
+
+stack_limit(10000)
+===
+spawn
+@unchecked
+Runs a function concurrently with an isolated environment.
+The spawned function only sees its arguments and prelude -
+no access to outer scope bindings. Values passed as arguments cross the
+isolation boundary explicitly. If a spawned computation faults while another
+computation is blocked in send, recv, or select, that blocking operation is
+released and the spawned fault propagates. Recoverable [@error, ...] values
+remain ordinary values and may be sent through channels normally.
+
+spawn(fn, arg, ...)
+
+let worker = (ch) { send(ch, 42) }
+let ch = channel()
+spawn(worker, ch)
+recv(ch)  # 42
+===
+channel
+@unchecked
+Creates a new unbuffered channel for communication between
+concurrent functions.
+
+channel()
+
+let ch = channel()
+===
+send
+@unchecked
+Sends a value on a channel. Blocks until the value is received.
+
+send(ch, val)
+
+send(ch, 42)
+send(ch, [@done])
+===
+recv
+@unchecked
+Receives a value from a channel. Blocks until a value is sent.
+
+recv(ch)
+
+let val = recv(ch)
+===
+print
+@unchecked
+Prints values to stdout without newline.
+
+print(val, ...)
+
+print("hello")
+print("x = ", x)
+===
+println
+@unchecked
+Prints values to stdout followed by a newline. With no arguments,
+prints just a newline.
+
+println(val, ...)
+
+println("Hello")          # prints "Hello\n"
+println("x = ", 42)       # prints "x = 42\n"
+println()                 # prints "\n"
+===
+read
+@unchecked
+Reads a line from stdin. Returns string without newline,
+or [@end] on EOF.
+
+read()
+
+let name = read()
+===
+input
+@unchecked
+Reads a line from stdin (alias for read).
+
+input()
+
+let name = input()
+===
+first
+Returns the first element of a list.
+
+first(list)
+
+first([1, 2, 3])      # 1
+first(["a", "b"])     # "a"
+===
+rest
+Returns a new list without the first element.
+
+rest(list)
+
+rest([1, 2, 3])       # [2, 3]
+rest([1])             # []
+===
+length
+Returns the number of elements in a list.
+
+length(list)
+
+length([1, 2, 3])     # 3
+length([])            # 0
+===
+prepend
+Returns a new list with the value at the front.
+
+prepend(list, val)
+
+prepend([2, 3], 1)    # [1, 2, 3]
+===
+append
+Returns a new list with the value at the end.
+
+append(list, val)
+
+append([1, 2], 3)     # [1, 2, 3]
+===
+empty
+Returns true if the list has no elements.
+
+empty(list)
+
+empty([])             # true
+empty([1])            # false
+===
+abs
+Returns the absolute value of a number.
+
+abs(n)
+
+abs(-5)    # 5
+abs(3)     # 3
+abs(0)     # 0
+===
+truncate
+Truncates a number toward zero, returning its integer part.
+
+truncate(n)
+
+truncate(2.7)     # 2
+truncate(-2.7)    # -2
+truncate(0)       # 0
+===
+type
+Returns the type of a value as a symbol.
+
+type(val)
+
+type(42)              # :number
+type("hi")            # :string
+type([1, 2])          # :list
+type(true)            # :boolean
+===
+inspect
+Returns a string representation of any value.
+
+inspect(val)
+
+inspect(42)           # "42"
+inspect([1, 2])       # "[1, 2]"
+===
+equal
+Returns true if two values are deeply equal.
+
+equal(a, b)
+
+equal(1, 1)           # true
+equal(:ok, :ok)       # true
+equal(1, 2)           # false
+===
+shape
+Returns the shape name of a shaped list, or :list for plain lists.
+
+shape(val)
+
+shape([@point, 1, 2]) # :point
+shape([1, 2, 3])      # :list
+===
+is_error
+Returns true if the value is a shaped error [@error, ...].
+
+is_error(val)
+
+is_error([@error, :lookup, "not found"])  # true
+is_error([1, 2, 3])                        # false
+===
+ord
+Returns the integer code point of a rune.
+
+ord(rune)
+
+ord('A')              # 65
+ord('a')              # 97
+===
+chr
+Returns the rune for an integer code point.
+Inverse of ord.
+
+chr(n)
+
+chr(65)               # 'A'
+chr(97)               # 'a'
+chr(8364)             # '€'
+ord(chr(65))          # 65
+===
+to_str
+Converts a value to its string representation.
+
+to_str(val)
+
+to_str(42)            # "42"
+to_str('A')           # "A"
+===
+to_number
+Parses a string as a number.
+
+to_number(str)
+
+to_number("42")       # 42
+to_number("3.14")     # 3.14
+===
+to_symbol
+Constructs a symbol from its value-level name. The colon used in source syntax is not part of the name.
+
+to_symbol(str)
+
+to_symbol("foo")       # :foo
+to_symbol("point")     # :point
+===
+shaped
+Returns the elements as a shaped list carrying the supplied symbol.
+
+shaped(symbol, elements)
+
+shaped(:point, [1, 2])                 # [@point, 1, 2]
+shaped(to_symbol("point"), [1, 2])     # [@point, 1, 2]
+===
+to_decimal
+Formats a number as a decimal string with specified places.
+
+to_decimal(n, places)
+
+to_decimal(3.14159, 2)  # "3.14"
+to_decimal(1/3, 4)      # "0.3333"
+===
+quit
+@unchecked
+Exits the REPL.
+
+quit()
+
+quit()
+===
+reset
+@unchecked
+Resets the environment to initial state.
+
+reset()
+
+reset()
+===
+delete
+@unchecked
+Deletes a user binding by name, allowing a shadowed prelude function to be visible again.
+
+delete(name)
+
+name must be a string.
+
+Returns true if a binding was deleted, false otherwise.
+
+let print = 1
+delete("print")
+print("restored!")
+===
+help
+@unchecked
+Shows help for a function.
+
+help(name)
+
+help(:print)
+help(:append)
+===
+doc
+@unchecked
+Shows full documentation for a function.
+
+doc(name)
+
+doc(:spawn)
+doc(:equal)

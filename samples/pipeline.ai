@@ -1,0 +1,22 @@
+# 1. Define your atomic tools
+let list = import("list")
+let math = import("math/ffi")
+
+let square = (x) {
+	return x * x
+}
+
+let is_even = (x) {
+	return equal(math.modulo(x, 2), 0)
+}
+
+# 2. The Pipeline
+# Reads left-to-right: Generate -> Filter -> Transform -> Aggregate
+list.range(1, 11) |>
+list.filter(is_even) |>
+list.map(square) |>
+list.sum() |>
+print()
+
+
+print("\n")

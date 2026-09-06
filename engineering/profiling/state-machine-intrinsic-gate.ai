@@ -1,0 +1,53 @@
+let time = import("time")
+let ref = import("state_machine/native")
+let fast = import("state_machine/ffi")
+
+# Neutral, domain-free two-state machine. Event 1 alternates states and
+# increments one 16-bit slot. No emission in the speed witness.
+let transitions = [
+	[0, 1, -1, 0, 1, [[1, 0, 1]], -1, -1],
+	[1, 1, -1, 0, 0, [[1, 0, 1]], -1, -1]
+]
+
+
+let count = 1000000
+
+let rp = ref.compile(2, 1, 0, 0, transitions)
+let fp = fast.compile(2, 1, 0, 0, transitions)
+let rm = ref.new(rp, [0])
+let fm = fast.new(fp, [0])
+
+let r0 = time.now()
+let rr = ref.run(rm, 1, count)
+let r1 = time.now()
+let f0 = time.now()
+let fr = fast.run(fm, 1, count)
+let f1 = time.now()
+
+let ref_ms = r1 - r0
+let fast_ms = f1 - f0
+println("STATE MACHINE INTRINSIC GATE")
+println("steps      " + to_str(count))
+println("reference  " + to_str(ref_ms) + " ms")
+println("intrinsic  " + to_str(fast_ms) + " ms")
+println("ref state  " + to_str(ref.state(rm)) + " slot " + to_str(ref.slot(rm, 0)))
+println("ffi state  " + to_str(fast.state(fm)) + " slot " + to_str(fast.slot(fm, 0)))
+if not equal(rr, fr) or not equal(ref.state(rm), fast.state(fm)) or not equal(ref.slot(rm, 0), fast.slot(fm, 0)) {
+	println("PARITY FAIL")
+	quit(1)
+}
+
+println("PARITY PASS")
+if equal(fast_ms, 0) {
+	println("SPEED PASS >=10x (intrinsic below 1 ms timer resolution)")
+	quit(0)
+}
+
+let ratio = ref_ms / fast_ms
+println("speedup    " + to_str(ratio) + "x")
+if ratio < 10 {
+	println("SPEED FAIL <10x")
+	quit(1)
+}
+
+println("SPEED PASS >=10x")

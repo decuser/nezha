@@ -1,0 +1,12 @@
+# The newline intentionally terminates foo(); (bar) is a second expression.
+# No output is expected; an empty gold pins successful parsing of that ambiguity.
+let foo = () {
+	return (n) {
+		return n
+	}
+}
+
+let bar = 1
+
+foo()
+(bar)

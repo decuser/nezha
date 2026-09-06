@@ -1,0 +1,9 @@
+@summary "target - shared recursive CLI target resolution and ignore policy"
+
+@func resolve
+@template "resolve(base, tool, targets, recurse_plain_dirs)"
+@help "Resolves exact and recursive filesystem targets with .aikiignore policy; returns [@targets, paths, excluded]."
+
+@func resolve_all
+@template "resolve_all(base, tool, targets, recurse_plain_dirs)"
+@help "Resolves targets exhaustively, bypassing .aikiignore policy while preserving normal target semantics."

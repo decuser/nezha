@@ -1,0 +1,11 @@
+# 02_blocks_if_engine.ai
+# Blocks, if, return.
+let abs = (n) {
+	if n < 0 {
+		return -n
+	}
+	return n
+}
+
+print(abs(-10), "\n")
+print(abs(7), "\n")

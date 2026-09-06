@@ -1,0 +1,49 @@
+@summary "state_machine - fixed-width state-machine semantics"
+
+@func compile
+@template "compile(state_count, slot_count, initial_state, emit_capacity, transitions, ...args)"
+@help "Admits a fixed-width state-machine program; an optional sixth argument declares separate 18-bit address scratch slots while ordinary slots remain 16-bit."
+
+@func new
+@template "new(program, initial_slots, ...args)"
+@help "Creates a mutable machine instance; optional bindings are typed word stores."
+
+@func step
+@template "step(m, event)"
+@help "Executes one admitted transition for event."
+
+@func run
+@template "run(m, event, count)"
+@help "Executes count repeated events."
+
+@func run_until
+@template "run_until(m, event, count, stop_state)"
+@help "Executes up to count events, stopping when stop_state is reached."
+
+@func state
+@template "state(m)"
+@help "Returns the current numeric state id."
+
+@func slot
+@template "slot(m, i)"
+@help "Returns slot i as an Aiki number."
+
+@func outputs
+@template "outputs(m)"
+@help "Returns the bounded observed output snapshot."
+
+@func dropped
+@template "dropped(m)"
+@help "Returns the bounded-output drop count."
+
+@func staged_writes
+@template "staged_writes(m)"
+@help "Returns the number of machine-local transactional writes awaiting commit."
+
+@func commit_writes
+@template "commit_writes(m)"
+@help "Atomically applies all previously staged bound-store writes and clears the machine-local journal."
+
+@func discard_writes
+@template "discard_writes(m)"
+@help "Discards all machine-local transactional writes without mutating bound stores."

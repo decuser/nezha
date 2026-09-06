@@ -1,0 +1,33 @@
+@summary "bytes/native - Aiki-native byte operations"
+
+@func str_to_bytes
+@template "str_to_bytes(s)"
+@help "Converts string to list of byte values."
+
+@func bytes_to_str
+@template "bytes_to_str(bytes)"
+@help "Converts list of byte values to string."
+
+@func bytes_new
+@template "bytes_new(list)"
+@help "Creates a byte value from a list of integers 0-255."
+
+@func bytes_get
+@template "bytes_get(bytes, i)"
+@help "Returns byte at index i."
+
+@func bytes_length
+@template "bytes_length(bytes)"
+@help "Returns length of byte list."
+
+@func bytes_slice
+@template "bytes_slice(bytes, start, end)"
+@help "Returns slice from start to end-1."
+
+@func digits_from_text
+@template "digits_from_text(text)"
+@help "Decodes ASCII decimal digits into byte values 0-9."
+
+@func digits_to_text
+@template "digits_to_text(bytes)"
+@help "Encodes byte values 0-9 as ASCII decimal digits."

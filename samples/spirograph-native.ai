@@ -1,0 +1,20 @@
+import("math/native", :sin, :cos)
+let cv = import("canvas")
+let time = import("time")
+
+let c = cv.canvas(800, 800)
+let tick = 0
+let R = 200
+let r = 80
+let d = 150
+let diff = R - r
+let ratio = diff / r
+while tick < 1257 {
+	let angle = tick / 100
+	let x = 400 + ((diff * cos(angle, 30)) + (d * cos(ratio * angle, 30)))
+	let y = 400 + ((diff * sin(angle, 30)) - (d * sin(ratio * angle, 30)))
+	cv.dot(c, x, y, :cyan)
+	tick = tick + 1
+}
+
+time.sleep(1000)

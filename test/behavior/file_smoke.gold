@@ -1,0 +1,20 @@
+OUT:true\n
+OUT:hello\n
+OUT:world\n
+OUT:test\n
+OUT:hello\n
+OUT:world\n
+OUT:test\n
+OUT:[@end]\n
+OUT:hello\n
+OUT:world\n
+OUT:test\n
+OUT:appended\n
+OUT:false\n
+OUT:Error caught\n
+OUT:done\n
+OUT:true\n
+OUT:whole\n
+OUT:file\n
+OUT:true\n
+OUT:ABC\n

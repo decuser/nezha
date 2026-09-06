@@ -1,0 +1,42 @@
+package "bits/ffi"
+
+# bits/ffi - provider-backed bit operations over non-negative integral numbers.
+let bit_and = _bits_and
+
+let bit_or = _bits_or
+
+let bit_xor = _bits_xor
+
+let bit_not = _bits_not
+
+let shl = _bits_shl
+
+let shr = _bits_shr
+
+let mask = (width) {
+	if width < 0 {
+		return _bits_shl(1, width)
+	}
+	if equal(width, 0) {
+		return 0
+	}
+	return shl(1, width) - 1
+}
+
+let low = (a, width) {
+	bit_and(a, mask(width))
+}
+
+let extract = (a, start, width) {
+	low(shr(a, start), width)
+}
+
+let replace = (a, start, width, value) {
+	let field_mask = shl(mask(width), start)
+	let selected = bit_and(a, field_mask)
+	let cleared = a - selected
+	let inserted = shl(low(value, width), start)
+	return bit_or(cleared, inserted)
+}
+
+export(:bit_and, :bit_or, :bit_xor, :bit_not, :shl, :shr, :mask, :low, :extract, :replace)

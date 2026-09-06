@@ -1,0 +1,17 @@
+package "math/ffi"
+
+# math/ffi - provider-backed exact math operations
+# These operations are accelerated semantic twins of math/native.
+let floor = (x) {
+	_floor(x)
+}
+
+let ceil = (x) {
+	_ceil(x)
+}
+
+let modulo = (a, b) {
+	_modulo(a, b)
+}
+
+export(:floor, :ceil, :modulo)

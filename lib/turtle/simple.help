@@ -1,0 +1,69 @@
+@summary "turtle/simple - Aiki-native stateful turtle facade over canvas"
+
+@func new
+@template "new(dim)"
+@help "Create or reset the canvas. new(dim) creates a dim x dim pixel canvas and remembers that size. new() reuses the current size."
+
+@func logical
+@template "logical(size)"
+@help "Set logical space to size x size. Rescales coordinate mapping."
+
+@func forward
+@template "forward(distance)"
+@help "Move turtle forward by distance."
+
+@func backward
+@template "backward(distance)"
+@help "Move turtle backward by distance."
+
+@func left
+@template "left(angle)"
+@help "Turn turtle left by angle degrees."
+
+@func right
+@template "right(angle)"
+@help "Turn turtle right by angle degrees."
+
+@func pen_up
+@template "pen_up()"
+@help "Lift pen; movement won't draw."
+
+@func pen_down
+@template "pen_down()"
+@help "Lower pen; movement will draw."
+
+@func pen_size
+@template "pen_size(n)"
+@help "Set pen width to n logical units."
+
+@func pencolor
+@template "pencolor(color)"
+@help "Set pen color. Accepts symbol (:red, :blue, etc.) or [r, g, b] list."
+
+@func background
+@template "background(color)"
+@help "Set canvas background color. Accepts symbol or [r, g, b] list."
+
+@func show_turtle
+@template "show_turtle()"
+@help "Show the turtle marker."
+
+@func hide_turtle
+@template "hide_turtle()"
+@help "Hide the turtle marker."
+
+@func home
+@template "home()"
+@help "Move to center without drawing, reset heading."
+
+@func clear
+@template "clear()"
+@help "Clear the canvas."
+
+@func position
+@template "position()"
+@help "Return position as [@point, x, y]."
+
+@func heading
+@template "heading()"
+@help "Return heading in degrees."

@@ -1,0 +1,38 @@
+package "hash/ffi"
+
+# hash/ffi - provider-backed realization of the hash/native contract.
+# The representation and semantics match hash/native; exported operations
+# execute through provider primitives rather than falling back to Aiki code.
+let hash_code = (val) {
+	_hash_code(val)
+}
+
+let new = () {
+	_hash_new()
+}
+
+let get = (h, key) {
+	_hash_get(h, key)
+}
+
+let put = (h, key, val) {
+	_hash_put(h, key, val)
+}
+
+let has = (h, key) {
+	_hash_has(h, key)
+}
+
+let del = (h, key) {
+	_hash_del(h, key)
+}
+
+let keys = (h) {
+	_hash_keys(h)
+}
+
+let values = (h) {
+	_hash_values(h)
+}
+
+export(:hash_code, :new, :get, :put, :has, :del, :keys, :values)

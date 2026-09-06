@@ -1,0 +1,28 @@
+resolve
+@unchecked
+Resolves CLI filesystem targets relative to the explicit base directory. Exact
+files, ./..., and arbitrary path/... targets are supported. Plain directories
+recurse only when recurse_plain_dirs is true. Results are sorted and deduplicated.
+
+A nearest-ancestor .aikiignore supplies [all] and tool-specific rules. The first
+matching policy language supports exact repository-relative paths, subtree
+prefixes written as path/**, and **/.* for hidden-path pruning. Policy is applied
+before descending into discovered directories. A target explicitly rooted inside
+an ignored subtree bypasses policy for that target.
+
+Returns [@targets, paths, excluded], where excluded contains policy decisions as
+[@target, path, :policy] records. Returns [@error, :target, msg] for invalid or
+nonexistent targets.
+
+resolve(base, tool, targets, recurse_plain_dirs)
+
+===
+
+resolve_all
+@unchecked
+Uses the same target language, ordering, deduplication, and command directory
+policy as resolve(), but bypasses .aikiignore. This is the exhaustive repository
+selection surface used by CLI --all validation modes. Explicit command filtering
+still applies after resolution.
+
+resolve_all(base, tool, targets, recurse_plain_dirs)

@@ -1,0 +1,42 @@
+package "state_machine/ffi"
+
+# Provider-backed realization of an admitted fixed-width state machine.
+# Definitions are ordinary Aiki lists at compile time. Once admitted, the hot
+# transition loop contains only fixed-width state/event/slot values and bound
+# typed word stores.
+let compile = _state_machine_compile
+let new = (program, initial_slots, ...args) {
+	if empty(args) {
+		return _state_machine_new(program, initial_slots)
+	}
+	if not empty(rest(args)) {
+		return [@error, :arity, "new expects program, slots, and optional bindings"]
+	}
+	return _state_machine_new(program, initial_slots, first(args))
+}
+
+let step = _state_machine_step
+let run = _state_machine_run
+let run_until = _state_machine_run_until
+let state = _state_machine_state
+let slot = _state_machine_slot
+let outputs = _state_machine_outputs
+let dropped = _state_machine_dropped
+let staged_writes = _state_machine_staged_writes
+let commit_writes = _state_machine_commit_writes
+let discard_writes = _state_machine_discard_writes
+
+export(
+	:compile,
+	:new,
+	:step,
+	:run,
+	:run_until,
+	:state,
+	:slot,
+	:outputs,
+	:dropped,
+	:staged_writes,
+	:commit_writes,
+	:discard_writes
+)

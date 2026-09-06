@@ -1,0 +1,6 @@
+# 07_ord_rune_engine.ai
+# Rune and ord coverage, no imports.
+print(ord('a'), "\n")
+print(ord('A'), "\n")
+print(ord('0'), "\n")
+print(ord('\n'), "\n")

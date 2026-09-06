@@ -1,0 +1,162 @@
+let test = import("test")
+let native = import("math/native")
+let ffi = import("math/ffi")
+
+let same = (name, ffi_value, native_value) {
+	test.run(name, () {
+		test.equal(ffi_value(), native_value())
+	})
+}
+
+# Exact compact integer/rational parity.
+same("ffi floor compact positive rational", () {
+	ffi.floor(7/3)
+}, () {
+	native.floor(7/3)
+})
+
+
+same("ffi floor compact negative rational", () {
+	ffi.floor(-7/3)
+}, () {
+	native.floor(-7/3)
+})
+
+
+same("ffi ceil compact positive rational", () {
+	ffi.ceil(7/3)
+}, () {
+	native.ceil(7/3)
+})
+
+
+same("ffi ceil compact negative rational", () {
+	ffi.ceil(-7/3)
+}, () {
+	native.ceil(-7/3)
+})
+
+
+same("ffi modulo compact rational", () {
+	ffi.modulo(7/3, 2/3)
+}, () {
+	native.modulo(7/3, 2/3)
+})
+
+
+same("ffi modulo negative rational dividend", () {
+	ffi.modulo(-7/3, 2/3)
+}, () {
+	native.modulo(-7/3, 2/3)
+})
+
+
+same("ffi modulo negative rational divisor", () {
+	ffi.modulo(7/3, -2/3)
+}, () {
+	native.modulo(7/3, -2/3)
+})
+
+
+same("ffi modulo both rational operands negative", () {
+	ffi.modulo(-7/3, -2/3)
+}, () {
+	native.modulo(-7/3, -2/3)
+})
+
+
+# Promoted arbitrary-precision integer/rational parity.
+let huge_int = 92233720368547758081234567890123456789
+let huge_rat = 92233720368547758081234567890123456789/97
+let huge_divisor = 18446744073709551617000000000000000003/101
+same("ffi floor promoted rational", () {
+	ffi.floor(huge_rat)
+}, () {
+	native.floor(huge_rat)
+})
+
+
+same("ffi ceil promoted rational", () {
+	ffi.ceil(huge_rat)
+}, () {
+	native.ceil(huge_rat)
+})
+
+
+same("ffi modulo promoted integer", () {
+	ffi.modulo(huge_int, 97)
+}, () {
+	native.modulo(huge_int, 97)
+})
+
+
+same("ffi modulo promoted rationals", () {
+	ffi.modulo(huge_rat, huge_divisor)
+}, () {
+	native.modulo(huge_rat, huge_divisor)
+})
+
+
+same("ffi modulo promoted negative dividend", () {
+	ffi.modulo(-huge_rat, huge_divisor)
+}, () {
+	native.modulo(-huge_rat, huge_divisor)
+})
+
+
+same("ffi modulo promoted negative divisor", () {
+	ffi.modulo(huge_rat, -huge_divisor)
+}, () {
+	native.modulo(huge_rat, -huge_divisor)
+})
+
+
+# Boundary and domain faults must agree on faulting behavior.
+test.run("ffi modulo zero divisor faults like native", () {
+	test.faults(() {
+		native.modulo(10, 0)
+	})
+	test.faults(() {
+		ffi.modulo(10, 0)
+	})
+})
+
+
+test.run("ffi modulo non-number dividend faults like native", () {
+	test.faults(() {
+		native.modulo("a", 3)
+	})
+	test.faults(() {
+		ffi.modulo("a", 3)
+	})
+})
+
+
+test.run("ffi modulo non-number divisor faults like native", () {
+	test.faults(() {
+		native.modulo(10, "a")
+	})
+	test.faults(() {
+		ffi.modulo(10, "a")
+	})
+})
+
+
+test.run("ffi floor non-number faults like native", () {
+	test.faults(() {
+		native.floor("a")
+	})
+	test.faults(() {
+		ffi.floor("a")
+	})
+})
+
+
+test.run("ffi ceil non-number faults like native", () {
+	test.faults(() {
+		native.ceil("a")
+	})
+	test.faults(() {
+		ffi.ceil("a")
+	})
+})

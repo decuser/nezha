@@ -1,0 +1,18 @@
+# Build a Korean greeting from code points
+let list = import("list")
+
+let annyeong = list.concat([chr(50504), chr(45397)], [chr(54616), chr(49464), chr(50836)])
+
+# Print it
+list.each(annyeong, (r) {
+	print(r)
+})
+
+
+println("")
+
+# Round-trip check
+println(ord(chr(50504)))
+
+# Build and print 안녕
+println(list.concat([chr(50504)], [chr(45397)]))

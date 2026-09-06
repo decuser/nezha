@@ -1,0 +1,5 @@
+@summary "hostnative - host-native implementation binding"
+
+@func bind
+@template "bind(implementation, operation)"
+@help "Resolves a host-native implementation operation once and returns its direct callable."

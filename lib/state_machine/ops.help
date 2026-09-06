@@ -1,0 +1,106 @@
+@summary "state_machine/ops - generic admitted state-machine operation ids"
+
+@func SET
+@template "ops.SET"
+@help "Operation id for setting a 16-bit slot to a constant."
+
+@func ADD_CONST
+@template "ops.ADD_CONST"
+@help "Operation id for wrapped 16-bit addition of a constant to a word slot."
+
+@func COPY
+@template "ops.COPY"
+@help "Operation id for copying one 16-bit word slot to another."
+
+@func AND_CONST
+@template "ops.AND_CONST"
+@help "Operation id for bitwise AND of a 16-bit word slot with a constant."
+
+@func OR_CONST
+@template "ops.OR_CONST"
+@help "Operation id for bitwise OR of a 16-bit word slot with a constant."
+
+@func XOR_CONST
+@template "ops.XOR_CONST"
+@help "Operation id for bitwise XOR of a 16-bit word slot with a constant."
+
+@func SHL_CONST
+@template "ops.SHL_CONST"
+@help "Operation id for logical left shift of a 16-bit word slot by a constant count."
+
+@func SHR_CONST
+@template "ops.SHR_CONST"
+@help "Operation id for logical right shift of a 16-bit word slot by a constant count."
+
+@func LOAD_WORD
+@template "ops.LOAD_WORD"
+@help "Operation id for loading a 16-bit word from a bound word store using a word-slot address."
+
+@func STORE_WORD
+@template "ops.STORE_WORD"
+@help "Operation id for storing a 16-bit word to a bound word store using a word-slot address."
+
+@func ADDR18_FROM_WORD
+@template "ops.ADDR18_FROM_WORD"
+@help "Operation id for copying a word slot into separate 18-bit address scratch."
+
+@func ADDR18_SHL
+@template "ops.ADDR18_SHL"
+@help "Operation id for left-shifting an 18-bit address scratch slot by a constant count."
+
+@func ADDR18_ADD_WORD
+@template "ops.ADDR18_ADD_WORD"
+@help "Operation id for adding a 16-bit word slot into an 18-bit address scratch slot."
+
+@func LOAD_WORD_ADDR18
+@template "ops.LOAD_WORD_ADDR18"
+@help "Operation id for loading a bound word store through an 18-bit byte address."
+
+@func ADD_WORD
+@template "ops.ADD_WORD"
+@help "Operation id for neutral wrapped 16-bit slot-to-slot addition."
+
+@func SUB_WORD
+@template "ops.SUB_WORD"
+@help "Operation id for neutral wrapped 16-bit slot-to-slot subtraction."
+
+@func AND_WORD
+@template "ops.AND_WORD"
+@help "Operation id for bitwise AND of two 16-bit word slots."
+
+@func OR_WORD
+@template "ops.OR_WORD"
+@help "Operation id for bitwise OR of two 16-bit word slots."
+
+@func XOR_WORD
+@template "ops.XOR_WORD"
+@help "Operation id for bitwise XOR of two 16-bit word slots."
+
+@func ADD_CARRY_WORD
+@template "ops.ADD_CARRY_WORD"
+@help "Operation id for the unsigned carry predicate of 16-bit slot-to-slot addition."
+
+@func SUB_BORROW_WORD
+@template "ops.SUB_BORROW_WORD"
+@help "Operation id for the unsigned borrow predicate of 16-bit slot-to-slot subtraction."
+
+@func ADD_OVERFLOW_WORD
+@template "ops.ADD_OVERFLOW_WORD"
+@help "Operation id for the signed-overflow predicate of 16-bit slot-to-slot addition."
+
+@func SUB_OVERFLOW_WORD
+@template "ops.SUB_OVERFLOW_WORD"
+@help "Operation id for the signed-overflow predicate of 16-bit slot-to-slot subtraction."
+
+
+@func STAGE_WORD_ADDR18
+@template "ops.STAGE_WORD_ADDR18"
+@help "Operation id for staging a 16-bit word write through an 18-bit byte address without mutating the bound store until commit."
+
+@func STAGE_BYTE_ADDR18
+@template "ops.STAGE_BYTE_ADDR18"
+@help "Operation id for staging a low-byte write through an 18-bit byte address without mutating the bound store until commit."
+
+@func LOAD_BYTE_ADDR18
+@template "ops.LOAD_BYTE_ADDR18"
+@help "Operation id for loading one byte through an 18-bit byte address, including the machine-local staged-write overlay."

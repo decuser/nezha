@@ -1,0 +1,349 @@
+package evaluator
+
+import (
+	"sync"
+	"testing"
+
+	"aiki/engine/runtime/hal/substrate"
+	"aiki/engine/semantics/value"
+	"aiki/engine/syntax"
+	"aiki/engine/syntax/grammar"
+)
+
+func eval(t *testing.T, source string) value.Value {
+	g, _ := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	lexer := syntax.NewLexer(g, "test", source, nil)
+	tokens, _ := lexer.Tokenize()
+	parser := syntax.NewParser(g, tokens, source, nil)
+	ast, err := parser.Parse()
+	if err != nil {
+		t.Fatalf("parse: %v", err)
+	}
+	rt := substrate.NewGoRuntime()
+	ev := New(rt, nil)
+	// Use prelude scope to access HAL primitives directly
+	env := value.NewEnvWithScope(value.ScopePrelude)
+	env.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.ai"))
+	return ev.Eval(ast, env)
+}
+
+func TestEvalNumber(t *testing.T) {
+	v := eval(t, "42")
+	if v.Inspect() != "42" {
+		t.Errorf("got %s", v.Inspect())
+	}
+}
+
+func TestEvalArithmetic(t *testing.T) {
+	tests := []struct{ in, out string }{
+		{"1 + 2", "3"},
+		{"5 - 3", "2"},
+		{"2 * 3", "6"},
+		{"8 / 4", "2"},
+		{"1 / 3", "1/3"},
+	}
+	for _, tt := range tests {
+		v := eval(t, tt.in)
+		if v.Inspect() != tt.out {
+			t.Errorf("%s: got %s, want %s", tt.in, v.Inspect(), tt.out)
+		}
+	}
+}
+
+func TestEvalNaturalScalarOrdering(t *testing.T) {
+	tests := []struct{ in, out string }{
+		{`1 < 2`, "true"},
+		{`2 >= 2`, "true"},
+		{`"alpha" < "beta"`, "true"},
+		{`"beta" >= "beta"`, "true"},
+		{`'a' < 'b'`, "true"},
+		{`:alpha < :beta`, "true"},
+		{`"猫" > "é"`, "true"},
+	}
+	for _, tt := range tests {
+		v := eval(t, tt.in)
+		if v.Inspect() != tt.out {
+			t.Errorf("%s: got %s, want %s", tt.in, v.Inspect(), tt.out)
+		}
+	}
+
+	for _, in := range []string{`[1] < [2]`, `1 < "2"`, `true < false`} {
+		if v := eval(t, in); v.Type() != value.FaultType {
+			t.Errorf("%s: got %s, want comparison fault", in, v.Inspect())
+		}
+	}
+}
+
+func TestEvalLazyLogicalOperators(t *testing.T) {
+	tests := []struct {
+		in  string
+		out string
+	}{
+		{"false and missing_name", "false"},
+		{"true or missing_name", "true"},
+		{"true and 7", "7"},
+		{"false or 7", "7"},
+		{"[] and missing_name", "[]"},
+		{"[1] or missing_name", "[1]"},
+	}
+
+	for _, tt := range tests {
+		v := eval(t, tt.in)
+		if v.Inspect() != tt.out {
+			t.Errorf("%s: got %s, want %s", tt.in, v.Inspect(), tt.out)
+		}
+	}
+}
+
+func TestEvalEagerNonLogicalOperators(t *testing.T) {
+	v := eval(t, "1 + missing_name")
+	if _, ok := v.(*value.Fault); !ok {
+		t.Fatalf("ordinary binary operators must remain eager; got %s", v.Inspect())
+	}
+}
+
+func TestEvalLet(t *testing.T) {
+	v := eval(t, "let x = 5\nx * 2")
+	if v.Inspect() != "10" {
+		t.Errorf("got %s", v.Inspect())
+	}
+}
+
+func TestEvalIf(t *testing.T) {
+	v := eval(t, "if true { 1 } else { 2 }")
+	if v.Inspect() != "1" {
+		t.Errorf("got %s", v.Inspect())
+	}
+	v = eval(t, "if false { 1 } else { 2 }")
+	if v.Inspect() != "2" {
+		t.Errorf("got %s", v.Inspect())
+	}
+}
+
+func TestEvalWhile(t *testing.T) {
+	v := eval(t, "let x = 0\nwhile x < 3 { x = x + 1 }\nx")
+	if v.Inspect() != "3" {
+		t.Errorf("got %s", v.Inspect())
+	}
+}
+
+func TestEvalFunction(t *testing.T) {
+	v := eval(t, "let f = (x) { x + 1 }\nf(5)")
+	if v.Inspect() != "6" {
+		t.Errorf("got %s", v.Inspect())
+	}
+}
+
+func TestEvalList(t *testing.T) {
+	v := eval(t, "[1, 2, 3]")
+	if v.Inspect() != "[1, 2, 3]" {
+		t.Errorf("got %s", v.Inspect())
+	}
+}
+
+func TestEvalBuiltin(t *testing.T) {
+	v := eval(t, "_length([1, 2, 3])")
+	if v.Inspect() != "3" {
+		t.Errorf("got %s", v.Inspect())
+	}
+}
+
+func TestEvalPipe(t *testing.T) {
+	v := eval(t, "[1, 2, 3] |> _first")
+	if v.Inspect() != "1" {
+		t.Errorf("got %s", v.Inspect())
+	}
+}
+
+func TestHandlerCoverageMatchesGrammarAST(t *testing.T) {
+	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	if err != nil {
+		t.Fatalf("load grammar: %v", err)
+	}
+	if err := validateHandlerCoverage(g, handlers); err != nil {
+		t.Fatal(err)
+	}
+
+	refs := g.Analysis().TokenRefs()
+	for _, name := range []string{"NAME", "NUMBER", "STRING", "RUNE", "SYMBOL", "SHAPE"} {
+		if _, ok := refs[name]; !ok {
+			t.Errorf("expected production TokenRef %s", name)
+		}
+	}
+	if _, ok := g.Productions["BINOP"]; !ok {
+		t.Error("expected BINOP to be a named production")
+	}
+	if _, ok := refs["BINOP"]; ok {
+		t.Error("BINOP is a production, not a TokenRef")
+	}
+	for _, name := range []string{"KEYWORD", "OPERATOR", "DELIMITER", "NEWLINE"} {
+		if _, ok := refs[name]; ok {
+			t.Errorf("lexical-only token unexpectedly production-referenced: %s", name)
+		}
+		if _, ok := handlers[name]; ok {
+			t.Errorf("lexical-only token unexpectedly has evaluator handler: %s", name)
+		}
+	}
+}
+
+func TestHandlerCoverageRejectsBothDirections(t *testing.T) {
+	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	if err != nil {
+		t.Fatalf("load grammar: %v", err)
+	}
+
+	missing := make(map[string]handlerFunc, len(handlers))
+	for name, h := range handlers {
+		missing[name] = h
+	}
+	delete(missing, "NAME")
+	if err := validateHandlerCoverage(g, missing); err == nil {
+		t.Fatal("expected missing grammar node handler to fail")
+	}
+
+	extra := make(map[string]handlerFunc, len(handlers)+1)
+	for name, h := range handlers {
+		extra[name] = h
+	}
+	extra["KEYWORD"] = (*Evaluator).evalTerminal
+	if err := validateHandlerCoverage(g, extra); err == nil {
+		t.Fatal("expected handler without grammar AST node to fail")
+	}
+}
+
+func TestBinaryOperatorCoverageMatchesGrammar(t *testing.T) {
+	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	if err != nil {
+		t.Fatalf("load grammar: %v", err)
+	}
+
+	ops := g.Analysis().TerminalAlternatives("BINOP")
+	if err := validateBinaryOperatorCoverage(ops, eagerBinaryOperatorSemantics, lazyLogicalOperators); err != nil {
+		t.Fatal(err)
+	}
+	if len(ops) != 10 {
+		t.Fatalf("BINOP alternatives = %d, want 10", len(ops))
+	}
+	for _, op := range []string{"+", "-", "*", "/", "<", ">", "<=", ">=", "and", "or"} {
+		if _, ok := ops[op]; !ok {
+			t.Errorf("grammar BINOP missing %q", op)
+		}
+	}
+}
+
+func TestBinaryOperatorCoverageRejectsBothDirections(t *testing.T) {
+	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	if err != nil {
+		t.Fatalf("load grammar: %v", err)
+	}
+	ops := g.Analysis().TerminalAlternatives("BINOP")
+
+	missing := make(map[string]binaryOperatorKind, len(eagerBinaryOperatorSemantics)-1)
+	for op, kind := range eagerBinaryOperatorSemantics {
+		if op != "+" {
+			missing[op] = kind
+		}
+	}
+	if err := validateBinaryOperatorCoverage(ops, missing, lazyLogicalOperators); err == nil {
+		t.Fatal("expected grammar operator without evaluator semantics to fail")
+	}
+
+	extra := make(map[string]binaryOperatorKind, len(eagerBinaryOperatorSemantics)+1)
+	for op, kind := range eagerBinaryOperatorSemantics {
+		extra[op] = kind
+	}
+	extra["fake-op"] = operatorAdd
+	if err := validateBinaryOperatorCoverage(ops, extra, lazyLogicalOperators); err == nil {
+		t.Fatal("expected evaluator operator without grammar BINOP to fail")
+	}
+}
+
+func TestBinaryOperatorMembershipComesFromGrammar(t *testing.T) {
+	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	if err != nil {
+		t.Fatalf("load grammar: %v", err)
+	}
+	ev := New(substrate.NewGoRuntime(), nil)
+	ev.SetGrammar(g)
+	if !ev.isBinaryOperator("+") {
+		t.Fatal("expected grammar-declared + to be an operator")
+	}
+	if ev.isBinaryOperator("fake-op") {
+		t.Fatal("unexpected operator not declared by grammar")
+	}
+}
+
+func TestNumberLiteralRealizedOncePerEvaluator(t *testing.T) {
+	ev := New(nil, nil)
+	node := &syntax.Node{Type: "NUMBER", Value: "123456789/7"}
+
+	first, ok := ev.evalNumber(node, nil).(*value.Number)
+	if !ok {
+		t.Fatal("first literal realization is not Number")
+	}
+	second, ok := ev.evalNumber(node, nil).(*value.Number)
+	if !ok {
+		t.Fatal("second literal realization is not Number")
+	}
+	if first != second {
+		t.Fatal("same immutable source literal must reuse semantic Number realization")
+	}
+	if got := second.Inspect(); got != "123456789/7" {
+		t.Fatalf("literal value = %s, want 123456789/7", got)
+	}
+}
+
+func TestNumberLiteralCacheKeysBySpellingWithoutRetainingASTIdentity(t *testing.T) {
+	ev := New(nil, nil)
+	a := &syntax.Node{Type: "NUMBER", Value: "42"}
+	b := &syntax.Node{Type: "NUMBER", Value: "42"}
+
+	first := ev.evalNumber(a, nil).(*value.Number)
+	second := ev.evalNumber(b, nil).(*value.Number)
+	if first != second {
+		t.Fatal("equal source spellings should share evaluator-local literal realization")
+	}
+}
+
+func TestNumberLiteralCacheConcurrentReads(t *testing.T) {
+	ev := New(nil, nil)
+	node := &syntax.Node{Type: "NUMBER", Value: "987654321/13"}
+	want := ev.evalNumber(node, nil).(*value.Number)
+
+	const goroutines = 32
+	const iterations = 1000
+	var wg sync.WaitGroup
+	errs := make(chan string, goroutines)
+
+	for range goroutines {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for range iterations {
+				got, ok := ev.evalNumber(node, nil).(*value.Number)
+				if !ok || got != want {
+					errs <- "concurrent literal realization changed identity"
+					return
+				}
+			}
+		}()
+	}
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		t.Fatal(err)
+	}
+}
+
+func TestNumberLiteralWarmObservationDoesNotAllocate(t *testing.T) {
+	ev := New(nil, nil)
+	node := &syntax.Node{Type: "NUMBER", Value: "314159265358979323846/100000000000000000000"}
+	_ = ev.evalNumber(node, nil)
+
+	allocs := testing.AllocsPerRun(1000, func() {
+		_ = ev.evalNumber(node, nil)
+	})
+	if allocs != 0 {
+		t.Fatalf("warm number literal observation allocated %.2f objects/run, want 0", allocs)
+	}
+}
