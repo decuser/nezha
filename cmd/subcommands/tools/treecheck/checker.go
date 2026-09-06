@@ -234,24 +234,6 @@ func (c *Checker) seedBuiltins() {
 			c.mark(p, "authoritative grammar artifact")
 		case p == "engine/runtime/prelude/prelude.ai" || p == "engine/runtime/prelude/prelude.help" || p == "engine/runtime/prelude/prelude.doc":
 			c.mark(p, "prelude artifact")
-		case strings.HasPrefix(p, "selfhost/") && strings.HasSuffix(p, ".ai"):
-			c.mark(p, "self-host implementation source")
-		case p == "editors/xed/aiki.lang":
-			c.mark(p, "Xed GtkSourceView language definition")
-		case p == "editors/xed/aiki_lsp.plugin":
-			c.mark(p, "Xed Aiki LSP plugin descriptor")
-		case strings.HasPrefix(p, "editors/xed/aiki_lsp/") && strings.HasSuffix(p, ".py"):
-			c.mark(p, "Xed Aiki LSP plugin source")
-		case p == "editors/vscode/package.json":
-			c.mark(p, "VS Code Aiki extension manifest")
-		case p == "editors/vscode/extension.js":
-			c.mark(p, "VS Code Aiki LSP client source")
-		case p == "editors/vscode/language-configuration.json":
-			c.mark(p, "VS Code Aiki editor configuration")
-		case p == "editors/vscode/.vscodeignore":
-			c.mark(p, "VS Code extension packaging configuration")
-		case p == "editors/vscode/syntaxes/aiki.tmLanguage.json":
-			c.mark(p, "VS Code Aiki lexical grammar")
 		}
 	}
 }
@@ -295,24 +277,6 @@ func (c *Checker) checkStructuralPairs() {
 			c.mark(p, "syntax conformance input")
 			if c.files[projection] {
 				c.mark(projection, "syntax conformance token projection")
-			}
-		}
-		if p == "selfhost/token_authority.ai" && c.files["selfhost/token_authority.gold"] {
-			c.mark("selfhost/token_authority.gold", "self-host authority projection")
-		}
-		if p == "editors/xed/aiki_lsp.plugin" && c.files["editors/xed/aiki_lsp/__init__.py"] {
-			c.mark("editors/xed/aiki_lsp.plugin", "Xed plugin descriptor paired with module")
-			c.mark("editors/xed/aiki_lsp/__init__.py", "Xed plugin module paired with descriptor")
-		}
-		if p == "editors/vscode/package.json" {
-			for _, q := range []string{
-				"editors/vscode/extension.js",
-				"editors/vscode/language-configuration.json",
-				"editors/vscode/syntaxes/aiki.tmLanguage.json",
-			} {
-				if c.files[q] {
-					c.mark(q, "VS Code extension companion")
-				}
 			}
 		}
 	}
@@ -413,31 +377,6 @@ func (c *Checker) structuralErrors() []Finding {
 			input := strings.TrimSuffix(p, ".tokens") + ".input"
 			if !c.files[input] {
 				out = append(out, Finding{Path: p, Reason: "syntax conformance projection has no .input specimen"})
-			}
-		}
-		if p == "selfhost/token_authority.gold" && !c.files["selfhost/token_authority.ai"] {
-			out = append(out, Finding{Path: p, Reason: "self-host authority projection has no .ai owner"})
-		}
-		if p == "editors/xed/aiki_lsp.plugin" && !c.files["editors/xed/aiki_lsp/__init__.py"] {
-			out = append(out, Finding{Path: p, Reason: "Xed plugin descriptor has no Python module"})
-		}
-		if p == "editors/xed/aiki_lsp/__init__.py" && !c.files["editors/xed/aiki_lsp.plugin"] {
-			out = append(out, Finding{Path: p, Reason: "Xed plugin module has no descriptor"})
-		}
-		if p == "editors/vscode/package.json" {
-			for _, q := range []string{
-				"editors/vscode/extension.js",
-				"editors/vscode/language-configuration.json",
-				"editors/vscode/syntaxes/aiki.tmLanguage.json",
-			} {
-				if !c.files[q] {
-					out = append(out, Finding{Path: p, Reason: "VS Code extension missing " + strings.TrimPrefix(q, "editors/vscode/")})
-				}
-			}
-		}
-		if strings.HasPrefix(p, "editors/vscode/") && p != "editors/vscode/README.md" && p != "editors/vscode/package.json" {
-			if !c.files["editors/vscode/package.json"] {
-				out = append(out, Finding{Path: p, Reason: "VS Code extension companion has no package.json owner"})
 			}
 		}
 		if isNamedPackageSource(p) {

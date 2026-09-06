@@ -196,23 +196,6 @@ func TestDeletedTrackedPathIsNotTreatedAsPresent(t *testing.T) {
 	}
 }
 
-func TestSelfHostSourcesAndAuthorityProjectionAreJustified(t *testing.T) {
-	root := minimalTree(t)
-	writeTestFile(t, root, "selfhost/lexer.ai", "let lex = (source) { source }\n")
-	writeTestFile(t, root, "selfhost/token_authority.ai", "println(\"authority\")\n")
-	writeTestFile(t, root, "selfhost/token_authority.gold", "authority\n")
-
-	result, err := Check(root, "treecheck.allow")
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, path := range []string{"selfhost/lexer.ai", "selfhost/token_authority.ai", "selfhost/token_authority.gold"} {
-		if hasFinding(result.Errors, path) || hasFinding(result.Orphans, path) {
-			t.Fatalf("self-host artifact should be justified: %s errors=%#v orphans=%#v", path, result.Errors, result.Orphans)
-		}
-	}
-}
-
 func TestSyntaxConformancePairIsJustified(t *testing.T) {
 	root := minimalTree(t)
 	input := "test/conformance/syntax/lex/basic.input"
@@ -249,113 +232,6 @@ func TestSyntaxConformanceProjectionWithoutInputIsStructuralError(t *testing.T) 
 	root := minimalTree(t)
 	path := "test/conformance/syntax/lex/orphan.tokens"
 	writeTestFile(t, root, path, "NAME let\n")
-
-	result, err := Check(root, "treecheck.allow")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !hasFinding(result.Errors, path) {
-		t.Fatalf("expected structural error for %s, got %#v", path, result.Errors)
-	}
-}
-
-func TestXedEditorArtifactsAreJustified(t *testing.T) {
-	root := minimalTree(t)
-	paths := []string{
-		"editors/xed/aiki.lang",
-		"editors/xed/aiki_lsp.plugin",
-		"editors/xed/aiki_lsp/__init__.py",
-		"editors/xed/README.md",
-	}
-	writeTestFile(t, root, paths[0], "<language/>\n")
-	writeTestFile(t, root, paths[1], "[Plugin]\nLoader=python3\nModule=aiki_lsp\n")
-	writeTestFile(t, root, paths[2], "# plugin\n")
-	writeTestFile(t, root, paths[3], "# Xed\n")
-
-	result, err := Check(root, "treecheck.allow")
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, path := range paths {
-		if hasFinding(result.Errors, path) || hasFinding(result.Orphans, path) {
-			t.Fatalf("Xed editor artifact should be justified: %s errors=%#v orphans=%#v", path, result.Errors, result.Orphans)
-		}
-	}
-}
-
-func TestXedPluginDescriptorWithoutModuleIsStructuralError(t *testing.T) {
-	root := minimalTree(t)
-	path := "editors/xed/aiki_lsp.plugin"
-	writeTestFile(t, root, path, "[Plugin]\nLoader=python3\nModule=aiki_lsp\n")
-
-	result, err := Check(root, "treecheck.allow")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !hasFinding(result.Errors, path) {
-		t.Fatalf("expected structural error for %s, got %#v", path, result.Errors)
-	}
-}
-
-func TestXedPluginModuleWithoutDescriptorIsStructuralError(t *testing.T) {
-	root := minimalTree(t)
-	path := "editors/xed/aiki_lsp/__init__.py"
-	writeTestFile(t, root, path, "# plugin\n")
-
-	result, err := Check(root, "treecheck.allow")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !hasFinding(result.Errors, path) {
-		t.Fatalf("expected structural error for %s, got %#v", path, result.Errors)
-	}
-}
-
-func TestVSCodeEditorArtifactsAreJustified(t *testing.T) {
-	root := minimalTree(t)
-	paths := []string{
-		"editors/vscode/package.json",
-		"editors/vscode/extension.js",
-		"editors/vscode/language-configuration.json",
-		"editors/vscode/syntaxes/aiki.tmLanguage.json",
-		"editors/vscode/README.md",
-	}
-	writeTestFile(t, root, paths[0], "{}\n")
-	writeTestFile(t, root, paths[1], "module.exports = {};\n")
-	writeTestFile(t, root, paths[2], "{}\n")
-	writeTestFile(t, root, paths[3], "{}\n")
-	writeTestFile(t, root, paths[4], "# VS Code\n")
-
-	result, err := Check(root, "treecheck.allow")
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, path := range paths {
-		if hasFinding(result.Errors, path) || hasFinding(result.Orphans, path) {
-			t.Fatalf("VS Code editor artifact should be justified: %s errors=%#v orphans=%#v", path, result.Errors, result.Orphans)
-		}
-	}
-}
-
-func TestVSCodeManifestMissingClientIsStructuralError(t *testing.T) {
-	root := minimalTree(t)
-	writeTestFile(t, root, "editors/vscode/package.json", "{}\n")
-	writeTestFile(t, root, "editors/vscode/language-configuration.json", "{}\n")
-	writeTestFile(t, root, "editors/vscode/syntaxes/aiki.tmLanguage.json", "{}\n")
-
-	result, err := Check(root, "treecheck.allow")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !hasFinding(result.Errors, "editors/vscode/package.json") {
-		t.Fatalf("expected VS Code structural error, got %#v", result.Errors)
-	}
-}
-
-func TestVSCodeCompanionWithoutManifestIsStructuralError(t *testing.T) {
-	root := minimalTree(t)
-	path := "editors/vscode/extension.js"
-	writeTestFile(t, root, path, "module.exports = {};\n")
 
 	result, err := Check(root, "treecheck.allow")
 	if err != nil {

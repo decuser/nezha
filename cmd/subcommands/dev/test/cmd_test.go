@@ -7,7 +7,6 @@ func TestCoverageScopeIsRepositoryPathPolicy(t *testing.T) {
 		"lib/string/string.ai":                    "supported",
 		"samples/pipeline.ai":                     "examples",
 		"examples/hello.ai":                       "examples",
-		"selfhost/evaluator.ai":                   "auxiliary",
 		"engineering/profiling/03-list-append.ai": "auxiliary",
 	}
 	for path, want := range cases {
