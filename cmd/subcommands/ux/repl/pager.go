@@ -6,29 +6,13 @@ import (
 	"os/exec"
 	"strings"
 	"unicode/utf8"
-
-	"github.com/chzyer/readline"
 )
 
 // newPageOutput returns a presentation hook for long help/documentation text.
 // It pages only when out is an actual terminal and the rendered text is taller
 // than the current screen. Returning false asks the caller to print normally.
 func newPageOutput(out io.Writer) func(string) bool {
-	f, ok := out.(*os.File)
-	if !ok || !readline.IsTerminal(int(f.Fd())) {
-		return nil
-	}
-
-	return func(text string) bool {
-		width, height, err := readline.GetSize(int(f.Fd()))
-		if err != nil || width <= 0 || height <= 0 {
-			return false
-		}
-		if displayLines(text, width) < height {
-			return false
-		}
-		return runPager(text, f)
-	}
+	return nil
 }
 
 // displayLines estimates the number of terminal rows occupied by text,

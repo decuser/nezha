@@ -35,27 +35,9 @@ var capabilityRegistry = map[string]Capability{
 		Name:       "permissions",
 		Operations: []string{"HAL.file.permissions", "HAL.file.chmod"},
 	},
-	"process": {
-		Name: "process",
-		Operations: []string{
-			"HAL.system.args", "HAL.system.env", "HAL.system.environ", "HAL.system.set_env", "HAL.system.unset_env", "HAL.system.cwd", "HAL.system.chdir", "HAL.process.exec",
-			"HAL.process.start", "HAL.process.stdin", "HAL.process.stdout", "HAL.process.stderr", "HAL.process.wait", "HAL.process.terminate",
-		},
-	},
-	"network": {
-		Name: "network",
-		Operations: []string{
-			"HAL.net.connect", "HAL.net.listen", "HAL.net.accept", "HAL.net.local", "HAL.net.remote", "HAL.net.close",
-			"HAL.net.udp_bind", "HAL.net.udp_send", "HAL.net.udp_recv",
-		},
-	},
 	"signals": {
 		Name:       "signals",
 		Operations: []string{"HAL.signal.watch", "HAL.signal.stop", "HAL.signal.send"},
-	},
-	"terminal": {
-		Name:       "terminal",
-		Operations: []string{"HAL.term.is", "HAL.term.size", "HAL.term.raw", "HAL.term.restore"},
 	},
 	"time": {
 		Name:       "time",

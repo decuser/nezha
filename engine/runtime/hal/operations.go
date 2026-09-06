@@ -152,30 +152,6 @@ var operationDefinitions = map[string]HostOperation{
 	"_system_cwd":     hostOperation("HAL.system.cwd", "_system_cwd", "runtime.process", "nonblocking", "fault", bindings(binding("system.cwd", "lib/system/system.ai"))),
 	"_system_chdir":   hostOperation("HAL.system.chdir", "_system_chdir", "runtime.process", "may block", "fault or shaped :io result", bindings(binding("system.chdir", "lib/system/system.ai"))),
 	"_path_separator": hostOperation("HAL.path.separator", "_path_separator", "runtime.platform", "nonblocking", "fault", bindings(binding("path.separator", "lib/path/path.ai"))),
-	"_process_start": {
-		Identity: "HAL.process.start", Primitive: "_process_start", Authority: "HAL.process.start",
-		Context: []string{"runtime.process", "runtime.io", "runtime.resources"}, Effect: "resource acquisition",
-		Blocking: "may block", Lifetime: "returns resource", Optionality: "constitutive",
-		ErrorContract: "fault or shaped :process result", SemanticObservation: "process.start",
-		AikiBindings: bindings(binding("process.start", "lib/process/process.ai")),
-	},
-	"_process_stdin":  processResourceOperation("HAL.process.stdin", "_process_stdin", "process.stdin"),
-	"_process_stdout": processResourceOperation("HAL.process.stdout", "_process_stdout", "process.stdout"),
-	"_process_stderr": processResourceOperation("HAL.process.stderr", "_process_stderr", "process.stderr"),
-	"_process_wait": {
-		Identity: "HAL.process.wait", Primitive: "_process_wait", Authority: "HAL.process.wait",
-		Context: []string{"runtime.process", "runtime.resources"}, Effect: "bounded call",
-		Blocking: "waits externally", Lifetime: "operates on resource", Optionality: "constitutive",
-		ErrorContract: "fault or shaped :process result", SemanticObservation: "process.wait",
-		AikiBindings: bindings(binding("process.wait", "lib/process/process.ai")),
-	},
-	"_process_terminate": {
-		Identity: "HAL.process.terminate", Primitive: "_process_terminate", Authority: "HAL.process.terminate",
-		Context: []string{"runtime.process", "runtime.resources"}, Effect: "state mutation",
-		Blocking: "nonblocking", Lifetime: "operates on resource", Optionality: "constitutive",
-		ErrorContract: "fault or shaped :process result", SemanticObservation: "process.terminate",
-		AikiBindings: bindings(binding("process.terminate", "lib/process/process.ai")),
-	},
 	"_signal_watch": {
 		Identity: "HAL.signal.watch", Primitive: "_signal_watch", Authority: "HAL.signal.watch",
 		Context: []string{"runtime.signals", "runtime.resources"}, Effect: "resource acquisition",
@@ -196,43 +172,6 @@ var operationDefinitions = map[string]HostOperation{
 		Blocking: "nonblocking", Lifetime: "operates on resource", Optionality: "constitutive",
 		ErrorContract: "fault or shaped :signal/:unsupported result", SemanticObservation: "signal.send",
 		AikiBindings: bindings(binding("signal.send", "lib/signal/signal.ai")),
-	},
-	"_net_connect":  networkOperation("HAL.net.connect", "_net_connect", "net.connect", "resource acquisition", "may block", "returns resource"),
-	"_net_listen":   networkOperation("HAL.net.listen", "_net_listen", "net.listen", "resource acquisition", "may block", "returns resource"),
-	"_net_accept":   networkOperation("HAL.net.accept", "_net_accept", "net.accept", "resource acquisition", "waits externally", "returns resource"),
-	"_net_local":    networkOperation("HAL.net.local", "_net_local", "net.local", "bounded call", "nonblocking", "operates on resource"),
-	"_net_remote":   networkOperation("HAL.net.remote", "_net_remote", "net.remote", "bounded call", "nonblocking", "operates on resource"),
-	"_net_close":    networkOperation("HAL.net.close", "_net_close", "net.close", "state mutation", "nonblocking", "operates on resource"),
-	"_net_udp_bind": networkOperation("HAL.net.udp_bind", "_net_udp_bind", "net.udp_bind", "resource acquisition", "may block", "returns resource"),
-	"_net_udp_send": networkOperation("HAL.net.udp_send", "_net_udp_send", "net.udp_send", "bounded call", "may block", "operates on resource"),
-	"_net_udp_recv": networkOperation("HAL.net.udp_recv", "_net_udp_recv", "net.udp_recv", "bounded call", "waits externally", "operates on resource"),
-	"_term_is": {
-		Identity: "HAL.term.is", Primitive: "_term_is", Authority: "HAL.term.is",
-		Context: []string{"runtime.terminal", "runtime.io"}, Effect: "bounded call",
-		Blocking: "nonblocking", Lifetime: "stateless", Optionality: "constitutive",
-		ErrorContract: "fault or shaped :terminal result", SemanticObservation: "term.is",
-		AikiBindings: bindings(binding("term.is", "lib/term/term.ai")),
-	},
-	"_term_size": {
-		Identity: "HAL.term.size", Primitive: "_term_size", Authority: "HAL.term.size",
-		Context: []string{"runtime.terminal", "runtime.io"}, Effect: "bounded call",
-		Blocking: "nonblocking", Lifetime: "stateless", Optionality: "constitutive",
-		ErrorContract: "fault or shaped :terminal result", SemanticObservation: "term.size",
-		AikiBindings: bindings(binding("term.size", "lib/term/term.ai")),
-	},
-	"_term_raw": {
-		Identity: "HAL.term.raw", Primitive: "_term_raw", Authority: "HAL.term.raw",
-		Context: []string{"runtime.terminal", "runtime.io", "runtime.resources"}, Effect: "resource acquisition",
-		Blocking: "nonblocking", Lifetime: "returns resource", Optionality: "constitutive",
-		ErrorContract: "fault or shaped :terminal result", SemanticObservation: "term.raw",
-		AikiBindings: bindings(binding("term.raw", "lib/term/term.ai")),
-	},
-	"_term_restore": {
-		Identity: "HAL.term.restore", Primitive: "_term_restore", Authority: "HAL.term.restore",
-		Context: []string{"runtime.terminal", "runtime.resources"}, Effect: "state mutation",
-		Blocking: "nonblocking", Lifetime: "operates on resource", Optionality: "constitutive",
-		ErrorContract: "fault or shaped :terminal result", SemanticObservation: "term.restore",
-		AikiBindings: bindings(binding("term.restore", "lib/term/term.ai")),
 	},
 	"_system_exec": {
 		Identity:            "HAL.process.exec",
@@ -302,24 +241,6 @@ func resourceOperation(identity, primitive, observation string, b AikiBinding) H
 	op := fileOperation(identity, primitive, observation, b)
 	op.Lifetime = "operates on resource"
 	return op
-}
-
-func processResourceOperation(identity, primitive, observation string) HostOperation {
-	op := hostOperation(identity, primitive, "runtime.process", "nonblocking", "fault or shaped :process result", bindings(binding(observation, "lib/process/process.ai")))
-	op.Context = []string{"runtime.process", "runtime.resources"}
-	op.Lifetime = "operates on resource"
-	op.SemanticObservation = observation
-	return op
-}
-
-func networkOperation(identity, primitive, observation, effect, blocking, lifetime string) HostOperation {
-	return HostOperation{
-		Identity: identity, Primitive: primitive, Authority: identity,
-		Context: []string{"runtime.network", "runtime.io", "runtime.resources"}, Effect: effect,
-		Blocking: blocking, Lifetime: lifetime, Optionality: "constitutive",
-		ErrorContract: "fault or shaped :network result", SemanticObservation: observation,
-		AikiBindings: bindings(binding(observation, "lib/net/net.ai")),
-	}
 }
 
 // OperationDefinition returns the architectural contract for a substrate primitive.

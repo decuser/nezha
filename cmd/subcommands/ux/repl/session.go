@@ -31,15 +31,10 @@ func NewSession(out io.Writer, debug bool) (*Session, error) {
 		return nil, err
 	}
 
-	var reader LineReader
-	reader, err = NewReadlineReader()
-	if err != nil {
-		reader = NewSimpleReader()
-	}
+	reader := NewSimpleReader()
 
 	tracker := &TrackingWriter{Out: out, EndedWithNewline: true}
 	sess.Runtime.SetIO(nil, tracker)
-	sess.Runtime.SetPageOutput(newPageOutput(out))
 
 	return &Session{
 		out:     out,

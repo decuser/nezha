@@ -53,26 +53,7 @@ func (g *GoRuntime) registerHAL() {
 	g.registerHost(goHostOperation("_time_now"), halTimeNow)
 	g.registerHost(goHostOperation("_system_cwd"), g.halSystemCwd)
 	g.registerHost(goHostOperation("_system_chdir"), g.halSystemChdir)
-	g.registerHost(goHostOperation("_term_is"), g.halTermIs)
-	g.registerHost(goHostOperation("_term_size"), g.halTermSize)
-	g.registerHost(goHostOperation("_term_raw"), g.halTermRaw)
-	g.registerHost(goHostOperation("_term_restore"), g.halTermRestore)
 	g.registerHost(goHostOperation("_system_exec"), g.halSystemExec)
-	g.registerHost(goHostOperation("_process_start"), g.halProcessStart)
-	g.registerHost(goHostOperation("_process_stdin"), g.halProcessStdin)
-	g.registerHost(goHostOperation("_process_stdout"), g.halProcessStdout)
-	g.registerHost(goHostOperation("_process_stderr"), g.halProcessStderr)
-	g.registerHost(goHostOperation("_process_wait"), g.halProcessWait)
-	g.registerHost(goHostOperation("_process_terminate"), g.halProcessTerminate)
-	g.registerHost(goHostOperation("_net_connect"), g.halNetConnect)
-	g.registerHost(goHostOperation("_net_listen"), g.halNetListen)
-	g.registerHost(goHostOperation("_net_accept"), g.halNetAccept)
-	g.registerHost(goHostOperation("_net_local"), g.halNetLocal)
-	g.registerHost(goHostOperation("_net_remote"), g.halNetRemote)
-	g.registerHost(goHostOperation("_net_close"), g.halNetClose)
-	g.registerHost(goHostOperation("_net_udp_bind"), g.halNetUDPBind)
-	g.registerHost(goHostOperation("_net_udp_send"), g.halNetUDPSend)
-	g.registerHost(goHostOperation("_net_udp_recv"), g.halNetUDPRecv)
 	g.registerHost(goHostOperation("_signal_watch"), g.halSignalWatch)
 	g.registerHost(goHostOperation("_signal_stop"), g.halSignalStop)
 	g.registerHost(goHostOperation("_signal_send"), g.halSignalSend)
@@ -100,10 +81,6 @@ func (g *GoRuntime) registerHAL() {
 		"_type": halType, "_stack_limit": halStackLimit, "_inspect": halInspect,
 		"_equal": halEqual, "_ord": halOrd, "_chr": halChr,
 		"_floor": halFloor, "_ceil": halCeil, "_truncate": halTruncate, "_modulo": halModulo,
-		"_bytes_new": halBytesNew, "_bytes_length": halBytesLength, "_bytes_get": halBytesGet,
-		"_bytes_slice": halBytesSlice, "_str_to_bytes": halStrToBytes,
-		"_bytes_to_str": halBytesToStr, "_bytes_to_str_pure": halBytesToStrPure,
-		"_bytes_digits_from_text": halBytesDigitsFromText, "_bytes_digits_to_text": halBytesDigitsToText,
 		"_shape": halShape, "_make_shaped_list": halMakeShapedList, "_to_str": halToStr,
 		"_to_decimal": halToDecimal, "_to_number": halToNumber, "_to_symbol": halToSymbol,
 		"_store_new": halStoreNew, "_store_get": halStoreGet, "_store_set": halStoreSet,
@@ -115,63 +92,6 @@ func (g *GoRuntime) registerHAL() {
 		"_fixed_store_word_write_addr": halFixedStoreWordWriteAddr, "_fixed_store_byte_read_addr": halFixedStoreByteReadAddr,
 		"_fixed_store_byte_write_addr": halFixedStoreByteWriteAddr, "_fixed_store_counter_get": halFixedStoreCounterGet,
 		"_fixed_store_counter_set": halFixedStoreCounterSet, "_fixed_store_counter_add": halFixedStoreCounterAdd,
-		"_state_machine_compile": halStateMachineCompile, "_state_machine_new": halStateMachineNew,
-		"_state_machine_step": halStateMachineStep, "_state_machine_run": halStateMachineRun,
-		"_state_machine_run_until": halStateMachineRunUntil,
-		"_state_machine_state":     halStateMachineState, "_state_machine_slot": halStateMachineSlot,
-		"_state_machine_outputs": halStateMachineOutputs, "_state_machine_dropped": halStateMachineDropped,
-		"_state_machine_staged_writes":  halStateMachineStagedWrites,
-		"_state_machine_commit_writes":  halStateMachineCommitWrites,
-		"_state_machine_discard_writes": halStateMachineDiscardWrites,
-		"_hostnative_bind":              halHostNativeBind,
-		"_machine_word":                 halMachineWord, "_machine_byte": halMachineByte, "_machine_addr18": halMachineAddr18,
-		"_machine_number": halMachineToNumber, "_machine_same": halMachineSame,
-		"_machine_word_add": halMachineWordAdd, "_machine_word_sub": halMachineWordSub,
-		"_machine_word_and": halMachineWordAnd, "_machine_word_or": halMachineWordOr,
-		"_machine_word_xor": halMachineWordXor, "_machine_word_not": halMachineWordNot,
-		"_machine_word_shl": halMachineWordShl, "_machine_word_shr": halMachineWordShr,
-		"_machine_word_extract": halMachineWordExtract, "_machine_word_lt": halMachineWordLT,
-		"_machine_word_gt": halMachineWordGT, "_machine_word_zero": halMachineWordZero,
-		"_machine_word_sign": halMachineWordSign, "_machine_word_low_byte": halMachineWordLowByte,
-		"_machine_word_high_byte": halMachineWordHighByte, "_machine_word_with_low_byte": halMachineWordWithLowByte,
-		"_machine_word_with_high_byte": halMachineWordWithHighByte, "_machine_byte_to_word": halMachineByteToWord,
-		"_machine_byte_sign_word": halMachineByteSignWord, "_machine_byte_zero": halMachineByteZero,
-		"_machine_addr_add": halMachineAddrAdd, "_machine_addr_even": halMachineAddrEven,
-		"_machine_word_field":         halMachineWordField,
-		"_machine_word_mask":          halMachineWordMask,
-		"_machine_word_eq_number":     halMachineWordEqNumber,
-		"_machine_word_lt_number":     halMachineWordLTNumber,
-		"_machine_word_ge_number":     halMachineWordGENumber,
-		"_machine_word_add_small":     halMachineWordAddSmall,
-		"_machine_word_sub_small":     halMachineWordSubSmall,
-		"_machine_word_add_carry":     halMachineWordAddCarry,
-		"_machine_word_sub_borrow":    halMachineWordSubBorrow,
-		"_machine_word_bit":           halMachineWordBit,
-		"_machine_word_any_mask":      halMachineWordAnyMask,
-		"_machine_word_set_bit":       halMachineWordSetBit,
-		"_machine_zero":               halMachineZero,
-		"_machine_negative":           halMachineNegative,
-		"_machine_addr_from_word":     halMachineAddrFromWord,
-		"_machine_addr_lt_number":     halMachineAddrLTNumber,
-		"_machine_addr_ge_number":     halMachineAddrGENumber,
-		"_machine_add":                halMachineAdd,
-		"_machine_sub":                halMachineSub,
-		"_machine_and":                halMachineAnd,
-		"_machine_or":                 halMachineOr,
-		"_machine_xor":                halMachineXor,
-		"_machine_not":                halMachineNot,
-		"_machine_add_small":          halMachineAddSmall,
-		"_machine_sub_small":          halMachineSubSmall,
-		"_machine_lt":                 halMachineLT,
-		"_machine_gt":                 halMachineGT,
-		"_machine_add_carry_generic":  halMachineAddCarryGeneric,
-		"_machine_sub_borrow_generic": halMachineSubBorrowGeneric,
-		"_machine_shr1":               halMachineShiftRightOne,
-		"_machine_shl1":               halMachineShiftLeftOne,
-		"_machine_low_bit":            halMachineLowBit,
-		"_machine_set_high_bit":       halMachineSetHighBit,
-		"_bits_and":                   halBitsAnd, "_bits_or": halBitsOr, "_bits_xor": halBitsXor,
-		"_bits_not": halBitsNot, "_bits_shl": halBitsShl, "_bits_shr": halBitsShr,
 	} {
 		switch name {
 		case "_stack_limit", "_store_get", "_store_set":
@@ -204,9 +124,6 @@ func (g *GoRuntime) registerHAL() {
 		"_hash_put": halHashPut, "_hash_has": halHashHas, "_hash_del": halHashDel,
 		"_hash_keys": halHashKeys, "_hash_values": halHashValues,
 		"_upper_rune": halUpperRune, "_lower_rune": halLowerRune,
-		"_regex_match": halRegexMatch, "_regex_find": halRegexFind,
-		"_regex_find_all": halRegexFindAll, "_regex_replace": halRegexReplace,
-		"_regex_replace_first": halRegexReplaceFirst, "_regex_split": halRegexSplit,
 	} {
 		g.registerContextFreePrimitive(name, fn)
 	}

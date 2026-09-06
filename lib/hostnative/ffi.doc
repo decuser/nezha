@@ -1,5 +1,0 @@
-bind
-@unchecked
-Resolves a named host-native implementation operation once during composition and returns a direct callable. Implementation and operation names are declarative binding data; calls through the returned value do not repeat name lookup.
-
-bind(implementation, operation)

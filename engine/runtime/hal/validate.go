@@ -11,13 +11,11 @@ var validContexts = map[string]bool{
 	"runtime.filesystem": true,
 	"runtime.graphics":   true,
 	"runtime.io":         true,
-	"runtime.network":    true,
 	"runtime.platform":   true,
 	"runtime.process":    true,
 	"runtime.random":     true,
 	"runtime.resources":  true,
 	"runtime.signals":    true,
-	"runtime.terminal":   true,
 }
 
 var validEffects = map[string]bool{
@@ -50,11 +48,9 @@ var validErrorContracts = map[string]bool{
 	"fault or shaped :environment result":         true,
 	"fault or shaped :io result":                  true,
 	"fault or shaped :io/:end result":             true,
-	"fault or shaped :network result":             true,
 	"fault or shaped :process result":             true,
 	"fault or shaped :signal result":              true,
 	"fault or shaped :signal/:unsupported result": true,
-	"fault or shaped :terminal result":            true,
 	"fault, false, or shaped :lock result":        true,
 	"fault or shaped :lock result":                true,
 }

@@ -9,7 +9,7 @@ func TestAnalyzeSourceCollectsLiteralImportsAndUsesNativeFFIPass(t *testing.T) {
 	g := testGrammar(t)
 	source := `package "sample"
 let dep = import("string/ffi")
-use("bytes")
+use("hash/ffi")
 let f = () {
     let nested = import("./local")
     nested
@@ -20,7 +20,7 @@ export(:f)
 	if err != nil {
 		t.Fatalf("AnalyzeSource: %v", err)
 	}
-	want := []string{"string/ffi", "bytes", "./local"}
+	want := []string{"string/ffi", "hash/ffi", "./local"}
 	if strings.Join(info.Imports, "\x00") != strings.Join(want, "\x00") {
 		t.Fatalf("imports = %v, want %v", info.Imports, want)
 	}
