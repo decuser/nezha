@@ -25,10 +25,6 @@ import (
 // graphicsImportPath is the host graphics library.
 const graphicsImportPath = "github.com/hajimehoshi/ebiten"
 
-// graphicsAllowedFile is the single file permitted to import it, relative to
-// the distribution root.
-const graphicsAllowedFile = "cmd/aiki-canvas/ebiten.go"
-
 // languageCorePackages must not depend on the host graphics library at all.
 // These are the packages that define and evaluate the language.
 var languageCorePackages = []string{
@@ -90,26 +86,18 @@ func goFilesImporting(t *testing.T, root, dir, prefix string, recurse bool) []st
 	return found
 }
 
-// TestGraphicsDependencyConfined checks that the host graphics library is
-// imported by one file only. A second importer would spread a dependency that
-// cannot be initialized without a display, and would put a headless
-// configuration out of reach.
-func TestGraphicsDependencyConfined(t *testing.T) {
+// TestGraphicsDependencyAbsent checks that the headless Nezha tree does not
+// import the host graphics library.
+func TestGraphicsDependencyAbsent(t *testing.T) {
 	root := distributionRoot(t)
 
 	var importers []string
 	for _, dir := range []string{"engine", "cmd", "test"} {
 		importers = append(importers, goFilesImporting(t, root, dir, graphicsImportPath, true)...)
 	}
-
-	switch {
-	case len(importers) == 0:
-		t.Errorf("no file imports %s; if graphics moved, this test needs updating", graphicsImportPath)
-	case len(importers) == 1 && importers[0] == graphicsAllowedFile:
-		// The boundary holds.
-	default:
-		t.Errorf("%s must be imported only by %s, but is imported by: %s",
-			graphicsImportPath, graphicsAllowedFile, strings.Join(importers, ", "))
+	if len(importers) > 0 {
+		t.Errorf("%s must not be imported, but is imported by: %s",
+			graphicsImportPath, strings.Join(importers, ", "))
 	}
 }
 
