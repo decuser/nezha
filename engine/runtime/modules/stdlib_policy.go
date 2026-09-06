@@ -97,7 +97,6 @@ var stdlibModulePolicies = []StdlibModulePolicy{
 	{Module: "profile", Role: RoleInternal, Realization: RealizationMixed},
 	{Module: "selfhost/bootstrap", Role: RoleInternal, Realization: RealizationMixed},
 	{Module: "test", Role: RoleInternal, Realization: RealizationIntrinsic},
-	{Module: "target", Role: RoleInternal, Realization: RealizationNative},
 }
 
 // StdlibModulePolicies returns a copy of all shipped module policy declarations.
