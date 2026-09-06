@@ -95,7 +95,6 @@ var stdlibModulePolicies = []StdlibModulePolicy{
 
 	// Tooling/runtime implementation support rather than general stdlib semantics.
 	{Module: "profile", Role: RoleInternal, Realization: RealizationMixed},
-	{Module: "selfhost/bootstrap", Role: RoleInternal, Realization: RealizationMixed},
 	{Module: "test", Role: RoleInternal, Realization: RealizationIntrinsic},
 }
 

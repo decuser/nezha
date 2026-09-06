@@ -1,7 +1,0 @@
-[Plugin]
-Loader=python3
-Module=aiki_lsp
-IAge=3
-Name=Aiki Language Services
-Description=Live Aiki diagnostics via aiki lsp
-Authors=Will Senn
