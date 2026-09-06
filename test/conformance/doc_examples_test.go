@@ -86,7 +86,7 @@ func buildAiki(t *testing.T) string {
 	}
 
 	distDir := t.TempDir()
-	for _, name := range []string{"lib", "vendor", "selfhost"} {
+	for _, name := range []string{"lib", "vendor"} {
 		src := filepath.Join(absRoot, name)
 		if _, err := os.Stat(src); err != nil {
 			if os.IsNotExist(err) {
