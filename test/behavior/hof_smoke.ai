@@ -1,9 +1,124 @@
 # Higher-order function tests
-let list = import("list")
-let math = import("math/ffi")
+let map = (xs, f) {
+	let result = []
+	let i = 0
+	while i < length(xs) {
+		result = append(result, f(xs[i]))
+		i = i + 1
+	}
+	return result
+}
+
+let filter = (xs, f) {
+	let result = []
+	let i = 0
+	while i < length(xs) {
+		if f(xs[i]) {
+			result = append(result, xs[i])
+		}
+		i = i + 1
+	}
+	return result
+}
+
+let reduce = (xs, acc, f) {
+	let result = acc
+	let i = 0
+	while i < length(xs) {
+		result = f(result, xs[i])
+		i = i + 1
+	}
+	return result
+}
+
+let each = (xs, f) {
+	let i = 0
+	while i < length(xs) {
+		f(xs[i])
+		i = i + 1
+	}
+	return true
+}
+
+let reverse = (xs) {
+	let result = []
+	let i = length(xs) - 1
+	while i >= 0 {
+		result = append(result, xs[i])
+		i = i - 1
+	}
+	return result
+}
+
+let find = (xs, f) {
+	let i = 0
+	while i < length(xs) {
+		if f(xs[i]) {
+			return xs[i]
+		}
+		i = i + 1
+	}
+	return false
+}
+
+let any = (xs, f) {
+	let i = 0
+	while i < length(xs) {
+		if f(xs[i]) {
+			return true
+		}
+		i = i + 1
+	}
+	return false
+}
+
+let all = (xs, f) {
+	let i = 0
+	while i < length(xs) {
+		if not f(xs[i]) {
+			return false
+		}
+		i = i + 1
+	}
+	return true
+}
+
+let sum = (xs) {
+	return reduce(xs, 0, (acc, x) {
+		acc + x
+	})
+}
+
+let max = (xs) {
+	let result = xs[0]
+	let i = 1
+	while i < length(xs) {
+		if xs[i] > result {
+			result = xs[i]
+		}
+		i = i + 1
+	}
+	return result
+}
+
+let min = (xs) {
+	let result = xs[0]
+	let i = 1
+	while i < length(xs) {
+		if xs[i] < result {
+			result = xs[i]
+		}
+		i = i + 1
+	}
+	return result
+}
+
+let is_even = (x) {
+	equal(x - (truncate(x / 2) * 2), 0)
+}
 
 # map
-let doubled = list.map([1, 2, 3], (x) {
+let doubled = map([1, 2, 3], (x) {
 	x * 2
 })
 
@@ -11,15 +126,12 @@ let doubled = list.map([1, 2, 3], (x) {
 print(doubled, "\n")
 
 # filter
-let evens = list.filter([1, 2, 3, 4, 5], (x) {
-	equal(math.modulo(x, 2), 0)
-})
-
+let evens = filter([1, 2, 3, 4, 5], is_even)
 
 print(evens, "\n")
 
 # reduce
-let total = list.reduce([1, 2, 3, 4], 0, (acc, x) {
+let total = reduce([1, 2, 3, 4], 0, (acc, x) {
 	acc + x
 })
 
@@ -27,7 +139,7 @@ let total = list.reduce([1, 2, 3, 4], 0, (acc, x) {
 print(total, "\n")
 
 # each (side effects)
-list.each([1, 2, 3], (x) {
+each([1, 2, 3], (x) {
 	print(x)
 })
 
@@ -35,10 +147,10 @@ list.each([1, 2, 3], (x) {
 print("\n")
 
 # reverse
-print(list.reverse([1, 2, 3]), "\n")
+print(reverse([1, 2, 3]), "\n")
 
 # find
-let found = list.find([1, 2, 3, 4], (x) {
+let found = find([1, 2, 3, 4], (x) {
 	x > 2
 })
 
@@ -46,30 +158,24 @@ let found = list.find([1, 2, 3, 4], (x) {
 print(found, "\n")
 
 # any
-print(list.any([1, 2, 3], (x) {
+print(any([1, 2, 3], (x) {
 	x > 2
 }), "\n")
 
 
-print(list.any([1, 2, 3], (x) {
+print(any([1, 2, 3], (x) {
 	x > 5
 }), "\n")
 
 
 # all
-print(list.all([2, 4, 6], (x) {
-	equal(math.modulo(x, 2), 0)
-}), "\n")
+print(all([2, 4, 6], is_even), "\n")
 
-
-print(list.all([2, 3, 6], (x) {
-	equal(math.modulo(x, 2), 0)
-}), "\n")
-
+print(all([2, 3, 6], is_even), "\n")
 
 # sum
-print(list.sum([1, 2, 3, 4, 5]), "\n")
+print(sum([1, 2, 3, 4, 5]), "\n")
 
 # max/min
-print(list.max([3, 1, 4, 1, 5]), "\n")
-print(list.min([3, 1, 4, 1, 5]), "\n")
+print(max([3, 1, 4, 1, 5]), "\n")
+print(min([3, 1, 4, 1, 5]), "\n")

@@ -1,21 +1,60 @@
 # 1. Atomic tools
-let list = import("list")
-let math = import("math/ffi")
+let range = (start, stop) {
+	let result = []
+	let i = start
+	while i < stop {
+		result = append(result, i)
+		i = i + 1
+	}
+	return result
+}
+
+let filter = (xs, f) {
+	let result = []
+	let i = 0
+	while i < length(xs) {
+		if f(xs[i]) {
+			result = append(result, xs[i])
+		}
+		i = i + 1
+	}
+	return result
+}
+
+let map = (xs, f) {
+	let result = []
+	let i = 0
+	while i < length(xs) {
+		result = append(result, f(xs[i]))
+		i = i + 1
+	}
+	return result
+}
+
+let sum = (xs) {
+	let total = 0
+	let i = 0
+	while i < length(xs) {
+		total = total + xs[i]
+		i = i + 1
+	}
+	return total
+}
 
 let square = (x) {
 	return x * x
 }
 
 let is_even = (x) {
-	return equal(math.modulo(x, 2), 0)
+	return equal(x - (truncate(x / 2) * 2), 0)
 }
 
 print("PIPELINE\n")
 
-list.range(1, 11) |>
-list.filter(is_even) |>
-list.map(square) |>
-list.sum() |>
+range(1, 11) |>
+filter(is_even) |>
+map(square) |>
+sum() |>
 print("\n")
 
 

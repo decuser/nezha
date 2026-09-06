@@ -70,22 +70,22 @@ func lintSource(t *testing.T, src string) []Diagnostic {
 
 func TestLintUseResolvesRegistryPackage(t *testing.T) {
 	dir := t.TempDir()
-	moduleDir := filepath.Join(dir, "lib", "list")
+	moduleDir := filepath.Join(dir, "lib", "fixture")
 	if err := os.MkdirAll(moduleDir, 0755); err != nil {
 		t.Fatal(err)
 	}
-	moduleSource := `package "list"
-let map = (xs, f) { return xs }
-export(:map)
+	moduleSource := `package "fixture"
+let identity = (x) { return x }
+export(:identity)
 `
-	if err := os.WriteFile(filepath.Join(moduleDir, "list.ai"), []byte(moduleSource), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(moduleDir, "fixture.ai"), []byte(moduleSource), 0644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(moduleDir, "list.help"), []byte(`@summary "test list module"
+	if err := os.WriteFile(filepath.Join(moduleDir, "fixture.help"), []byte(`@summary "test fixture module"
 `), 0644); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(moduleDir, "list.doc"), nil, 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(moduleDir, "fixture.doc"), nil, 0644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -102,18 +102,17 @@ export(:map)
 	if err != nil {
 		t.Fatal(err)
 	}
-	source := `use("list")
-let xs = [1, 2, 3]
-let ys = map(xs, (x) { return x })
-println(ys)
+	source := `use("fixture")
+let x = identity(42)
+println(x)
 `
 	diags, err := LintSource(g, filepath.Join(dir, "program.ai"), source, value.ScopeUser)
 	if err != nil {
 		t.Fatalf("LintSource error: %v", err)
 	}
 	for _, d := range diags {
-		if d.Severity == "error" && strings.Contains(d.Message, "undefined name: 'map'") {
-			t.Fatalf("use(\"list\") did not bind registry export map: %v", diags)
+		if d.Severity == "error" && strings.Contains(d.Message, "undefined name: 'identity'") {
+			t.Fatalf("use(\"fixture\") did not bind registry export identity: %v", diags)
 		}
 	}
 }

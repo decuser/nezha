@@ -1,8 +1,8 @@
 # @negative parse
-use("list")
 
 let data = [1, 2, 3]
 let double = (n) { return n * 2 }
+let map = (f) { return f }
 
 let out = data
 	|> map(double)

@@ -1,6 +1,4 @@
 # to_str smoke test - verify value conversion (not display formatting)
-let list = import("list")
-
 # Rune to string - should be "A" not "'A'"
 println(to_str('A'))
 println(to_str(chr(50504)))
@@ -20,11 +18,13 @@ println(to_str(false))
 println(to_str(:foo))
 
 # Build string from runes
+let letters = ['h', 'e', 'l', 'l', 'o']
 let s = ""
-list.each(['h', 'e', 'l', 'l', 'o'], (r) {
-	s = s + to_str(r)
-})
-
+let i = 0
+while i < length(letters) {
+	s = s + to_str(letters[i])
+	i = i + 1
+}
 
 println(s)
 
