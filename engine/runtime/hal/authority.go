@@ -61,14 +61,6 @@ var authorityPolicy = map[string][]string{
 		"_bytes_to_str",
 		"_str_to_bytes",
 	},
-	"lib/canvas/canvas.ai": {
-		"_canvas",
-		"_canvas_alive",
-		"_canvas_command",
-		"_canvas_height",
-		"_canvas_width",
-		"_destroy",
-	},
 	"lib/file/file.ai": {
 		"_file_close",
 		"_file_copy",
@@ -338,19 +330,6 @@ var authorityPolicy = map[string][]string{
 		"_after",
 		"_sleep",
 		"_time_now",
-	},
-	"lib/turtle/simple.ai": {
-		"_canvas",
-		"_canvas_alive",
-		"_canvas_command",
-		"_canvas_width",
-		"_destroy",
-		"_truncate",
-	},
-	"lib/turtle/turtle.ai": {
-		"_canvas_command",
-		"_canvas_height",
-		"_canvas_width",
 	},
 }
 

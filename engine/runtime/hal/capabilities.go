@@ -65,13 +65,6 @@ var capabilityRegistry = map[string]Capability{
 		Name:       "random",
 		Operations: []string{"HAL.random.seed", "HAL.random.below"},
 	},
-	"canvas": {
-		Name: "canvas",
-		Operations: []string{
-			"HAL.canvas.open", "HAL.canvas.command", "HAL.canvas.close",
-			"HAL.canvas.width", "HAL.canvas.height", "HAL.canvas.alive",
-		},
-	},
 }
 
 // CapabilityDefinition returns an independent copy of one capability.

@@ -14,8 +14,8 @@ import (
 )
 
 func TestStripDocMarkers(t *testing.T) {
-	in := "@preamble use(\"turtle\")\npencolor\n@unchecked\nSets the color.\n\npencolor(:red)"
-	want := "pencolor\nSets the color.\n\npencolor(:red)"
+	in := "@preamble use(\"turtle\")\nsqrt\n@unchecked\nComputes a square root.\n\nsqrt(:red)"
+	want := "sqrt\nComputes a square root.\n\nsqrt(:red)"
 	if got := stripDocMarkers(in); got != want {
 		t.Fatalf("stripDocMarkers() = %q, want %q", got, want)
 	}
@@ -30,8 +30,8 @@ func TestStripDocMarkersLeavesOrdinaryAtLines(t *testing.T) {
 }
 
 func TestModuleHelpCarriesPreamble(t *testing.T) {
-	mh := &modules.ModuleHelp{Preamble: `use("turtle/simple")`}
-	if got, want := mh.Preamble, `use("turtle/simple")`; got != want {
+	mh := &modules.ModuleHelp{Preamble: `use("math/native")`}
+	if got, want := mh.Preamble, `use("math/native")`; got != want {
 		t.Fatalf("ModuleHelp.Preamble = %q, want %q", got, want)
 	}
 }

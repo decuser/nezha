@@ -47,7 +47,6 @@ var validOptionality = map[string]bool{
 
 var validErrorContracts = map[string]bool{
 	"fault":                                       true,
-	"fault or shaped :canvas result":              true,
 	"fault or shaped :environment result":         true,
 	"fault or shaped :io result":                  true,
 	"fault or shaped :io/:end result":             true,

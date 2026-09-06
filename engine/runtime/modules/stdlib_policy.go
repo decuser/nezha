@@ -73,9 +73,7 @@ var stdlibModulePolicies = []StdlibModulePolicy{
 	{Module: "store/ffi", Role: RoleRuntimeCapability, Realization: RealizationFFI},
 
 	// Host-mediated facilities. path intentionally composes portable Aiki code
-	// with host/runtime operations and is therefore mixed. Turtle is classified
-	// below as portable/native: its Aiki semantics bottom out in canvas capability.
-	{Module: "canvas", Role: RoleHostCapability, Realization: RealizationIntrinsic},
+	// with host/runtime operations and is therefore mixed.
 	{Module: "file", Role: RoleHostCapability, Realization: RealizationIntrinsic},
 	{Module: "net", Role: RoleHostCapability, Realization: RealizationIntrinsic},
 	{Module: "path", Role: RoleHostCapability, Realization: RealizationMixed},
@@ -85,8 +83,6 @@ var stdlibModulePolicies = []StdlibModulePolicy{
 	{Module: "system", Role: RoleHostCapability, Realization: RealizationIntrinsic},
 	{Module: "term", Role: RoleHostCapability, Realization: RealizationIntrinsic},
 	{Module: "time", Role: RoleHostCapability, Realization: RealizationIntrinsic},
-	{Module: "turtle", Role: RolePortable, Realization: RealizationNative},
-	{Module: "turtle/simple", Role: RolePortable, Realization: RealizationNative},
 
 	// Deliberate provider semantics: regex/ffi currently documents Go regexp / RE2
 	// syntax, so the provider contract itself is part of the public meaning.

@@ -79,12 +79,6 @@ func (g *GoRuntime) registerHAL() {
 	g.registerHost(goHostOperation("_path_separator"), halPathSeparator)
 	g.registerHost(goHostOperation("_seed"), g.halSeed)
 	g.registerHost(goHostOperation("_random"), g.halRandom)
-	g.registerHost(goHostOperation("_canvas"), g.halCanvas)
-	g.registerHost(goHostOperation("_canvas_command"), g.halCanvasCommand)
-	g.registerHost(goHostOperation("_destroy"), g.halDestroy)
-	g.registerHost(goHostOperation("_canvas_width"), g.halCanvasWidth)
-	g.registerHost(goHostOperation("_canvas_height"), g.halCanvasHeight)
-	g.registerHost(goHostOperation("_canvas_alive"), g.halCanvasAlive)
 
 	// Evaluator/language intrinsics.
 	g.registerPrimitive("_apply", halApply)

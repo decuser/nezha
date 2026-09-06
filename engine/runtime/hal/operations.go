@@ -152,48 +152,6 @@ var operationDefinitions = map[string]HostOperation{
 	"_system_cwd":     hostOperation("HAL.system.cwd", "_system_cwd", "runtime.process", "nonblocking", "fault", bindings(binding("system.cwd", "lib/system/system.ai"))),
 	"_system_chdir":   hostOperation("HAL.system.chdir", "_system_chdir", "runtime.process", "may block", "fault or shaped :io result", bindings(binding("system.chdir", "lib/system/system.ai"))),
 	"_path_separator": hostOperation("HAL.path.separator", "_path_separator", "runtime.platform", "nonblocking", "fault", bindings(binding("path.separator", "lib/path/path.ai"))),
-	"_canvas": {
-		Identity:            "HAL.canvas.open",
-		Primitive:           "_canvas",
-		Authority:           "HAL.canvas.open",
-		Context:             []string{"runtime.resources", "runtime.graphics"},
-		Effect:              "resource acquisition",
-		Blocking:            "waits externally",
-		Lifetime:            "returns resource",
-		Optionality:         "optional",
-		ErrorContract:       "fault or shaped :canvas result",
-		SemanticObservation: "canvas.canvas",
-		AikiBindings:        bindings(binding("canvas.canvas", "lib/canvas/canvas.ai")),
-	},
-	"_canvas_command": {
-		Identity:            "HAL.canvas.command",
-		Primitive:           "_canvas_command",
-		Authority:           "HAL.canvas.command",
-		Context:             []string{"runtime.resources", "runtime.graphics"},
-		Effect:              "bounded call",
-		Blocking:            "may block",
-		Lifetime:            "operates on resource",
-		Optionality:         "optional",
-		ErrorContract:       "fault or shaped :canvas result",
-		SemanticObservation: "canvas.command",
-		AikiBindings: bindings(
-			binding("canvas.dot", "lib/canvas/canvas.ai"),
-			binding("canvas.line", "lib/canvas/canvas.ai"),
-			binding("canvas.rect", "lib/canvas/canvas.ai"),
-			binding("canvas.fill_rect", "lib/canvas/canvas.ai"),
-			binding("canvas.circle", "lib/canvas/canvas.ai"),
-			binding("canvas.fill_circle", "lib/canvas/canvas.ai"),
-			binding("canvas.arc", "lib/canvas/canvas.ai"),
-			binding("canvas.clear", "lib/canvas/canvas.ai"),
-			binding("canvas.set_bg", "lib/canvas/canvas.ai"),
-			binding("canvas.set_fg", "lib/canvas/canvas.ai"),
-			binding("canvas.pen_size", "lib/canvas/canvas.ai"),
-		),
-	},
-	"_destroy":       canvasResourceOperation("HAL.canvas.close", "_destroy", "canvas.destroy", binding("canvas.destroy", "lib/canvas/canvas.ai")),
-	"_canvas_width":  canvasResourceOperation("HAL.canvas.width", "_canvas_width", "canvas.width", binding("canvas.width", "lib/canvas/canvas.ai")),
-	"_canvas_height": canvasResourceOperation("HAL.canvas.height", "_canvas_height", "canvas.height", binding("canvas.height", "lib/canvas/canvas.ai")),
-	"_canvas_alive":  canvasResourceOperation("HAL.canvas.alive", "_canvas_alive", "canvas.alive", binding("canvas.alive", "lib/canvas/canvas.ai")),
 	"_process_start": {
 		Identity: "HAL.process.start", Primitive: "_process_start", Authority: "HAL.process.start",
 		Context: []string{"runtime.process", "runtime.io", "runtime.resources"}, Effect: "resource acquisition",
@@ -343,14 +301,6 @@ func resourceAcquisition(identity, primitive, observation string, b AikiBinding)
 func resourceOperation(identity, primitive, observation string, b AikiBinding) HostOperation {
 	op := fileOperation(identity, primitive, observation, b)
 	op.Lifetime = "operates on resource"
-	return op
-}
-
-func canvasResourceOperation(identity, primitive, observation string, b AikiBinding) HostOperation {
-	op := hostOperation(identity, primitive, "runtime.resources", "nonblocking", "fault or shaped :canvas result", bindings(b))
-	op.Lifetime = "operates on resource"
-	op.Optionality = "optional"
-	op.SemanticObservation = observation
 	return op
 }
 

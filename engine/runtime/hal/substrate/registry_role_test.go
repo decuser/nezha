@@ -55,7 +55,7 @@ func TestCompatibilityRegistrySeparatedByRole(t *testing.T) {
 		}
 	}
 
-	for _, name := range []string{"_apply", "_first", "_regex_match", "_file_open", "_canvas", "_profile_counts"} {
+	for _, name := range []string{"_apply", "_first", "_regex_match", "_file_open", "_profile_counts"} {
 		if _, ok := rt.lookupBuiltin(name); !ok {
 			t.Errorf("compatibility lookup lost %s", name)
 		}
