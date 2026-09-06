@@ -3,7 +3,6 @@
 # This sample shows the full range of string operations available
 # in the string library, organized by category.
 let str = import("string")
-let list = import("list")
 
 println("=== String Functions Showcase ===")
 println("")
@@ -98,7 +97,9 @@ println("")
 println("--- Character Classes ---")
 
 let test_chars = ['A', 'a', '5', ' ', '!']
-list.each(test_chars, (c) {
+let i = 0
+while i < length(test_chars) {
+	let c = test_chars[i]
 	print(to_str(c) + ": ")
 	print("digit=" + to_str(str.is_digit(c)) + " ")
 	print("alpha=" + to_str(str.is_alpha(c)) + " ")
@@ -106,8 +107,8 @@ list.each(test_chars, (c) {
 	print("lower=" + to_str(str.is_lower(c)) + " ")
 	print("alnum=" + to_str(str.is_alnum(c)) + " ")
 	println("space=" + to_str(str.is_whitespace(c)))
-})
-
+	i = i + 1
+}
 
 println("")
 
@@ -162,14 +163,16 @@ let rows = str.lines(csv_data)
 let headers = str.split(first(rows), ",")
 println("Headers: " + inspect(headers))
 
-list.each(rest(rows), (row) {
+let row_index = 1
+while row_index < length(rows) {
+	let row = rows[row_index]
 	let values = str.split(row, ",")
 	let name = first(values)
 	let age = first(rest(values))
 	let city = first(rest(rest(values)))
 	println(name + " is " + age + " years old, lives in " + city)
-})
-
+	row_index = row_index + 1
+}
 
 println("")
 

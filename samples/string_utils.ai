@@ -5,8 +5,6 @@
 #
 # NOTE: These are educational implementations. The string library provides
 # optimized versions of these functions (starts_with, ends_with, etc.)
-let list = import("list")
-
 # my_slice(s, start, end) - extract substring
 let my_slice = (s, start, end) {
 	let result = ""
@@ -70,9 +68,13 @@ let my_join = (lst, delim) {
 	if empty(lst) {
 		return ""
 	}
-	list.reduce(rest(lst), first(lst), (acc, x) {
-		acc + delim + x
-	})
+	let result = first(lst)
+	let i = 1
+	while i < length(lst) {
+		result = result + delim + lst[i]
+		i = i + 1
+	}
+	return result
 }
 
 # my_split(s, delim) - split string by delimiter
