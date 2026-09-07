@@ -1,19 +1,14 @@
 package hal
 
-// HostOperation describes one canonical irreducible crossing from Nezha into
-// the host. It is architectural metadata: the Nezha-facing meaning, HAL
-// contract identity, and substrate realization remain distinct names.
+// HostOperation describes one canonical crossing from Nezha into the host.
+// The current specimen has one such crossing: _print writes to the runtime
+// output endpoint. This metadata records that boundary without preserving the
+// larger Aiki-era capability/profile taxonomy.
 type HostOperation struct {
 	Identity            string
 	Primitive           string
-	Authority           string
-	Context             []string
 	Effect              string
-	Blocking            string
-	Lifetime            string
-	Optionality         string
-	ErrorContract       string
-	SemanticObservation string
+	Blocking            bool
 	SubstrateProvenance string
 	NezhaBindings       []NezhaBinding
 }
@@ -26,8 +21,8 @@ type NezhaBinding struct {
 }
 
 // HostOperationProvider is an optional runtime capability for inspecting the
-// canonical host contracts currently bound by a substrate. It is intentionally
-// separate from RuntimeContract during M1 so evaluator behavior does not change.
+// canonical host contracts currently bound by a substrate. It is separate from
+// RuntimeContract so evaluator behavior does not depend on metadata inspection.
 type HostOperationProvider interface {
 	HostOperations() []HostOperation
 }

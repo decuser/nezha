@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sync"
 
 	"nezha/engine/runtime/hal"
 	"nezha/engine/runtime/primitives"
@@ -77,7 +76,6 @@ type GoRuntime struct {
 	builtins     map[string]*Builtin
 	hostBindings map[string]hal.HostOperation
 	stdout       io.Writer
-	mu           sync.RWMutex
 }
 
 // Verify GoRuntime implements RuntimeContract.
@@ -95,43 +93,21 @@ func NewGoRuntime() *GoRuntime {
 	return rt
 }
 
-// SetIO replaces the runtime-owned output endpoint. The input argument is
-// ignored and retained only so existing test harnesses can keep a stable call
-// shape while Nezha has no host input operation. A nil output restores stdout.
-func (g *GoRuntime) SetIO(_ io.Reader, out io.Writer) {
-	g.mu.Lock()
+// SetOutput replaces the runtime-owned output endpoint. A nil output restores stdout.
+func (g *GoRuntime) SetOutput(out io.Writer) {
 	if out == nil {
 		out = os.Stdout
 	}
 	g.stdout = out
-	g.mu.Unlock()
-}
-
-func (g *GoRuntime) Execute(name string, args []value.Value) (value.Value, error) {
-	g.mu.RLock()
-	b, ok := g.lookupBuiltin(name)
-	g.mu.RUnlock()
-
-	if !ok {
-		return nil, fmt.Errorf("builtin %s not found", name)
-	}
-
-	result := b.Call(args)
-	if fault, ok := result.(*value.Fault); ok {
-		return nil, fmt.Errorf("%s", fault.Message)
-	}
-	return result, nil
 }
 
 // authorityKey returns the architectural grant checked for a runtime binding.
 // Canonical host operations are authorized by HAL identity; leaf runtime
 // primitives use their implementation primitive name.
 func (g *GoRuntime) authorityKey(name string) string {
-	g.mu.RLock()
 	op, ok := g.hostBindings[name]
-	g.mu.RUnlock()
 	if ok {
-		return op.Authority
+		return op.Identity
 	}
 	return name
 }
@@ -142,9 +118,7 @@ func (g *GoRuntime) HasBuiltin(name string, authority value.Authority) bool {
 	if !authority.Allows(g.authorityKey(name)) {
 		return false
 	}
-	g.mu.RLock()
 	_, ok := g.lookupBuiltin(name)
-	g.mu.RUnlock()
 	return ok
 }
 
@@ -155,9 +129,7 @@ func (g *GoRuntime) GetBuiltin(name string, authority value.Authority) (value.Ca
 	if !authority.Allows(g.authorityKey(name)) {
 		return nil, false
 	}
-	g.mu.RLock()
 	b, ok := g.lookupBuiltin(name)
-	g.mu.RUnlock()
 	return b, ok
 }
 

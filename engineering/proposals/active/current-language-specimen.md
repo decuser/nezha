@@ -306,3 +306,30 @@ and one HAL-backed output operation.
 ```
 
 This is the starting specimen for later evaluation-character work.
+
+## Post-boundary checkpoint
+
+After the final boundary cleanup set, the core invariant is:
+
+```text
+only evaluator code evaluates Nezha bodies
+substrate builtins are leaf functions
+runner is the only script-with-prelude facade
+engine + runner pass cleanroom without cmd/test/engineering/samples
+```
+
+The remaining registered substrate surface is a flat builtin table. `_print` is
+still recorded as the single HAL-crossing host effect. `_apply` is evaluator-owned
+and exists so the prelude can expose first-class application without creating a
+runtime-to-evaluator callback.
+
+Remaining design seams are no longer residue cleanup:
+
+```text
+Function.Body / Function.Env interface{} closure seam
+whether _print/HAL survives long term
+whether ReturnType should remain a value carrier
+how shapes, match, and access decompose into evaluation characters
+```
+
+The next phase is evaluation-character inventory, not more broad removal.

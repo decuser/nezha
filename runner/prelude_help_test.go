@@ -25,7 +25,7 @@ func TestPreludeHelpRegistryComplete(t *testing.T) {
 	}
 
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
-	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
+	preludeEnv.SetAuthority(rt.PreludeAuthority())
 	if err := loadPrelude(g, rt, preludeEnv); err != nil {
 		t.Fatalf("loadPrelude: %v", err)
 	}

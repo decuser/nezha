@@ -84,6 +84,5 @@ Validate:
 
 ```sh
 make validate-lang
-make validate-all
-make rigorous
+make cleanroom
 ```

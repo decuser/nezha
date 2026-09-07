@@ -99,7 +99,7 @@ func run(path, stage string, stdout, stderr io.Writer) int {
 
 		// Create prelude environment
 		preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
-		preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
+		preludeEnv.SetAuthority(rt.PreludeAuthority())
 		preludeEnv.SetFile("<prelude>")
 		preludeEnv.SetSource(prelude.Source)
 

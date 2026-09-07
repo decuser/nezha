@@ -175,13 +175,13 @@ func evalWithScope(code string, scope value.Scope, loadPrel bool) (value.Value, 
 	// Create env with specified scope
 	env := value.NewEnvWithScope(scope)
 	if scope == value.ScopePrelude {
-		env.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
+		env.SetAuthority(rt.PreludeAuthority())
 	}
 
 	// Optionally load prelude first (into a prelude-scope env, then enclose)
 	if loadPrel {
 		preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
-		preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
+		preludeEnv.SetAuthority(rt.PreludeAuthority())
 		if err := loadPreludeInto(g, rt, preludeEnv); err != nil {
 			return nil, err
 		}

@@ -6,31 +6,7 @@ import (
 	"strings"
 )
 
-var validContexts = map[string]bool{
-	"runtime.io": true,
-}
-
-var validEffects = map[string]bool{
-	"bounded call": true,
-}
-
-var validBlocking = map[string]bool{
-	"may block": true,
-}
-
-var validLifetimes = map[string]bool{
-	"stateless": true,
-}
-
-var validOptionality = map[string]bool{
-	"constitutive": true,
-}
-
-var validErrorContracts = map[string]bool{
-	"fault": true,
-}
-
-// ValidateMetadata verifies the internal HAL metadata graph. Inputs are explicit
+// ValidateMetadata verifies the compact HAL metadata graph. Inputs are explicit
 // so invariant tests can exercise the same validator with deliberately malformed
 // graphs rather than duplicating validation logic.
 func ValidateMetadata(operations map[string]HostOperation) error {
@@ -38,6 +14,9 @@ func ValidateMetadata(operations map[string]HostOperation) error {
 
 	identities := map[string]string{}
 	for primitive, op := range operations {
+		if primitive == "" {
+			problems = append(problems, "empty operation key")
+		}
 		if primitive != op.Primitive {
 			problems = append(problems, fmt.Sprintf("operation key %s disagrees with primitive %s", primitive, op.Primitive))
 		}
@@ -48,36 +27,16 @@ func ValidateMetadata(operations map[string]HostOperation) error {
 		} else {
 			identities[op.Identity] = primitive
 		}
-		if op.Authority != op.Identity {
-			problems = append(problems, fmt.Sprintf("operation %s authority %s does not match canonical identity %s", primitive, op.Authority, op.Identity))
+		if op.Effect == "" {
+			problems = append(problems, fmt.Sprintf("operation %s has empty effect", primitive))
 		}
-		if len(op.Context) == 0 {
-			problems = append(problems, fmt.Sprintf("operation %s has no context", primitive))
+		if len(op.NezhaBindings) == 0 {
+			problems = append(problems, fmt.Sprintf("operation %s has no Nezha binding", primitive))
 		}
-		seenContext := map[string]bool{}
-		for _, context := range op.Context {
-			if !validContexts[context] {
-				problems = append(problems, fmt.Sprintf("operation %s has unknown context %s", primitive, context))
+		for _, binding := range op.NezhaBindings {
+			if binding.Name == "" || binding.Source == "" {
+				problems = append(problems, fmt.Sprintf("operation %s has incomplete Nezha binding", primitive))
 			}
-			if seenContext[context] {
-				problems = append(problems, fmt.Sprintf("operation %s repeats context %s", primitive, context))
-			}
-			seenContext[context] = true
-		}
-		if !validEffects[op.Effect] {
-			problems = append(problems, fmt.Sprintf("operation %s has unknown effect %q", primitive, op.Effect))
-		}
-		if !validBlocking[op.Blocking] {
-			problems = append(problems, fmt.Sprintf("operation %s has unknown blocking class %q", primitive, op.Blocking))
-		}
-		if !validLifetimes[op.Lifetime] {
-			problems = append(problems, fmt.Sprintf("operation %s has unknown lifetime %q", primitive, op.Lifetime))
-		}
-		if !validOptionality[op.Optionality] {
-			problems = append(problems, fmt.Sprintf("operation %s has unknown optionality %q", primitive, op.Optionality))
-		}
-		if !validErrorContracts[op.ErrorContract] {
-			problems = append(problems, fmt.Sprintf("operation %s has unknown error contract %q", primitive, op.ErrorContract))
 		}
 	}
 

@@ -72,7 +72,7 @@ func isValidCase(name string) bool {
 
 func makeGlobals(g *grammar.Grammar, lintScope value.Scope, catalog Catalog) scopeFrame {
 	globals := make(scopeFrame)
-	// Prelude exports are derived from the engine-owned prelude catalog.
+	// Prelude bindings are derived from the engine-owned prelude catalog.
 	if authored, err := prelude.LoadCatalog(g); err == nil {
 		for _, name := range authored.Names {
 			globals[name] = true

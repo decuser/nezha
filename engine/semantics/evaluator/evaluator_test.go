@@ -23,7 +23,7 @@ func eval(t *testing.T, source string) value.Value {
 	ev := New(rt)
 	// Use prelude scope to access HAL primitives directly
 	env := value.NewEnvWithScope(value.ScopePrelude)
-	env.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
+	env.SetAuthority(rt.PreludeAuthority())
 	return ev.Eval(ast, env)
 }
 

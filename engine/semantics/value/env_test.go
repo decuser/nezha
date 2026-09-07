@@ -13,29 +13,12 @@ func TestGetSourceLineUsesCachedSource(t *testing.T) {
 	}
 }
 
-func TestIsolatedEnclosedEnvOwnsCallStack(t *testing.T) {
-	parent := NewEnvWithScope(ScopePrelude)
-	parent.PushFrame("parent", 1, ScopePrelude)
-
-	child := NewIsolatedEnclosedEnv(parent)
-	if got := child.StackDepth(); got != 0 {
-		t.Fatalf("isolated child stack depth: got %d, want 0", got)
-	}
-	child.PushFrame("child", 2, ScopePrelude)
-	if got := parent.StackDepth(); got != 1 {
-		t.Fatalf("parent stack changed by child: got %d, want 1", got)
-	}
-	if got := child.StackDepth(); got != 1 {
-		t.Fatalf("child stack depth: got %d, want 1", got)
-	}
-}
-
 func TestCallEnvUsesLexicalBindingsAndDynamicStack(t *testing.T) {
 	lexical := NewEnvWithScope(ScopePrelude)
 	lexical.Set("lexical", NewNumber(7, 1))
 	lexical.PushFrame("lexical-frame", 1, ScopePrelude)
 
-	caller := NewIsolatedEnclosedEnv(lexical)
+	caller := NewEnvWithScope(ScopePrelude)
 	caller.PushFrame("caller-frame", 2, ScopePrelude)
 
 	call := NewCallEnv(lexical, caller)
@@ -63,25 +46,6 @@ func TestScopeDoesNotConferAuthority(t *testing.T) {
 	}
 	if env.GetAuthority().Allows("_file_open") {
 		t.Fatal("authority must grant only declared primitives")
-	}
-}
-
-func TestIsolatedEnvSeparatesPreludeVocabularyFromAuthority(t *testing.T) {
-	prelude := NewEnvWithScope(ScopePrelude)
-	prelude.SetAuthority(NewAuthority("_print", "_file_open"))
-	prelude.Set("println", &String{Val: "visible-vocabulary"})
-
-	spawnedAuthority := NewAuthority("_print")
-	isolated := NewIsolatedEnclosedEnvWithAuthority(prelude, spawnedAuthority)
-
-	if _, ok := isolated.Get("println"); !ok {
-		t.Fatal("isolated env must retain access to prelude lexical vocabulary")
-	}
-	if !isolated.GetAuthority().Allows("_print") {
-		t.Fatal("isolated env must retain definition-bound authority")
-	}
-	if isolated.GetAuthority().Allows("_file_open") {
-		t.Fatal("isolated env must not inherit outer prelude authority")
 	}
 }
 
@@ -156,8 +120,6 @@ func TestEnvColdMetadataPreservesInheritanceAndReset(t *testing.T) {
 	root := NewEnv()
 	root.SetFile("root.nez")
 	root.SetSource("one\ntwo\n")
-	root.SetExports([]string{"x"})
-	root.SetPackageName("pkg")
 	root.DefineShape(&ShapeDef{Name: "point"})
 
 	child := NewEnclosedEnv(root)
@@ -174,8 +136,6 @@ func TestEnvColdMetadataPreservesInheritanceAndReset(t *testing.T) {
 	call := NewCallEnv(root, child)
 	call.SetFile("call.nez")
 	call.SetSource("call\nsource\n")
-	call.SetExports([]string{"temp"})
-	call.SetPackageName("temporary")
 	call.DefineShape(&ShapeDef{Name: "temp"})
 	call.ResetCallEnv(root, child)
 
@@ -184,12 +144,6 @@ func TestEnvColdMetadataPreservesInheritanceAndReset(t *testing.T) {
 	}
 	if got := call.GetSourceLine(2); got != "two" {
 		t.Fatalf("reset call source line = %q, want inherited two", got)
-	}
-	if got := call.GetExports(); got != nil {
-		t.Fatalf("reset call exports = %#v, want nil", got)
-	}
-	if got := call.GetPackageName(); got != "" {
-		t.Fatalf("reset call package = %q, want empty", got)
 	}
 	if _, ok := call.GetShape("temp"); ok {
 		t.Fatal("reset call must discard invocation-local shape")

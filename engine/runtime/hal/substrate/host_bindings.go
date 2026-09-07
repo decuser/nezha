@@ -31,15 +31,12 @@ func goHostOperation(primitive string) hal.HostOperation {
 // runtime, sorted by HAL identity. The returned slice is independent of runtime
 // execution state and is intended for tooling, validation, and observation.
 func (g *GoRuntime) HostOperations() []hal.HostOperation {
-	g.mu.RLock()
 	out := make([]hal.HostOperation, 0, len(g.hostBindings))
 	for _, op := range g.hostBindings {
 		copyOp := op
-		copyOp.Context = append([]string(nil), op.Context...)
 		copyOp.NezhaBindings = append([]hal.NezhaBinding(nil), op.NezhaBindings...)
 		out = append(out, copyOp)
 	}
-	g.mu.RUnlock()
 
 	sort.Slice(out, func(i, j int) bool { return out[i].Identity < out[j].Identity })
 	return out

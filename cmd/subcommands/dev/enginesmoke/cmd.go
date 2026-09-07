@@ -343,12 +343,12 @@ func dumpEval(g *grammar.Grammar, file, source string) ([]byte, error) {
 
 	// Load prelude into a fresh environment.
 	rt := substrate.NewGoRuntime()
-	rt.SetIO(nil, &out)
+	rt.SetOutput(&out)
 	if err := initHelpRegistry(g); err != nil {
 		return nil, err
 	}
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
-	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
+	preludeEnv.SetAuthority(rt.PreludeAuthority())
 	if err := loadPrelude(g, rt, preludeEnv); err != nil {
 		return nil, err
 	}

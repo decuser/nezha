@@ -37,20 +37,11 @@ func TestHALHostOperationThreeNameCoverage(t *testing.T) {
 		if !strings.HasPrefix(op.Identity, "HAL.") {
 			t.Errorf("%s: canonical identity must begin HAL.", op.Primitive)
 		}
-		if op.Authority != op.Identity {
-			t.Errorf("%s: M1 authority must be its exact canonical identity, got %q", op.Identity, op.Authority)
-		}
 		if op.SubstrateProvenance == "" || !strings.HasPrefix(op.SubstrateProvenance, "go:") {
 			t.Errorf("%s: missing Go substrate provenance", op.Identity)
 		}
-		if len(op.Context) == 0 || op.Context[0] == "" {
-			t.Errorf("%s: missing required context facet", op.Identity)
-		}
-		if op.Effect == "" || op.Blocking == "" || op.Lifetime == "" || op.Optionality == "" || op.ErrorContract == "" {
-			t.Errorf("%s: incomplete host contract metadata", op.Identity)
-		}
-		if op.SemanticObservation == "" {
-			t.Errorf("%s: missing Nezha-level semantic observation identity", op.Identity)
+		if op.Effect == "" {
+			t.Errorf("%s: missing host effect description", op.Identity)
 		}
 		if prior, ok := identities[op.Identity]; ok {
 			t.Errorf("duplicate HAL identity %s on %s and %s", op.Identity, prior, op.Primitive)
@@ -69,12 +60,12 @@ func TestHALHostOperationThreeNameCoverage(t *testing.T) {
 
 		for _, b := range op.NezhaBindings {
 			assertNezhaBindingUsesPrimitive(t, root, b.Name, b.Source, op.Primitive)
-			authority := rt.AuthorityForSource(b.Source)
+			authority := rt.PreludeAuthority()
 			if !authority.Allows(op.Identity) {
-				t.Errorf("%s: trusted source %s lacks canonical authority %s", op.Identity, b.Source, op.Identity)
+				t.Errorf("%s: prelude lacks canonical authority %s", op.Identity, op.Identity)
 			}
 			if authority.Allows(op.Primitive) {
-				t.Errorf("%s: trusted source %s grants raw host binding %s instead of canonical identity", op.Identity, b.Source, op.Primitive)
+				t.Errorf("%s: prelude grants raw host binding %s instead of canonical identity", op.Identity, op.Primitive)
 			}
 		}
 	}

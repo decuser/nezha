@@ -1,8 +1,6 @@
 package evaluator
 
 import (
-	"fmt"
-	"os"
 	"strings"
 
 	"nezha/engine/semantics/value"
@@ -88,19 +86,6 @@ func (e *Evaluator) evalLet(node *syntax.Node, env *value.Env) value.Value {
 
 	if e.runtime != nil && e.runtime.HasBuiltin(name, env.GetAuthority()) {
 		return e.makeFault(node, env, "cannot shadow builtin: %s", name)
-	}
-
-	// Warn if shadowing a prelude binding at top level (not inside functions/blocks)
-	// Only warn for user scope (ScopeUser), not for libs (ScopePrelude)
-	if env.GetScope() == value.ScopeUser {
-		if preludeEnv := env.GetPreludeEnv(); preludeEnv != nil {
-			if _, exists := preludeEnv.Get(name); exists {
-				// Only warn if env is directly enclosed by prelude (top-level user scope)
-				if env.Outer() == preludeEnv {
-					fmt.Fprintf(os.Stderr, "warning: shadowing prelude function '%s'\n", name)
-				}
-			}
-		}
 	}
 
 	val := e.Eval(valNode, env)

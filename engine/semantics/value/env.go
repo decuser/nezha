@@ -178,15 +178,13 @@ type envCold struct {
 	shapes      map[string]*ShapeDef
 	file        string
 	sourceLines []string
-	exports     []string
-	packageName string
 }
 
 // Env holds variable bindings and scope chain.
 //
-// The hot object deliberately contains only execution/binding state. Module,
-// source, diagnostic, and shape metadata live behind cold and are allocated
-// only for environments that actually own such metadata.
+// The hot object deliberately contains only execution/binding state. Source,
+// diagnostic, and shape metadata live behind cold and are allocated only for
+// environments that actually own such metadata.
 type Env struct {
 	bindings         *envBindings
 	callParamNames   []string
@@ -244,36 +242,11 @@ func NewEnclosedEnvWithScope(outer *Env, scope Scope) *Env {
 	return env
 }
 
-// NewIsolatedEnclosedEnv creates a child that can read through outer but owns
-// its own dynamic call-stack state. This is used by spawn: spawned computations
-// share the prelude vocabulary but must not share mutable execution metadata
-// with the parent goroutine. The current stack-limit value is copied.
-func NewIsolatedEnclosedEnv(outer *Env) *Env {
-	return NewIsolatedEnclosedEnvWithAuthority(outer, outer.authority)
-}
-
-// NewIsolatedEnclosedEnvWithAuthority creates an isolated dynamic environment
-// that can read lexical vocabulary through outer while carrying an explicit
-// definition-bound authority set. Spawn uses this to see prelude names without
-// inheriting prelude privilege.
-func NewIsolatedEnclosedEnvWithAuthority(outer *Env, authority Authority) *Env {
-	stack := make([]StackFrame, 0)
-	limit := outer.GetStackLimit()
-	env := &Env{
-		outer:      outer,
-		scope:      outer.scope,
-		authority:  authority,
-		stack:      &stack,
-		stackLimit: &limit,
-	}
-	return env
-}
-
 // NewCallEnv creates a function-call environment. Name lookup is lexical and
 // therefore chains through lexicalOuter, while execution metadata is dynamic
-// and therefore follows caller. Keeping those two relationships separate is
-// essential for isolated spawn: calling a prelude function must not reconnect
-// a spawned computation to the parent's call stack.
+// and therefore follows caller. Keeping those two relationships separate lets
+// function values retain lexical bindings while stack traces and recursion
+// limits belong to the active caller.
 func NewCallEnv(lexicalOuter, caller *Env) *Env {
 	env := &Env{
 		outer:      lexicalOuter,
@@ -618,30 +591,4 @@ func splitLines(s string) []string {
 		lines = append(lines, s[start:])
 	}
 	return lines
-}
-
-// SetExports sets the list of exported names for this module.
-func (e *Env) SetExports(names []string) {
-	e.ensureCold().exports = names
-}
-
-// GetExports returns the list of exported names.
-func (e *Env) GetExports() []string {
-	if e.cold == nil {
-		return nil
-	}
-	return e.cold.exports
-}
-
-// SetPackageName sets the package name for this module.
-func (e *Env) SetPackageName(name string) {
-	e.ensureCold().packageName = name
-}
-
-// GetPackageName returns the package name declared by this module.
-func (e *Env) GetPackageName() string {
-	if e.cold == nil {
-		return ""
-	}
-	return e.cold.packageName
 }

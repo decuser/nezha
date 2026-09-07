@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"nezha/engine/semantics/value"
 	"nezha/runner"
 )
 
@@ -36,27 +35,25 @@ func Main() {
 }
 
 func runFile(filename string, opts Options) {
-	if err := runner.Run(filename, flag.Args()[1:]...); err != nil {
+	if flag.NArg() != 1 {
+		fmt.Fprintln(os.Stderr, "error: program arguments are not supported")
+		flag.Usage()
+		os.Exit(2)
+	}
+	if err := runner.Run(filename); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
 func runExpr(expr string, opts Options) {
-	sess, err := runner.NewSession()
+	result, err := runner.RunExpr(expr)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
-
-	result := sess.Eval(expr)
-
-	if f, ok := result.(*value.Fault); ok {
-		fmt.Fprintln(os.Stderr, f.Inspect())
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 
 	if opts.Debug {
-		fmt.Println(result.Inspect())
+		fmt.Println(result)
 	}
 }

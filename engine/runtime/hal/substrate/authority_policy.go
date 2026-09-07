@@ -1,25 +1,40 @@
 package substrate
 
-import (
-	"nezha/engine/runtime/hal"
-	"nezha/engine/semantics/value"
-)
+import "nezha/engine/semantics/value"
 
-// AuthorityForSource returns only the grants explicitly declared for a
-// canonical trusted source. Host bindings are translated to canonical HAL
-// identities; non-host primitives retain their implementation names. Merely
-// residing beneath lib/ confers nothing.
-func (g *GoRuntime) AuthorityForSource(path string) value.Authority {
-	bindings, ok := hal.AuthorityPrimitivesForSource(path)
-	if !ok {
-		bindings = nil
-	}
-	if len(bindings) == 0 {
-		return value.NoAuthority()
-	}
-	grants := make([]string, 0, len(bindings))
-	for _, name := range bindings {
+// preludePrimitiveAuthority records the raw privileged names that the embedded
+// prelude is allowed to resolve. Ordinary source files receive no raw primitive
+// authority; they use the public bindings created by prelude.nez.
+var preludePrimitiveAuthority = []string{
+	"_append",
+	"_apply",
+	"_empty",
+	"_equal",
+	"_first",
+	"_length",
+	"_make_shaped_list",
+	"_prepend",
+	"_print",
+	"_rest",
+	"_shape",
+	"_to_str",
+	"_type",
+}
+
+// PreludeAuthority returns the exact grants used while evaluating the embedded
+// prelude. Host bindings are translated to their canonical HAL identities;
+// evaluator-owned and leaf runtime primitives retain their implementation names.
+func (g *GoRuntime) PreludeAuthority() value.Authority {
+	grants := make([]string, 0, len(preludePrimitiveAuthority))
+	for _, name := range preludePrimitiveAuthority {
 		grants = append(grants, g.authorityKey(name))
 	}
 	return value.NewAuthority(grants...)
+}
+
+// PreludeAuthorityPrimitives returns the raw prelude dependency list for
+// invariant tests. It is intentionally not path-based; the runner decides when
+// it is evaluating the embedded prelude.
+func PreludeAuthorityPrimitives() []string {
+	return append([]string(nil), preludePrimitiveAuthority...)
 }

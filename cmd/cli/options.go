@@ -20,7 +20,7 @@ func parseOptions() Options {
 	expr := flag.String("e", "", "evaluate expression and exit")
 
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: nezha [options] <file.nez [args...]>")
+		fmt.Fprintln(os.Stderr, "usage: nezha [options] <file.nez>")
 		fmt.Fprintln(os.Stderr, "       nezha <command> [command options] [args...]")
 		fmt.Fprintln(os.Stderr, "       nezha gate <command> [command options] [args...]")
 		fmt.Fprintln(os.Stderr, "")

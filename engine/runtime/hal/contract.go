@@ -7,9 +7,6 @@ import "nezha/engine/semantics/value"
 // RuntimeContract defines the behavioral requirements of the evaluator.
 // The evaluator delegates all host-level effects through this interface.
 type RuntimeContract interface {
-	// Execute calls a registered primitive function by name.
-	Execute(name string, args []value.Value) (value.Value, error)
-
 	// HasBuiltin checks whether a name is executable under the supplied authority.
 	HasBuiltin(name string, authority value.Authority) bool
 

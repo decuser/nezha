@@ -35,8 +35,6 @@ func (g *GoRuntime) registerBuiltin(name string, arity Arity, fn BuiltinFunc) {
 // The returned map is a validation snapshot; callers cannot mutate runtime
 // dispatch through it.
 func (g *GoRuntime) PrimitiveRegistrations() map[string]Arity {
-	g.mu.RLock()
-	defer g.mu.RUnlock()
 	out := map[string]Arity{}
 	for name, builtin := range g.builtins {
 		out[name] = builtin.arity
