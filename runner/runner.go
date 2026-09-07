@@ -13,20 +13,9 @@ import (
 	"nezha/engine/syntax/grammar"
 )
 
-// ExitStatusError carries a requested nonzero Nezha program exit status back to the CLI.
-type ExitStatusError struct{ Code int }
-
-func (e *ExitStatusError) Error() string { return fmt.Sprintf("exit status %d", e.Code) }
-
 func executionResultError(result value.Value) error {
 	if fault, ok := result.(*value.Fault); ok {
 		return fmt.Errorf("%s", fault.Inspect())
-	}
-	if exit, ok := result.(*value.ProgramExitSignal); ok {
-		if exit.Code == 0 {
-			return nil
-		}
-		return &ExitStatusError{Code: exit.Code}
 	}
 	return nil
 }

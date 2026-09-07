@@ -3,7 +3,6 @@ package value
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"sync"
 )
@@ -12,26 +11,15 @@ import (
 type Type string
 
 const (
-	NumberType        Type = "number"
-	BooleanType       Type = "boolean"
-	RuneType          Type = "rune"
-	StringType        Type = "string"
-	BytesType         Type = "bytes"
-	OpaqueType        Type = "opaque"
-	SymbolType        Type = "symbol"
-	ListType          Type = "list"
-	FunctionType      Type = "function"
-	FaultType         Type = "fault"
-	ReturnType        Type = "return"
-	FileType          Type = "file"
-	FileLockType      Type = "file_lock"
-	ChannelType       Type = "channel"
-	StoreType         Type = "store"
-	ProcessType       Type = "process"
-	EndpointType      Type = "endpoint"
-	ListenerType      Type = "listener"
-	DatagramType      Type = "datagram"
-	TerminalStateType Type = "terminal_state"
+	NumberType   Type = "number"
+	BooleanType  Type = "boolean"
+	RuneType     Type = "rune"
+	StringType   Type = "string"
+	SymbolType   Type = "symbol"
+	ListType     Type = "list"
+	FunctionType Type = "function"
+	FaultType    Type = "fault"
+	ReturnType   Type = "return"
 )
 
 // Value is the interface all Nezha values implement.
@@ -73,128 +61,6 @@ type String struct {
 
 func (s *String) Type() Type      { return StringType }
 func (s *String) Inspect() string { return fmt.Sprintf("%q", s.Val) }
-
-// Bytes is an immutable sequence of bytes (0-255).
-type Bytes struct {
-	Val []byte
-}
-
-func (b *Bytes) Type() Type { return BytesType }
-func (b *Bytes) Inspect() string {
-	if len(b.Val) <= 20 {
-		return fmt.Sprintf("<bytes:%d %v>", len(b.Val), b.Val)
-	}
-	return fmt.Sprintf("<bytes:%d [%v...]>", len(b.Val), b.Val[:20])
-}
-
-// Opaque is a provider-owned value whose representation and operations are not
-// part of Nezha's language semantics. Providers may distinguish private kinds,
-// but ordinary Nezha code sees only an opaque capability value.
-type Opaque struct {
-	Provider string
-	Kind     string
-	Bits     uint32
-}
-
-func (o *Opaque) Type() Type      { return OpaqueType }
-func (o *Opaque) Inspect() string { return "<opaque>" }
-
-// FixedStore is provider-backed mutable fixed-width storage. Unlike Store,
-// cells are not arbitrary Nezha values. Width is provider policy, not a Nezha
-// numeric type.
-type FixedStore struct {
-	mu       sync.RWMutex
-	Kind     string
-	Bytes    []uint8
-	Words    []uint16
-	Addrs    []uint32
-	Counters []uint64
-}
-
-func (s *FixedStore) Type() Type { return StoreType }
-func (s *FixedStore) Inspect() string {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return fmt.Sprintf("<store/ffi %d>", s.fixedLen())
-}
-func (s *FixedStore) fixedLen() int {
-	switch s.Kind {
-	case "byte":
-		return len(s.Bytes)
-	case "word":
-		return len(s.Words)
-	case "addr18":
-		return len(s.Addrs)
-	case "counter":
-		return len(s.Counters)
-	default:
-		return 0
-	}
-}
-func (s *FixedStore) FixedLen() int { s.mu.RLock(); defer s.mu.RUnlock(); return s.fixedLen() }
-func (s *FixedStore) FixedGet(i int) uint32 {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	switch s.Kind {
-	case "byte":
-		return uint32(s.Bytes[i])
-	case "word":
-		return uint32(s.Words[i])
-	case "addr18":
-		return s.Addrs[i]
-	default:
-		return uint32(s.Counters[i])
-	}
-}
-func (s *FixedStore) FixedSet(i int, v uint32) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	switch s.Kind {
-	case "byte":
-		s.Bytes[i] = uint8(v)
-	case "word":
-		s.Words[i] = uint16(v)
-	case "addr18":
-		s.Addrs[i] = v & 0x3ffff
-	default:
-		s.Counters[i] = uint64(v)
-	}
-}
-func (s *FixedStore) FixedSnapshot(count int) []uint32 {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	out := make([]uint32, count)
-	for i := 0; i < count; i++ {
-		switch s.Kind {
-		case "byte":
-			out[i] = uint32(s.Bytes[i])
-		case "word":
-			out[i] = uint32(s.Words[i])
-		case "addr18":
-			out[i] = s.Addrs[i]
-		default:
-			out[i] = uint32(s.Counters[i])
-		}
-	}
-	return out
-}
-
-func (s *FixedStore) CounterGet(i int) uint64 {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.Counters[i]
-}
-func (s *FixedStore) CounterSet(i int, v uint64) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.Counters[i] = v
-}
-func (s *FixedStore) CounterAdd(i int, delta uint64) uint64 {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.Counters[i] += delta
-	return s.Counters[i]
-}
 
 // Symbol
 type Symbol struct {
@@ -364,114 +230,6 @@ type Return struct {
 
 func (r *Return) Type() Type      { return ReturnType }
 func (r *Return) Inspect() string { return r.Val.Inspect() }
-
-// File wraps an open file handle.
-type File struct {
-	Path string
-	F    *os.File
-	Mode string // "read", "write", "append"
-}
-
-func (f *File) Type() Type      { return FileType }
-func (f *File) Inspect() string { return fmt.Sprintf("<file %s %s>", f.Mode, f.Path) }
-
-// Store is explicit mutable indexed storage for systems work.
-// It is an opaque capability: ordinary Nezha lists remain immutable.
-// A store may be shared explicitly across spawned evaluations; the mutex
-// protects concurrent access inside the Go implementation.
-type Store struct {
-	mu    sync.RWMutex
-	Cells []Value
-}
-
-func (s *Store) Type() Type { return StoreType }
-func (s *Store) Inspect() string {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return fmt.Sprintf("<store %d>", len(s.Cells))
-}
-
-// StoreLen returns the number of cells.
-func (s *Store) StoreLen() int {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return len(s.Cells)
-}
-
-// StoreGet returns a cell value. The caller must bounds-check first.
-func (s *Store) StoreGet(i int) Value {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.Cells[i]
-}
-
-// StoreSet replaces a cell value. The caller must bounds-check first.
-func (s *Store) StoreSet(i int, v Value) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	s.Cells[i] = v
-}
-
-// StoreSnapshot returns an immutable copy of the first count cells.
-// The caller must validate count against StoreLen before calling.
-func (s *Store) StoreSnapshot(count int) []Value {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	out := make([]Value, count)
-	copy(out, s.Cells[:count])
-	return out
-}
-
-// Channel for concurrency.
-type Channel struct {
-	C        chan Value
-	sendable bool
-}
-
-func (c *Channel) Type() Type      { return ChannelType }
-func (c *Channel) Inspect() string { return "<channel>" }
-
-// CanSend reports whether user code may send on the channel.
-// Ordinary channels are sendable; system event sources may be receive-only.
-func (c *Channel) CanSend() bool { return c.sendable }
-
-// NewChannel creates a new unbuffered, sendable channel.
-func NewChannel() *Channel {
-	return &Channel{C: make(chan Value), sendable: true}
-}
-
-// NewEventChannel creates an internal one-event receive-only channel.
-// The capacity prevents an abandoned event source from stranding its producer.
-// General buffered channels are not part of Nezha's language semantics.
-func NewEventChannel() *Channel {
-	return &Channel{C: make(chan Value, 1), sendable: false}
-}
-
-// ExitSignal signals REPL to exit.
-type ExitSignal struct{}
-
-func (e *ExitSignal) Type() Type      { return "exit" }
-func (e *ExitSignal) Inspect() string { return "" }
-
-var EXIT = &ExitSignal{}
-
-// ProgramExitSignal requests immediate termination of the current Nezha program
-// with a portable process exit status. It is evaluator control flow, not an
-// ordinary Nezha value.
-type ProgramExitSignal struct {
-	Code int
-}
-
-func (e *ProgramExitSignal) Type() Type      { return "program_exit" }
-func (e *ProgramExitSignal) Inspect() string { return fmt.Sprintf("<exit:%d>", e.Code) }
-
-// ResetSignal signals REPL to reset environment.
-type ResetSignal struct{}
-
-func (r *ResetSignal) Type() Type      { return "reset" }
-func (r *ResetSignal) Inspect() string { return "<reset>" }
-
-var RESET = &ResetSignal{}
 
 // ShapeDef defines a shaped list structure.
 type ShapeDef struct {

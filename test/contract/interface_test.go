@@ -58,7 +58,6 @@ func TestAllValueTypesImplementValue(t *testing.T) {
 		{"List with elements", &value.List{Elements: []value.Value{value.NewNumber(1, 1)}}, value.ListType},
 		{"Shaped list", &value.List{Shape: "point", Elements: []value.Value{}}, value.ListType},
 		{"Fault", value.NewFault("test error"), value.FaultType},
-		{"Bytes", &value.Bytes{Val: []byte{1, 2, 3}}, value.BytesType},
 	}
 
 	for _, tt := range tests {

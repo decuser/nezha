@@ -6,13 +6,9 @@ import (
 )
 
 // shouldHalt returns true if evaluation should halt on this value.
-// Faults and explicit program-exit control halt evaluation. Shaped errors flow as data.
+// Faults halt evaluation. Shaped errors flow as data.
 func shouldHalt(v value.Value) bool {
-	if value.IsFault(v) {
-		return true
-	}
-	_, exit := v.(*value.ProgramExitSignal)
-	return exit
+	return value.IsFault(v)
 }
 
 func (e *Evaluator) nonTerminalChildren(node *syntax.Node) []*syntax.Node {
