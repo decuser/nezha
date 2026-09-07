@@ -84,7 +84,7 @@ func ParseFile(moduleName, path string) ([]Example, error) {
 				expr := strings.TrimSpace(m[1])
 				expected := strings.TrimSpace(m[2])
 				if reValue.MatchString(expected) {
-					ex.Code = append(ex.Code, "println(inspect("+expr+"))")
+					ex.Code = append(ex.Code, "println(to_str("+expr+"))")
 					ex.Expects = append(ex.Expects, expected)
 					continue
 				}

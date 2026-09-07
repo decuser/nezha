@@ -108,7 +108,7 @@ let my_replace = (s, old, new) {
 
 # trim helpers
 let my_is_whitespace = (r) {
-	equal(r, ' ') or equal(r, chr(9)) or equal(r, chr(10)) or equal(r, chr(13))
+	equal(r, ' ') or equal(r, '\t') or equal(r, '\n') or equal(r, '\r')
 }
 
 let my_trim_start = (s) {

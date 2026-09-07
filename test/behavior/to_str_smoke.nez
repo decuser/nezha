@@ -1,7 +1,6 @@
 # to_str smoke test - verify value conversion (not display formatting)
 # Rune to string - should be "A" not "'A'"
 println(to_str('A'))
-println(to_str(chr(50504)))
 
 # String unchanged
 println(to_str("hello"))

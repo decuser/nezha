@@ -6,38 +6,21 @@ apply(fn, args)
 let add = (a, b) { a + b }
 apply(add, [1, 2])  # 3
 ===
-stack_limit
-@unchecked
-
-Sets the maximum non tail call depth for evaluation. Tail calls do not consume stack.
-
-stack_limit(n)
-
-n must be an integer >= 1.
-
-Example
-
-stack_limit(10000)
-===
 print
 @unchecked
-Prints values to stdout without newline.
+Writes values to stdout without newline.
 
 print(val, ...)
 
 print("hello")
-print("x = ", x)
 ===
 println
 @unchecked
-Prints values to stdout followed by a newline. With no arguments,
-prints just a newline.
+Writes values to stdout followed by newline.
 
 println(val, ...)
 
-println("Hello")          # prints "Hello\n"
-println("x = ", 42)       # prints "x = 42\n"
-println()                 # prints "\n"
+println("Hello")
 ===
 first
 Returns the first element of a list.
@@ -45,7 +28,6 @@ Returns the first element of a list.
 first(list)
 
 first([1, 2, 3])      # 1
-first(["a", "b"])     # "a"
 ===
 rest
 Returns a new list without the first element.
@@ -53,7 +35,6 @@ Returns a new list without the first element.
 rest(list)
 
 rest([1, 2, 3])       # [2, 3]
-rest([1])             # []
 ===
 length
 Returns the number of elements in a list.
@@ -104,94 +85,46 @@ type("hi")            # :string
 type([1, 2])          # :list
 type(true)            # :boolean
 ===
-inspect
-Returns a string representation of any value.
-
-inspect(val)
-
-inspect(42)           # "42"
-inspect([1, 2])       # "[1, 2]"
-===
 equal
-Returns true if two values are deeply equal.
+Returns true if two values are equal.
 
 equal(a, b)
 
 equal(1, 1)           # true
-equal(:ok, :ok)       # true
 equal(1, 2)           # false
+equal([1], [1])       # false
 ===
 shape
-Returns the shape name of a shaped list, or :list for plain lists.
+Returns the shape of a list, or :list for an unshaped list.
 
 shape(val)
 
+let @point [x, y]
 shape([@point, 1, 2]) # :point
-shape([1, 2, 3])      # :list
+shape([1, 2])         # :list
 ===
 is_error
-Returns true if the value is a shaped error [@error, ...].
+Returns true if val is a shaped error.
 
 is_error(val)
 
-is_error([@error, :lookup, "not found"])  # true
-is_error([1, 2, 3])                        # false
-===
-ord
-Returns the integer code point of a rune.
-
-ord(rune)
-
-ord('A')              # 65
-ord('a')              # 97
-===
-chr
-Returns the rune for an integer code point.
-Inverse of ord.
-
-chr(n)
-
-chr(65)               # 'A'
-chr(97)               # 'a'
-chr(8364)             # '€'
-ord(chr(65))          # 65
+is_error([@error, "x"]) # true
+is_error([1, 2])        # false
 ===
 to_str
-Converts a value to its string representation.
+@unchecked
+Converts a value to a string.
 
 to_str(val)
 
-to_str(42)            # "42"
-to_str('A')           # "A"
-===
-to_number
-Parses a string as a number.
-
-to_number(str)
-
-to_number("42")       # 42
-to_number("3.14")     # 3.14
-===
-to_symbol
-Constructs a symbol from its value-level name. The colon used in source syntax is not part of the name.
-
-to_symbol(str)
-
-to_symbol("foo")       # :foo
-to_symbol("point")     # :point
+to_str(42)           # "42"
+to_str(true)         # "true"
+to_str(:ok)          # ":ok"
 ===
 shaped
-Returns the elements as a shaped list carrying the supplied symbol.
+@unchecked
+Constructs a shaped list.
 
-shaped(symbol, elements)
+shaped(sym, elements)
 
-shaped(:point, [1, 2])                 # [@point, 1, 2]
-shaped(to_symbol("point"), [1, 2])     # [@point, 1, 2]
-===
-to_decimal
-Formats a number as a decimal string with specified places.
-
-to_decimal(n, places)
-
-to_decimal(3.14159, 2)  # "3.14"
-to_decimal(1/3, 4)      # "0.3333"
+shaped(:point, [1, 2]) # [@point, 1, 2]

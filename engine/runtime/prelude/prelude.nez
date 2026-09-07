@@ -6,10 +6,6 @@ let apply = (fn, args) {
 	_apply(fn, args)
 }
 
-let stack_limit = (n) {
-	_stack_limit(n)
-}
-
 # I/O (irreducible)
 let print = (...args) {
 	apply(_print, args)
@@ -50,20 +46,8 @@ let type = (val) {
 	_type(val)
 }
 
-let inspect = (val) {
-	_inspect(val)
-}
-
 let equal = (a, b) {
 	_equal(a, b)
-}
-
-let ord = (r) {
-	_ord(r)
-}
-
-let chr = (n) {
-	_chr(n)
 }
 
 let shape = (val) {
@@ -76,18 +60,6 @@ let is_error = (val) {
 
 let to_str = (val) {
 	_to_str(val)
-}
-
-let to_decimal = (n, places) {
-	_to_decimal(n, places)
-}
-
-let to_number = (s) {
-	_to_number(s)
-}
-
-let to_symbol = (s) {
-	_to_symbol(s)
 }
 
 let shaped = (sym, elements) {

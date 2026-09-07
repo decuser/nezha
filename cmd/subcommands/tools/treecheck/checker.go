@@ -128,7 +128,7 @@ func (c *Checker) loadFiles() error {
 			}
 			return nil
 		}
-		if rel == "nezha" || strings.HasPrefix(rel, "profile-out/") {
+		if rel == "nezha" {
 			return nil
 		}
 		c.files[rel] = true

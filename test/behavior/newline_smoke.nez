@@ -93,7 +93,7 @@ let outer = () {
 println(outer())
 
 # The original problem case: let followed by paren expr
-let c = ord('A')
+let c = 65
 (c >= 65) and (c <= 90)
 println("char class check passed")
 

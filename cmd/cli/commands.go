@@ -10,7 +10,6 @@ import (
 	nezhafmt "nezha/cmd/subcommands/tools/fmt"
 	nezhalint "nezha/cmd/subcommands/tools/lint"
 	nezhalsp "nezha/cmd/subcommands/tools/lsp"
-	nezhaprofile "nezha/cmd/subcommands/tools/profile"
 	nezhatags "nezha/cmd/subcommands/tools/tags"
 	nezhatreecheck "nezha/cmd/subcommands/tools/treecheck"
 )
@@ -28,7 +27,6 @@ var commands = []command{
 	{Name: "fmt", Description: "format Nezha source", Run: nezhafmt.Run},
 	{Name: "lint", Description: "lint Nezha source", Run: nezhalint.Run},
 	{Name: "lsp", Description: "run the language server", Run: nezhalsp.Run},
-	{Name: "profile", Description: "profile a Nezha program", Run: nezhaprofile.Run},
 	{Name: "smoke", Description: "run smoke/golden tests", Run: nezhasmoke.Run},
 	{Name: "tags", Description: "generate editor tags", Run: nezhatags.Run},
 	{Name: "treecheck", Description: "verify repository distribution relationships", Run: nezhatreecheck.Run},

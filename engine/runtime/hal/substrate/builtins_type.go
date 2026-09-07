@@ -12,13 +12,6 @@ func halType(args []value.Value, ctx *hal.EvalContext) value.Value {
 	return &value.Symbol{Val: string(args[0].Type())}
 }
 
-func halInspect(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("inspect: want 1 argument, got %d", len(args))
-	}
-	return &value.String{Val: args[0].Inspect()}
-}
-
 func halEqual(args []value.Value, ctx *hal.EvalContext) value.Value {
 	if len(args) != 2 {
 		return value.NewFault("equal: want 2 arguments, got %d", len(args))
@@ -27,24 +20,6 @@ func halEqual(args []value.Value, ctx *hal.EvalContext) value.Value {
 		return value.TRUE
 	}
 	return value.FALSE
-}
-
-func halOrd(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("ord: want 1 argument")
-	}
-	switch v := args[0].(type) {
-	case *value.Rune:
-		return value.NewNumber(int64(v.Val), 1)
-	case *value.String:
-		r, ok := v.FirstRune()
-		if !ok {
-			return value.NewNumber(0, 1)
-		}
-		return value.NewNumber(int64(r), 1)
-	default:
-		return value.NewFault("ord: expected rune or string")
-	}
 }
 
 func valuesEqual(a, b value.Value) bool {
@@ -70,25 +45,4 @@ func valuesEqual(a, b value.Value) bool {
 	default:
 		return false
 	}
-}
-
-// halStackLimit sets the evaluator stack limit (non tail call frames).
-// n must be an integer >= 1.
-func halStackLimit(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("stack_limit: want 1 argument, got %d", len(args))
-	}
-	if ctx == nil || ctx.Env == nil {
-		return value.NewFault("stack_limit: environment not available")
-	}
-	num, ok := args[0].(*value.Number)
-	if !ok || !num.IsInt() {
-		return value.NewFault("stack_limit: n must be integer >= 1")
-	}
-	n := num.Int64Value()
-	if n < 1 {
-		return value.NewFault("stack_limit: n must be integer >= 1")
-	}
-	ctx.Env.SetStackLimit(int(n))
-	return value.EMPTY
 }

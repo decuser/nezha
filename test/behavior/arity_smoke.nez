@@ -5,15 +5,15 @@ let two = (a, b) {
 }
 
 # Exact and surplus arguments behave as in ordinary application.
-println(inspect(apply(two, [1, 2])))
-println(inspect(apply(two, [1, 2, 3])))
+println(apply(two, [1, 2]))
+println(apply(two, [1, 2, 3]))
 
 # A rest parameter binds [] when no arguments remain.
 let rest_fn = (a, ...r) {
 	return [a, r]
 }
 
-println(inspect(apply(rest_fn, [1])))
-println(inspect(apply(rest_fn, [1, 2, 3])))
+println(apply(rest_fn, [1]))
+println(apply(rest_fn, [1, 2, 3]))
 
 println("ARITY_SMOKE_DONE")

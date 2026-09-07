@@ -35,7 +35,7 @@ func TestPreludeCatalogJoinsSourceHelpAndDocs(t *testing.T) {
 
 func TestPreludeInvariantRejectsMissingHelp(t *testing.T) {
 	helpSource := strings.Replace(prelude.HelpSource,
-		"@func abs\n@template \"abs(n)\"\n@help \"Returns absolute value of number.\"\n", "", 1)
+		"@func abs\n@template \"abs(x)\"\n@help \"Return the absolute value of x.\"\n", "", 1)
 	if helpSource == prelude.HelpSource {
 		t.Fatal("fixture did not remove abs help")
 	}

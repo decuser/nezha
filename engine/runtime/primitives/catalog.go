@@ -35,17 +35,10 @@ var nonHALRoles = map[string]Role{
 	"_empty":            RoleRuntime,
 	"_range":            RoleRuntime,
 	"_type":             RoleRuntime,
-	"_stack_limit":      RoleRuntime,
-	"_inspect":          RoleRuntime,
 	"_equal":            RoleRuntime,
-	"_ord":              RoleRuntime,
-	"_chr":              RoleRuntime,
 	"_shape":            RoleRuntime,
 	"_make_shaped_list": RoleRuntime,
 	"_to_str":           RoleRuntime,
-	"_to_decimal":       RoleRuntime,
-	"_to_number":        RoleRuntime,
-	"_to_symbol":        RoleRuntime,
 }
 
 // RoleOf returns the architectural role for a primitive. Canonical HAL host

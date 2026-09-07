@@ -216,9 +216,3 @@ func RunExpr(expr string) (string, error) {
 
 	return result.Inspect(), nil
 }
-
-// RunProfile executes a Nezha source file with semantic profiling enabled.
-func RunProfile(filename string, attributed bool) (engine.SemanticMeasurement, error) {
-	run, err := RunProfileDetailed(filename, ProfileOptions{Attributed: attributed})
-	return run.Semantic, err
-}

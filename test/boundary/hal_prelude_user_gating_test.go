@@ -126,36 +126,8 @@ func TestUserScopeGetsNothingFromRuntime(t *testing.T) {
 }
 
 // TestUserCannotSeeHALChr verifies user scope cannot see _chr.
-func TestUserCannotSeeHALChr(t *testing.T) {
-	code := `_chr(65)`
-
-	result, err := evalWithScope(code, value.ScopeUser, false)
-	if err != nil {
-		t.Fatalf("eval error: %v", err)
-	}
-
-	if !value.IsFault(result) {
-		t.Errorf("expected fault for _chr without authority, got: %s", result.Inspect())
-	}
-}
 
 // TestUserCanSeeChrAfterPrelude verifies user scope can see chr after prelude.
-func TestUserCanSeeChrAfterPrelude(t *testing.T) {
-	code := `chr(65)`
-
-	result, err := evalWithScope(code, value.ScopeUser, true)
-	if err != nil {
-		t.Fatalf("eval error: %v", err)
-	}
-
-	if value.IsFault(result) {
-		t.Errorf("expected chr to work without authority after prelude, got fault: %s", result.Inspect())
-	}
-	r, ok := result.(*value.Rune)
-	if !ok || r.Val != 'A' {
-		t.Errorf("expected 'A', got: %s", result.Inspect())
-	}
-}
 
 // TestUserCanSeeAppendAfterPrelude verifies user scope can see append after prelude.
 func TestUserCanSeeAppendAfterPrelude(t *testing.T) {
@@ -176,25 +148,6 @@ func TestUserCanSeeAppendAfterPrelude(t *testing.T) {
 }
 
 // TestChrOrdRoundTrip verifies chr and ord are inverses.
-func TestChrOrdRoundTrip(t *testing.T) {
-	code := `ord(chr(8364))`
-
-	result, err := evalWithScope(code, value.ScopeUser, true)
-	if err != nil {
-		t.Fatalf("eval error: %v", err)
-	}
-
-	if value.IsFault(result) {
-		t.Errorf("expected round trip to work, got fault: %s", result.Inspect())
-	}
-	num, ok := result.(*value.Number)
-	if !ok {
-		t.Fatalf("expected number, got: %s", result.Inspect())
-	}
-	if !num.Equal(value.NewNumber(8364, 1)) {
-		t.Errorf("expected 8364, got: %s", result.Inspect())
-	}
-}
 
 // TestUserCannotSeeHALUpper verifies user scope cannot see _upper.
 func TestUserCannotSeeHALUpper(t *testing.T) {

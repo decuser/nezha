@@ -75,11 +75,6 @@ func TestCompatibilityRegistrySeparatedByRole(t *testing.T) {
 func TestBuiltinContextPolicyDefaultsConservative(t *testing.T) {
 	g := NewGoRuntime()
 
-	contextBuiltin, ok := g.lookupBuiltin("_stack_limit")
-	if !ok || !contextBuiltin.NeedsEvalContext() {
-		t.Fatal("_stack_limit must require EvalContext")
-	}
-
 	for _, name := range []string{
 		"_first", "_rest", "_length", "_type", "_equal",
 	} {

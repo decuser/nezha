@@ -16,19 +16,10 @@ func (g *GoRuntime) registerHAL() {
 	for name, fn := range map[string]BuiltinFunc{
 		"_first": halFirst, "_rest": halRest, "_length": halLength,
 		"_prepend": halPrepend, "_empty": halEmpty, "_range": halRange,
-		"_type": halType, "_stack_limit": halStackLimit, "_inspect": halInspect,
-		"_equal": halEqual, "_ord": halOrd, "_chr": halChr,
+		"_type": halType, "_equal": halEqual,
 		"_shape": halShape, "_make_shaped_list": halMakeShapedList, "_to_str": halToStr,
-		"_to_decimal": halToDecimal, "_to_number": halToNumber, "_to_symbol": halToSymbol,
 	} {
-		switch name {
-		case "_stack_limit":
-			// These operations observe evaluator context for stack state or
-			// semantic profiling. Keep the conservative context path.
-			g.registerPrimitive(name, fn)
-		default:
-			g.registerContextFreePrimitive(name, fn)
-		}
+		g.registerContextFreePrimitive(name, fn)
 	}
 
 }
