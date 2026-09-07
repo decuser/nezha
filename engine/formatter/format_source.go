@@ -5,7 +5,6 @@ import (
 	"sort"
 	"strings"
 
-	"nezha/engine"
 	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
 )
@@ -17,22 +16,13 @@ import (
 //  2. Parse formatted output must succeed.
 //  3. AST structure must match (prevents meaning changes).
 func FormatSource(g *grammar.Grammar, file string, source string) (string, error) {
-	return FormatSourceWithObserver(g, file, source, nil)
-}
-
-// FormatSourceWithObserver formats source with an optional observer for tracing.
-func FormatSourceWithObserver(g *grammar.Grammar, file string, source string, observer engine.Observer) (string, error) {
-	if observer == nil {
-		observer = engine.SilentObserver{}
-	}
-
 	// Canonical formatting must be a fixed point. The printer preserves some
 	// source-layout information (notably blank-line positions), so one pass can
 	// occasionally change the positions that inform the next pass. Iterate a
 	// small bounded number of times and return only a stable representation.
 	current := source
 	for pass := 0; pass < 4; pass++ {
-		formatted, err := formatSourceOnce(g, file, current, observer)
+		formatted, err := formatSourceOnce(g, file, current)
 		if err != nil {
 			return "", err
 		}
@@ -44,7 +34,7 @@ func FormatSourceWithObserver(g *grammar.Grammar, file string, source string, ob
 	return "", fmt.Errorf("formatter did not converge to a canonical fixed point")
 }
 
-func formatSourceOnce(g *grammar.Grammar, file string, source string, observer engine.Observer) (string, error) {
+func formatSourceOnce(g *grammar.Grammar, file string, source string) (string, error) {
 	// Parse original.
 	origTokens, origAST, err := parseWithTokens(g, file, source)
 	if err != nil {
@@ -57,7 +47,6 @@ func formatSourceOnce(g *grammar.Grammar, file string, source string, observer e
 	p := &printer{
 		comments:    comments,
 		eolComments: eol,
-		observer:    observer,
 	}
 	p.printProgram(origAST)
 	if p.err != nil {
@@ -74,20 +63,18 @@ func formatSourceOnce(g *grammar.Grammar, file string, source string, observer e
 		return "", fmt.Errorf("formatter produced invalid source: %w", err)
 	}
 	if !astEqual(origAST, fmtAST) {
-		// Debug: show where ASTs diverge
-		observer.OnFormat("AST_DIFF", astDiffStr(origAST, fmtAST, "root"), "comparison", 0)
 		return "", fmt.Errorf("formatter changed AST; refusing to write")
 	}
 	return formatted, nil
 }
 
 func parseWithTokens(g *grammar.Grammar, file, source string) ([]syntax.Token, *syntax.Node, error) {
-	lx := syntax.NewLexer(g, file, source, nil)
+	lx := syntax.NewLexer(g, file, source)
 	toks, err := lx.Tokenize()
 	if err != nil {
 		return nil, nil, err
 	}
-	ps := syntax.NewParser(g, toks, source, nil)
+	ps := syntax.NewParser(g, toks, source)
 	node, err := ps.Parse()
 	if err != nil {
 		return toks, nil, err
@@ -264,13 +251,7 @@ type printer struct {
 	comments    map[int]string // line -> standalone comment text
 	eolComments map[int]string // line -> EOL comment text
 	lastLine    int
-	observer    engine.Observer
-	depth       int
 	err         error
-}
-
-func (p *printer) observe(method, output, node string) {
-	p.observer.OnFormat(method, output, node, p.depth)
 }
 
 func (p *printer) write(s string) {
@@ -299,7 +280,6 @@ func (p *printer) emitCommentsBefore(line int) {
 	for _, cl := range lines {
 		p.writeIndent()
 		text := p.comments[cl]
-		p.observe("emitComment", text, "comment")
 		p.write(text)
 		p.newline()
 		delete(p.comments, cl)
@@ -309,7 +289,6 @@ func (p *printer) emitCommentsBefore(line int) {
 func (p *printer) emitEOLComment(line int) {
 	if text, ok := p.eolComments[line]; ok {
 		p.write("  ")
-		p.observe("emitEOLComment", text, "comment")
 		p.write(text)
 		delete(p.eolComments, line)
 	}
@@ -324,15 +303,12 @@ func (p *printer) emitTrailingComments() {
 	for _, line := range lines {
 		p.newline()
 		text := p.comments[line]
-		p.observe("emitTrailingComment", text, "comment")
 		p.write(text)
 		p.newline()
 	}
 }
 
 func (p *printer) printProgram(node *syntax.Node) {
-	p.observe("printProgram", "enter", fmt.Sprintf("program(%d children)", len(node.Children)))
-	p.depth++
 	prevLine := 0
 	for i, child := range node.Children {
 		line := nodeStartLine(child)
@@ -350,19 +326,14 @@ func (p *printer) printProgram(node *syntax.Node) {
 	if len(s) > 0 && s[len(s)-1] != '\n' {
 		p.newline()
 	}
-	p.depth--
-	p.observe("printProgram", "exit", "program")
 }
 
 func (p *printer) printStatement(node *syntax.Node) {
 	if len(node.Children) == 0 {
-		p.observe("printStatement", "skip", "empty")
 		return
 	}
 	child := node.Children[0]
 	line := nodeStartLine(node)
-	p.observe("printStatement", "enter", child.Type)
-	p.depth++
 
 	switch child.Type {
 	case "if_stmt":
@@ -376,8 +347,6 @@ func (p *printer) printStatement(node *syntax.Node) {
 		p.emitEOLComment(line)
 		p.newline()
 	}
-	p.depth--
-	p.observe("printStatement", "exit", child.Type)
 }
 
 type printKind uint8
@@ -463,11 +432,7 @@ func (p *printer) printNode(node *syntax.Node) {
 	if p.err != nil {
 		return
 	}
-	p.observe("printNode", "enter", node.Type)
-	p.depth++
 	defer func() {
-		p.depth--
-		p.observe("printNode", "exit", node.Type)
 	}()
 
 	if kind, ok := productionPrinters[node.Type]; ok {
@@ -526,17 +491,14 @@ func (p *printer) printNode(node *syntax.Node) {
 		return
 	}
 	if _, ok := printableLeafTypes[node.Type]; ok {
-		p.observe("printNode", node.Value, node.Type)
 		p.write(node.Value)
 		return
 	}
 	if node.Type == "TERMINAL" {
-		p.observe("printNode", node.Value, "TERMINAL")
 		p.write(node.Value)
 		return
 	}
 	if _, ok := handledByParent[node.Type]; ok {
-		p.observe("printNode", "parent-handled-recurse", node.Type)
 		for _, child := range node.Children {
 			p.printNode(child)
 		}

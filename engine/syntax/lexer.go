@@ -35,15 +35,10 @@ type Lexer struct {
 	pos      int
 	line     int
 	col      int
-	observer engine.Observer
 	literals []literalCandidate
 }
 
-func NewLexer(g *grammar.Grammar, file, source string, observer engine.Observer) *Lexer {
-	if observer == nil {
-		observer = engine.SilentObserver{}
-	}
-
+func NewLexer(g *grammar.Grammar, file, source string) *Lexer {
 	var lits []literalCandidate
 	for di, def := range g.Tokens {
 		if def.Pattern != nil {
@@ -71,7 +66,6 @@ func NewLexer(g *grammar.Grammar, file, source string, observer engine.Observer)
 		pos:      0,
 		line:     1,
 		col:      1,
-		observer: observer,
 		literals: lits,
 	}
 }
@@ -161,7 +155,6 @@ func (l *Lexer) Next() (Token, error) {
 
 	tok := Token{Type: bestType, Lexeme: bestLex, Pos: startPos}
 	l.advance(bestLen)
-	l.observer.OnLex(tok.Type, tok.Lexeme, tok.Pos)
 	return tok, nil
 }
 

@@ -30,7 +30,7 @@ func TestHandlerValidationPanicsOnMissingHandler(t *testing.T) {
 		Tokens: []grammar.TokenDef{},
 	}
 
-	ev := evaluator.New(nil, nil)
+	ev := evaluator.New(nil)
 	ev.SetGrammar(g) // should panic
 }
 
@@ -60,7 +60,7 @@ func TestHandlerValidationPanicsOnMissingTokenHandler(t *testing.T) {
 	}}
 	g.Reanalyze()
 
-	ev := evaluator.New(nil, nil)
+	ev := evaluator.New(nil)
 	ev.SetGrammar(g) // should panic
 }
 
@@ -72,6 +72,6 @@ func TestHandlerValidationPassesForRealGrammar(t *testing.T) {
 		t.Fatalf("load grammar: %v", err)
 	}
 
-	ev := evaluator.New(nil, nil)
+	ev := evaluator.New(nil)
 	ev.SetGrammar(g) // should not panic
 }

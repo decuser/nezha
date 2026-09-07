@@ -18,12 +18,12 @@ func loadTestGrammar(t *testing.T) *grammar.Grammar {
 
 func parseSource(t *testing.T, source string) *Node {
 	g := loadTestGrammar(t)
-	lexer := NewLexer(g, "test.nez", source, nil)
+	lexer := NewLexer(g, "test.nez", source)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatalf("lexer error: %v", err)
 	}
-	parser := NewParser(g, tokens, source, nil)
+	parser := NewParser(g, tokens, source)
 	ast, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("parser error: %v", err)
@@ -161,57 +161,17 @@ func TestParserPosition(t *testing.T) {
 	}
 }
 
-func TestParserObserver(t *testing.T) {
-	g := loadTestGrammar(t)
-	source := `let x = 1`
-
-	lexer := NewLexer(g, "test.nez", source, nil)
-	tokens, err := lexer.Tokenize()
-	if err != nil {
-		t.Fatalf("lexer error: %v", err)
-	}
-
-	var observed []string
-	obs := &testParserObserver{
-		onParse: func(production string, depth int, pos engine.Position) {
-			observed = append(observed, production)
-		},
-	}
-
-	parser := NewParser(g, tokens, source, obs)
-	_, err = parser.Parse()
-	if err != nil {
-		t.Fatalf("parser error: %v", err)
-	}
-
-	if len(observed) == 0 {
-		t.Error("expected observer to be called")
-	}
-
-	// Should include program
-	hasProgram := false
-	for _, p := range observed {
-		if p == "program" {
-			hasProgram = true
-			break
-		}
-	}
-	if !hasProgram {
-		t.Error("expected 'program' in observed productions")
-	}
-}
-
 func TestParserError(t *testing.T) {
 	g := loadTestGrammar(t)
 	source := `let = 1` // missing name
 
-	lexer := NewLexer(g, "test.nez", source, nil)
+	lexer := NewLexer(g, "test.nez", source)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatalf("lexer error: %v", err)
 	}
 
-	parser := NewParser(g, tokens, source, nil)
+	parser := NewParser(g, tokens, source)
 	_, err = parser.Parse()
 	if err == nil {
 		t.Fatal("expected parse error")
@@ -233,33 +193,11 @@ func TestParserSuppressionIgnoresUnmatchedCloser(t *testing.T) {
 		{Type: "DELIMITER", Lexeme: ")", Pos: engine.Position{File: "test.nez", Line: 2, Col: 1}},
 	}
 
-	p := NewParser(g, tokens, "]\n(1\n)", nil)
+	p := NewParser(g, tokens, "]\n(1\n)")
 	for _, tok := range p.tokens {
 		if tok.Lexeme == ";" {
 			t.Fatalf("unmatched closer corrupted later suppression; inserted terminator at %v", tok.Pos)
 		}
-	}
-}
-
-func TestParserReportsUnavailableNewlineAnalysisToDiagnosticObserver(t *testing.T) {
-	g := loadTestGrammar(t)
-	delete(g.Productions, "expr")
-	g.Reanalyze()
-
-	var kind, message string
-	obs := &testParserObserver{
-		onDiagnostic: func(gotKind, gotMessage string, pos engine.Position) {
-			kind = gotKind
-			message = gotMessage
-		},
-	}
-
-	_ = NewParser(g, nil, "", obs)
-	if kind != "grammar-newline-analysis" {
-		t.Fatalf("diagnostic kind = %q, want grammar-newline-analysis", kind)
-	}
-	if !strings.Contains(message, "no expr production") {
-		t.Fatalf("diagnostic message = %q, want missing expr reason", message)
 	}
 }
 
@@ -288,30 +226,10 @@ func findAllNodes(node *Node, nodeType string) []*Node {
 	return result
 }
 
-type testParserObserver struct {
-	onParse      func(production string, depth int, pos engine.Position)
-	onDiagnostic func(kind string, message string, pos engine.Position)
-}
-
-func (o *testParserObserver) OnLex(token, lexeme string, pos engine.Position) {}
-func (o *testParserObserver) OnParse(production string, depth int, pos engine.Position) {
-	if o.onParse != nil {
-		o.onParse(production, depth, pos)
-	}
-}
-func (o *testParserObserver) OnEval(node, result string, scope int, pos engine.Position) {}
-func (o *testParserObserver) OnEffect(action, target string, pos engine.Position)        {}
-func (o *testParserObserver) OnFormat(method, output, node string, depth int)            {}
-func (o *testParserObserver) OnDiagnostic(kind, message string, pos engine.Position) {
-	if o.onDiagnostic != nil {
-		o.onDiagnostic(kind, message, pos)
-	}
-}
-
 func TestParserConsumesGrammarNewlineCompletionRule(t *testing.T) {
 	g := loadTestGrammar(t)
 	source := "let x = 1\n\t+ 2\n"
-	lexer := NewLexer(g, "test.nez", source, nil)
+	lexer := NewLexer(g, "test.nez", source)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatalf("lexer error: %v", err)
@@ -319,7 +237,7 @@ func TestParserConsumesGrammarNewlineCompletionRule(t *testing.T) {
 
 	// The declared rule terminates after NUMBER, so the leading binary
 	// continuation is rejected under the baseline policy.
-	if _, err := NewParser(g, tokens, source, nil).Parse(); err == nil {
+	if _, err := NewParser(g, tokens, source).Parse(); err == nil {
 		t.Fatal("expected baseline newline rule to reject leading '+'")
 	}
 
@@ -334,7 +252,7 @@ func TestParserConsumesGrammarNewlineCompletionRule(t *testing.T) {
 	}
 	g.Newline.AfterToken = kept
 
-	if _, err := NewParser(g, tokens, source, nil).Parse(); err != nil {
+	if _, err := NewParser(g, tokens, source).Parse(); err != nil {
 		t.Fatalf("parser did not consume modified grammar newline rule: %v", err)
 	}
 }
@@ -344,12 +262,12 @@ func TestParserNewlineContinuationDiagnosticUsesGrammarHelp(t *testing.T) {
 	g.Newline.Meta.Help = "TEST NEWLINE POLICY"
 	source := "let x = 1\n\t+ 2\n"
 
-	lexer := NewLexer(g, "test.nez", source, nil)
+	lexer := NewLexer(g, "test.nez", source)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatal(err)
 	}
-	parser := NewParser(g, tokens, source, nil)
+	parser := NewParser(g, tokens, source)
 	_, err = parser.Parse()
 	if err == nil {
 		t.Fatal("expected parse error")
@@ -408,7 +326,6 @@ func TestTerminalMismatchUsesZeroAllocationControlFlow(t *testing.T) {
 			Lexeme: "actual",
 			Pos:    engine.Position{File: "test.nez", Line: 1, Col: 1},
 		}},
-		observer: engine.SilentObserver{},
 	}
 	term := &grammar.Terminal{Value: "expected"}
 
@@ -442,8 +359,7 @@ func TestTerminalMismatchRenderingPreservesQuotedExpectation(t *testing.T) {
 			Lexeme: "actual",
 			Pos:    engine.Position{File: "test.nez", Line: 1, Col: 1},
 		}},
-		source:   source,
-		observer: engine.SilentObserver{},
+		source: source,
 	}
 
 	parser.recordTerminalFailure(

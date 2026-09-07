@@ -20,7 +20,7 @@ func TestReusableArgTargetRequiresNonEscapingNonRestFunction(t *testing.T) {
 }
 
 func TestArgFrameInlineAndPromotion(t *testing.T) {
-	ev := New(nil, nil)
+	ev := New(nil)
 	env := value.NewEnv()
 	fn := &value.Function{TailEnvReusable: true}
 
@@ -44,7 +44,7 @@ func TestArgFrameInlineAndPromotion(t *testing.T) {
 }
 
 func TestActiveRecursiveArgFramesNeverAlias(t *testing.T) {
-	ev := New(nil, nil)
+	ev := New(nil)
 	env := value.NewEnv()
 	fn := &value.Function{TailEnvReusable: true}
 
@@ -62,7 +62,7 @@ func TestActiveRecursiveArgFramesNeverAlias(t *testing.T) {
 }
 
 func TestArgFrameReleaseClearsReferences(t *testing.T) {
-	ev := New(nil, nil)
+	ev := New(nil)
 	env := value.NewEnv()
 	fn := &value.Function{TailEnvReusable: true}
 	args := ev.acquireArgValues(fn, 2, env)
@@ -85,7 +85,7 @@ func TestArgFrameMeasuredPromotionBoundaryIsThree(t *testing.T) {
 }
 
 func TestArgFrameReleaseClearsOnlyUsedCompactSlots(t *testing.T) {
-	ev := New(nil, nil)
+	ev := New(nil)
 	env := value.NewEnv()
 	fn := &value.Function{TailEnvReusable: true}
 

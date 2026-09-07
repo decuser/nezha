@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"sync"
 
-	"nezha/engine"
 	"nezha/engine/runtime/hal"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
@@ -71,7 +70,6 @@ func init() {
 
 // Evaluator evaluates AST nodes.
 type Evaluator struct {
-	observer        engine.Observer
 	runtime         hal.RuntimeContract
 	grammar         *grammar.Grammar
 	binaryOperators map[string]struct{}
@@ -89,13 +87,9 @@ type Evaluator struct {
 }
 
 // New creates an evaluator with a runtime.
-func New(runtime hal.RuntimeContract, observer engine.Observer) *Evaluator {
-	if observer == nil {
-		observer = engine.SilentObserver{}
-	}
+func New(runtime hal.RuntimeContract) *Evaluator {
 	return &Evaluator{
-		observer: observer,
-		runtime:  runtime,
+		runtime: runtime,
 	}
 }
 
@@ -153,8 +147,6 @@ func (e *Evaluator) isBinaryOperator(s string) bool {
 
 // Eval evaluates an AST node.
 func (e *Evaluator) Eval(node *syntax.Node, env *value.Env) value.Value {
-	e.observer.OnEval(node.Type, "", 0, node.Pos)
-
 	h, ok := handlers[node.Type]
 	if !ok {
 		// Should never happen after validation

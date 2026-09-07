@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 
-	"nezha/engine"
 	"nezha/engine/runtime/hal/substrate"
 	"nezha/engine/runtime/prelude"
 	"nezha/engine/semantics/evaluator"
@@ -22,23 +21,21 @@ import (
 func Run(args []string) int {
 	fs := flag.NewFlagSet("debug", flag.ContinueOnError)
 	stage := fs.String("stage", "all", "lex|parse|eval|fmt|all")
-	trace := fs.Bool("trace", false, "enable trace observation")
-	prelude := fs.Bool("prelude", false, "include prelude in trace")
 
 	if err := fs.Parse(args); err != nil {
 		return 1
 	}
 
 	if fs.NArg() < 1 {
-		fmt.Fprintln(os.Stderr, "usage: nezha debug [-stage lex|parse|eval|fmt|all] [-trace] [-prelude] <filename>")
+		fmt.Fprintln(os.Stderr, "usage: nezha debug [-stage lex|parse|eval|fmt|all] <filename>")
 		return 1
 	}
 
-	return run(fs.Arg(0), *stage, *trace, *prelude, os.Stdout, os.Stderr)
+	return run(fs.Arg(0), *stage, os.Stdout, os.Stderr)
 }
 
 // run is the internal implementation, separated for testability.
-func run(path, stage string, trace, tracePrelude bool, stdout, stderr io.Writer) int {
+func run(path, stage string, stdout, stderr io.Writer) int {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		fmt.Fprintf(stderr, "failed to read file: %v\n", err)
@@ -52,19 +49,10 @@ func run(path, stage string, trace, tracePrelude bool, stdout, stderr io.Writer)
 		return 1
 	}
 
-	var obs engine.Observer
-	if trace {
-		tobs := &TraceObserver{out: stdout}
-		if !tracePrelude {
-			tobs.fileOnly = path
-		}
-		obs = tobs
-	}
-
 	// Fmt stage - run formatter with observer
 	if stage == "fmt" {
 		fmt.Fprintln(stdout, "==== Format ====")
-		formatted, err := nezhafmt.FormatSourceWithObserver(g, path, source, obs)
+		formatted, err := nezhafmt.FormatSource(g, path, source)
 		if err != nil {
 			fmt.Fprintf(stderr, "format error: %v\n", err)
 			return 1
@@ -75,7 +63,7 @@ func run(path, stage string, trace, tracePrelude bool, stdout, stderr io.Writer)
 	}
 
 	// Lex
-	lexer := syntax.NewLexer(g, path, source, obs)
+	lexer := syntax.NewLexer(g, path, source)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		fmt.Fprintf(stderr, "lex error: %v\n", err)
@@ -91,7 +79,7 @@ func run(path, stage string, trace, tracePrelude bool, stdout, stderr io.Writer)
 	}
 
 	// Parse
-	parser := syntax.NewParser(g, tokens, source, obs)
+	parser := syntax.NewParser(g, tokens, source)
 	tree, err := parser.Parse()
 	if err != nil {
 		fmt.Fprintf(stderr, "parse error: %v\n", err)
@@ -115,29 +103,25 @@ func run(path, stage string, trace, tracePrelude bool, stdout, stderr io.Writer)
 		preludeEnv.SetFile("<prelude>")
 		preludeEnv.SetSource(prelude.Source)
 
-		// Load prelude (with observer only if -prelude flag set)
-		var preObs engine.Observer
-		if tracePrelude {
-			preObs = obs
-		}
-		preLexer := syntax.NewLexer(g, "<prelude>", prelude.Source, preObs)
+		// Load prelude.
+		preLexer := syntax.NewLexer(g, "<prelude>", prelude.Source)
 		preTokens, err := preLexer.Tokenize()
 		if err != nil {
 			fmt.Fprintf(stderr, "prelude lex error: %v\n", err)
 			return 1
 		}
-		preParser := syntax.NewParser(g, preTokens, prelude.Source, preObs)
+		preParser := syntax.NewParser(g, preTokens, prelude.Source)
 		preTree, err := preParser.Parse()
 		if err != nil {
 			fmt.Fprintf(stderr, "prelude parse error: %v\n", err)
 			return 1
 		}
-		preEv := evaluator.New(rt, preObs)
+		preEv := evaluator.New(rt)
 		preEv.SetGrammar(g)
 		preEv.Eval(preTree, preludeEnv)
 
 		// Create user environment and evaluator
-		ev := evaluator.New(rt, obs)
+		ev := evaluator.New(rt)
 		ev.SetGrammar(g)
 
 		// Create user environment

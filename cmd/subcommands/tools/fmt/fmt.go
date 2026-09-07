@@ -10,6 +10,7 @@ import (
 
 	"nezha/cmd/internal/targetresolve"
 	"nezha/cmd/internal/testfixture"
+	"nezha/engine/formatter"
 	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
 )
@@ -89,7 +90,7 @@ func formatFile(path string, cfg Config, stdout io.Writer) (bool, error) {
 		return false, err
 	}
 
-	formatted, err := FormatSource(g, path, string(data))
+	formatted, err := formatter.FormatSource(g, path, string(data))
 	if err != nil {
 		return false, err
 	}

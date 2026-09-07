@@ -31,9 +31,9 @@ public prelude and registered runtime surface:
 
 The user-facing profiling command, CPU/trace top-level flags, semantic profiling
 probe, observation network, dynamic coverage package, language-service observer
-package, and evaluator profiling hooks are removed. Debug tracing still uses the
-small `engine.Observer` interface for explicit developer commands; that is
-tooling, not language.
+package, evaluator profiling hooks, and the engine-wide observer callback
+interface are removed. Debug remains command-side phase inspection rather than
+an engine event bus.
 
 ## Next audit targets
 

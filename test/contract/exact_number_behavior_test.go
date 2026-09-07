@@ -13,15 +13,15 @@ import (
 // eval helper for invariant tests
 func eval(t *testing.T, source string) value.Value {
 	g, _ := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
-	lexer := syntax.NewLexer(g, "test", source, nil)
+	lexer := syntax.NewLexer(g, "test", source)
 	tokens, _ := lexer.Tokenize()
-	parser := syntax.NewParser(g, tokens, source, nil)
+	parser := syntax.NewParser(g, tokens, source)
 	ast, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("parse: %v", err)
 	}
 	rt := substrate.NewGoRuntime()
-	ev := evaluator.New(rt, nil)
+	ev := evaluator.New(rt)
 	env := value.NewEnvWithScope(value.ScopePrelude)
 	return ev.Eval(ast, env)
 }

@@ -18,7 +18,7 @@ import (
 
 	"nezha/cmd/internal/targetresolve"
 	"nezha/cmd/internal/testfixture"
-	nezhafmt "nezha/cmd/subcommands/tools/fmt"
+	nezhafmt "nezha/engine/formatter"
 	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
 )
@@ -287,12 +287,12 @@ func formatNezha(path, source string) (string, error) {
 }
 
 func parseNezhaAST(g *grammar.Grammar, path, source string) (*syntax.Node, error) {
-	lx := syntax.NewLexer(g, path, source, nil)
+	lx := syntax.NewLexer(g, path, source)
 	tokens, err := lx.Tokenize()
 	if err != nil {
 		return nil, err
 	}
-	ps := syntax.NewParser(g, tokens, source, nil)
+	ps := syntax.NewParser(g, tokens, source)
 	return ps.Parse()
 }
 

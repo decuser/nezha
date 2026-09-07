@@ -3,7 +3,6 @@ package formatter
 import "nezha/engine/syntax"
 
 func (p *printer) printLetBinding(node *syntax.Node) {
-	p.observe("printLetBinding", "enter", "let_binding")
 	var name string
 	var valueNode *syntax.Node
 
@@ -21,18 +20,14 @@ func (p *printer) printLetBinding(node *syntax.Node) {
 			break
 		}
 	}
-
-	p.observe("printLetBinding", name, "NAME")
 	p.write(name)
 	p.write(" = ")
 	if valueNode != nil {
 		p.printNode(valueNode)
 	}
-	p.observe("printLetBinding", "exit", "let_binding")
 }
 
 func (p *printer) printAssign(node *syntax.Node) {
-	p.observe("printAssign", "enter", "assign_stmt")
 	p.writeIndent()
 	foundEquals := false
 	for _, child := range node.Children {
@@ -47,12 +42,9 @@ func (p *printer) printAssign(node *syntax.Node) {
 			p.printNode(child)
 		}
 	}
-	p.observe("printAssign", "exit", "assign_stmt")
 }
 
 func (p *printer) printIf(node *syntax.Node) {
-	p.observe("printIf", "enter", "if_stmt")
-	defer p.observe("printIf", "exit", "if_stmt")
 
 	p.writeIndent()
 	p.write("if ")
@@ -107,8 +99,6 @@ func (p *printer) printIf(node *syntax.Node) {
 
 // printIfNoIndent prints an if statement without leading indent (for else if chains)
 func (p *printer) printIfNoIndent(node *syntax.Node) {
-	p.observe("printIfNoIndent", "enter", "if_stmt")
-	defer p.observe("printIfNoIndent", "exit", "if_stmt")
 
 	p.write("if ")
 
@@ -159,7 +149,6 @@ func (p *printer) printIfNoIndent(node *syntax.Node) {
 }
 
 func (p *printer) printWhile(node *syntax.Node) {
-	p.observe("printWhile", "enter", "while_stmt")
 	p.writeIndent()
 	p.write("while ")
 
@@ -180,11 +169,9 @@ func (p *printer) printWhile(node *syntax.Node) {
 	line := nodeStartLine(node)
 	p.emitEOLComment(line)
 	p.newline()
-	p.observe("printWhile", "exit", "while_stmt")
 }
 
 func (p *printer) printMatch(node *syntax.Node) {
-	p.observe("printMatch", "enter", "match_stmt")
 	p.writeIndent()
 	p.write("match ")
 
@@ -229,11 +216,9 @@ func (p *printer) printMatch(node *syntax.Node) {
 	line := nodeStartLine(node)
 	p.emitEOLComment(line)
 	p.newline()
-	p.observe("printMatch", "exit", "match_stmt")
 }
 
 func (p *printer) printPattern(node *syntax.Node) {
-	p.observe("printPattern", "enter", "pattern")
 	for _, child := range node.Children {
 		switch child.Type {
 		case "TERMINAL":
@@ -257,7 +242,6 @@ func (p *printer) printPattern(node *syntax.Node) {
 			p.printPatternLiteral(child)
 		}
 	}
-	p.observe("printPattern", "exit", "pattern")
 }
 
 func (p *printer) printPatternLiteral(node *syntax.Node) {
@@ -272,7 +256,6 @@ func (p *printer) printPatternLiteral(node *syntax.Node) {
 }
 
 func (p *printer) printReturn(node *syntax.Node) {
-	p.observe("printReturn", "enter", "return_stmt")
 	p.writeIndent()
 	p.write("return ")
 	for _, child := range node.Children {
@@ -280,20 +263,16 @@ func (p *printer) printReturn(node *syntax.Node) {
 			p.printNode(child)
 		}
 	}
-	p.observe("printReturn", "exit", "return_stmt")
 }
 
 func (p *printer) printExprStmt(node *syntax.Node) {
-	p.observe("printExprStmt", "enter", "expr_stmt")
 	p.writeIndent()
 	for _, child := range node.Children {
 		p.printNode(child)
 	}
-	p.observe("printExprStmt", "exit", "expr_stmt")
 }
 
 func (p *printer) printBlock(node *syntax.Node) {
-	p.observe("printBlock", "enter", "block")
 	p.write("{\n")
 	p.indent++
 	for _, child := range node.Children {
@@ -307,19 +286,15 @@ func (p *printer) printBlock(node *syntax.Node) {
 	p.indent--
 	p.writeIndent()
 	p.write("}")
-	p.observe("printBlock", "exit", "block")
 }
 
 func (p *printer) printExpr(node *syntax.Node) {
-	p.observe("printExpr", "enter", "expr")
 	for _, child := range node.Children {
 		p.printNode(child)
 	}
-	p.observe("printExpr", "exit", "expr")
 }
 
 func (p *printer) printPipeExpr(node *syntax.Node) {
-	p.observe("printPipeExpr", "enter", "pipe_expr")
 	children := node.Children
 	pipeCount := 0
 	for _, child := range children {
@@ -335,7 +310,6 @@ func (p *printer) printPipeExpr(node *syntax.Node) {
 				p.printNode(child)
 			}
 		}
-		p.observe("printPipeExpr", "exit", "pipe_expr")
 		return
 	}
 	for _, child := range children {
@@ -347,11 +321,9 @@ func (p *printer) printPipeExpr(node *syntax.Node) {
 			p.printNode(child)
 		}
 	}
-	p.observe("printPipeExpr", "exit", "pipe_expr")
 }
 
 func (p *printer) printInfix(node *syntax.Node) {
-	p.observe("printInfix", "enter", "infix_expr")
 	first := true
 	for _, child := range node.Children {
 		if child.Type == "BINOP" {
@@ -373,20 +345,17 @@ func (p *printer) printInfix(node *syntax.Node) {
 			first = false
 		}
 	}
-	p.observe("printInfix", "exit", "infix_expr")
 }
 
 func (p *printer) printBinop(node *syntax.Node) {
 	for _, child := range node.Children {
 		if child.Type == "TERMINAL" {
-			p.observe("printBinop", child.Value, "TERMINAL")
 			p.write(child.Value)
 		}
 	}
 }
 
 func (p *printer) printUnary(node *syntax.Node) {
-	p.observe("printUnary", "enter", "unary_expr")
 	for _, child := range node.Children {
 		if child.Type == "TERMINAL" {
 			if child.Value == "not" {
@@ -398,19 +367,15 @@ func (p *printer) printUnary(node *syntax.Node) {
 			p.printNode(child)
 		}
 	}
-	p.observe("printUnary", "exit", "unary_expr")
 }
 
 func (p *printer) printPostfix(node *syntax.Node) {
-	p.observe("printPostfix", "enter", "postfix_expr")
 	for _, child := range node.Children {
 		p.printNode(child)
 	}
-	p.observe("printPostfix", "exit", "postfix_expr")
 }
 
 func (p *printer) printPrimary(node *syntax.Node) {
-	p.observe("printPrimary", "enter", "primary")
 	for _, child := range node.Children {
 		switch child.Type {
 		case "TERMINAL":
@@ -425,11 +390,9 @@ func (p *printer) printPrimary(node *syntax.Node) {
 			p.printNode(child)
 		}
 	}
-	p.observe("printPrimary", "exit", "primary")
 }
 
 func (p *printer) printFuncLiteral(node *syntax.Node) {
-	p.observe("printFuncLiteral", "enter", "func_literal")
 	p.write("(")
 	for _, child := range node.Children {
 		if child.Type == "params" {
@@ -442,11 +405,9 @@ func (p *printer) printFuncLiteral(node *syntax.Node) {
 			p.printBlock(child)
 		}
 	}
-	p.observe("printFuncLiteral", "exit", "func_literal")
 }
 
 func (p *printer) printParams(node *syntax.Node) {
-	p.observe("printParams", "enter", "params")
 	var params []string
 	for _, child := range node.Children {
 		switch child.Type {
@@ -472,7 +433,6 @@ func (p *printer) printParams(node *syntax.Node) {
 		p.indent++
 		for i, param := range params {
 			p.writeIndent()
-			p.observe("printParams", param, "NAME")
 			p.write(param)
 			if i+1 < len(params) {
 				p.write(",")
@@ -481,7 +441,6 @@ func (p *printer) printParams(node *syntax.Node) {
 		}
 		p.indent--
 		p.writeIndent()
-		p.observe("printParams", "exit", "params")
 		return
 	}
 
@@ -489,14 +448,11 @@ func (p *printer) printParams(node *syntax.Node) {
 		if i > 0 {
 			p.write(", ")
 		}
-		p.observe("printParams", param, "NAME")
 		p.write(param)
 	}
-	p.observe("printParams", "exit", "params")
 }
 
 func (p *printer) printList(node *syntax.Node) {
-	p.observe("printList", "enter", "list_literal")
 	p.write("[")
 	var items []*syntax.Node
 	for _, child := range node.Children {
@@ -518,7 +474,6 @@ func (p *printer) printList(node *syntax.Node) {
 		p.indent--
 		p.writeIndent()
 		p.write("]")
-		p.observe("printList", "exit", "list_literal")
 		return
 	}
 	for i, item := range items {
@@ -528,11 +483,9 @@ func (p *printer) printList(node *syntax.Node) {
 		p.printNode(item)
 	}
 	p.write("]")
-	p.observe("printList", "exit", "list_literal")
 }
 
 func (p *printer) printCall(node *syntax.Node) {
-	p.observe("printCall", "enter", "call")
 	p.write("(")
 	var args []*syntax.Node
 	for _, child := range node.Children {
@@ -554,7 +507,6 @@ func (p *printer) printCall(node *syntax.Node) {
 		p.indent--
 		p.writeIndent()
 		p.write(")")
-		p.observe("printCall", "exit", "call")
 		return
 	}
 	for i, arg := range args {
@@ -564,11 +516,9 @@ func (p *printer) printCall(node *syntax.Node) {
 		p.printNode(arg)
 	}
 	p.write(")")
-	p.observe("printCall", "exit", "call")
 }
 
 func (p *printer) printIndex(node *syntax.Node) {
-	p.observe("printIndex", "enter", "index")
 	p.write("[")
 	for _, child := range node.Children {
 		if child.Type != "TERMINAL" {
@@ -576,23 +526,18 @@ func (p *printer) printIndex(node *syntax.Node) {
 		}
 	}
 	p.write("]")
-	p.observe("printIndex", "exit", "index")
 }
 
 func (p *printer) printAccess(node *syntax.Node) {
-	p.observe("printAccess", "enter", "access")
 	p.write(".")
 	for _, child := range node.Children {
 		if child.Type == "NAME" {
-			p.observe("printAccess", child.Value, "NAME")
 			p.write(child.Value)
 		}
 	}
-	p.observe("printAccess", "exit", "access")
 }
 
 func (p *printer) printLet(node *syntax.Node) {
-	p.observe("printLet", "enter", "let_stmt")
 	p.writeIndent()
 	p.write("let ")
 
@@ -608,11 +553,9 @@ func (p *printer) printLet(node *syntax.Node) {
 	} else {
 		p.printLetBinding(node)
 	}
-	p.observe("printLet", "exit", "let_stmt")
 }
 
 func (p *printer) printShapeDef(node *syntax.Node) {
-	p.observe("printShapeDef", "enter", "shape_def")
 	for _, child := range node.Children {
 		if child.Type == "SHAPE" {
 			p.write(child.Value)
@@ -635,5 +578,4 @@ func (p *printer) printShapeDef(node *syntax.Node) {
 		}
 	}
 	p.write("]")
-	p.observe("printShapeDef", "exit", "shape_def")
 }

@@ -74,14 +74,14 @@ func runSourceWithRuntimeDirect(filename, source string, programArgs []string, r
 	userEnv.SetAuthority(rt.AuthorityForSource(filename))
 
 	// Lex user code
-	lexer := syntax.NewLexer(g, filename, source, nil)
+	lexer := syntax.NewLexer(g, filename, source)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		return fmt.Errorf("lexer: %w", err)
 	}
 
 	// Parse user code
-	parser := syntax.NewParser(g, tokens, source, nil)
+	parser := syntax.NewParser(g, tokens, source)
 	ast, err := parser.Parse()
 	if err != nil {
 		return fmt.Errorf("parser: %w", err)
@@ -90,7 +90,7 @@ func runSourceWithRuntimeDirect(filename, source string, programArgs []string, r
 	// Eval user code
 	userEnv.SetFile(filename)
 	userEnv.SetSource(source)
-	ev := evaluator.New(rt, nil)
+	ev := evaluator.New(rt)
 	ev.SetGrammar(g)
 	result := ev.Eval(ast, userEnv)
 	return executionResultError(result)
@@ -103,13 +103,13 @@ func loadPrelude(g *grammar.Grammar, rt *substrate.GoRuntime, env *value.Env) er
 		return fmt.Errorf("loading help: %w", err)
 	}
 
-	lexer := syntax.NewLexer(g, "<prelude>", prelude.Source, nil)
+	lexer := syntax.NewLexer(g, "<prelude>", prelude.Source)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		return err
 	}
 
-	parser := syntax.NewParser(g, tokens, prelude.Source, nil)
+	parser := syntax.NewParser(g, tokens, prelude.Source)
 	ast, err := parser.Parse()
 	if err != nil {
 		return err
@@ -117,7 +117,7 @@ func loadPrelude(g *grammar.Grammar, rt *substrate.GoRuntime, env *value.Env) er
 
 	env.SetFile("<prelude>")
 	env.SetSource(prelude.Source)
-	ev := evaluator.New(rt, nil)
+	ev := evaluator.New(rt)
 	ev.SetGrammar(g)
 	result := ev.Eval(ast, env)
 	if fault, ok := result.(*value.Fault); ok {
@@ -156,19 +156,19 @@ func RunExpr(expr string) (string, error) {
 	userEnv := value.NewEnclosedEnvWithScope(preludeEnv, value.ScopeUser)
 	userEnv.SetAuthority(value.NoAuthority())
 
-	lexer := syntax.NewLexer(g, "<expr>", expr, nil)
+	lexer := syntax.NewLexer(g, "<expr>", expr)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		return "", err
 	}
 
-	parser := syntax.NewParser(g, tokens, expr, nil)
+	parser := syntax.NewParser(g, tokens, expr)
 	ast, err := parser.Parse()
 	if err != nil {
 		return "", err
 	}
 
-	ev := evaluator.New(rt, nil)
+	ev := evaluator.New(rt)
 	ev.SetGrammar(g)
 	result := ev.Eval(ast, userEnv)
 	if fault, ok := result.(*value.Fault); ok {

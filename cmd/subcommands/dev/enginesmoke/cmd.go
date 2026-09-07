@@ -14,7 +14,6 @@ import (
 	"strings"
 
 	"nezha/cmd/internal/targetresolve"
-	"nezha/engine"
 	"nezha/engine/runtime/hal/substrate"
 	"nezha/engine/runtime/prelude"
 	"nezha/engine/semantics/evaluator"
@@ -204,12 +203,12 @@ func uncoveredProductions(g *grammar.Grammar, inputs []string) ([]string, error)
 			return nil, fmt.Errorf("reading %s: %w", inPath, err)
 		}
 		source := string(sourceBytes)
-		lexer := syntax.NewLexer(g, inPath, source, nil)
+		lexer := syntax.NewLexer(g, inPath, source)
 		tokens, err := lexer.Tokenize()
 		if err != nil {
 			return nil, fmt.Errorf("lexing %s: %w", inPath, err)
 		}
-		parser := syntax.NewParser(g, tokens, source, nil)
+		parser := syntax.NewParser(g, tokens, source)
 		ast, err := parser.Parse()
 		if err != nil {
 			return nil, fmt.Errorf("parsing %s: %w", inPath, err)
@@ -310,22 +309,25 @@ func runStage(s stage, g *grammar.Grammar, file, source string) ([]byte, error) 
 }
 
 func dumpLex(g *grammar.Grammar, file, source string) ([]byte, error) {
-	obs := &tokenDumpObserver{}
-	lexer := syntax.NewLexer(g, file, source, obs)
-	_, err := lexer.Tokenize()
-	if err != nil {
-		return nil, err
-	}
-	return obs.Bytes(), nil
-}
-
-func dumpParse(g *grammar.Grammar, file, source string) ([]byte, error) {
-	lexer := syntax.NewLexer(g, file, source, nil)
+	lexer := syntax.NewLexer(g, file, source)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		return nil, err
 	}
-	parser := syntax.NewParser(g, tokens, source, nil)
+	var buf bytes.Buffer
+	for _, tok := range tokens {
+		fmt.Fprintf(&buf, "%d:%d\t%s\t%s\n", tok.Pos.Line, tok.Pos.Col, tok.Type, strconv.Quote(tok.Lexeme))
+	}
+	return buf.Bytes(), nil
+}
+
+func dumpParse(g *grammar.Grammar, file, source string) ([]byte, error) {
+	lexer := syntax.NewLexer(g, file, source)
+	tokens, err := lexer.Tokenize()
+	if err != nil {
+		return nil, err
+	}
+	parser := syntax.NewParser(g, tokens, source)
 	ast, err := parser.Parse()
 	if err != nil {
 		return nil, err
@@ -354,18 +356,18 @@ func dumpEval(g *grammar.Grammar, file, source string) ([]byte, error) {
 	userEnv.SetFile(file)
 	userEnv.SetSource(source)
 
-	lexer := syntax.NewLexer(g, file, source, nil)
+	lexer := syntax.NewLexer(g, file, source)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		return nil, err
 	}
-	parser := syntax.NewParser(g, tokens, source, nil)
+	parser := syntax.NewParser(g, tokens, source)
 	ast, err := parser.Parse()
 	if err != nil {
 		return nil, err
 	}
 
-	ev := evaluator.New(rt, nil)
+	ev := evaluator.New(rt)
 	ev.SetGrammar(g)
 	result := ev.Eval(ast, userEnv)
 	if faultV, ok := result.(*value.Fault); ok {
@@ -376,12 +378,12 @@ func dumpEval(g *grammar.Grammar, file, source string) ([]byte, error) {
 }
 
 func loadPrelude(g *grammar.Grammar, rt *substrate.GoRuntime, env *value.Env) error {
-	lexer := syntax.NewLexer(g, "<prelude>", prelude.Source, nil)
+	lexer := syntax.NewLexer(g, "<prelude>", prelude.Source)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		return err
 	}
-	parser := syntax.NewParser(g, tokens, prelude.Source, nil)
+	parser := syntax.NewParser(g, tokens, prelude.Source)
 	ast, err := parser.Parse()
 	if err != nil {
 		return err
@@ -389,53 +391,13 @@ func loadPrelude(g *grammar.Grammar, rt *substrate.GoRuntime, env *value.Env) er
 
 	env.SetFile("<prelude>")
 	env.SetSource(prelude.Source)
-	ev := evaluator.New(rt, nil)
+	ev := evaluator.New(rt)
 	ev.SetGrammar(g)
 	result := ev.Eval(ast, env)
 	if faultV, ok := result.(*value.Fault); ok {
 		return fmt.Errorf("%s", faultV.Inspect())
 	}
 	return nil
-}
-
-type tokenDumpObserver struct {
-	buf bytes.Buffer
-}
-
-func (t *tokenDumpObserver) OnLex(token string, lexeme string, pos engine.Position) {
-	// Stable, one token per line.
-	// Format: line:col<TAB>TYPE<TAB>%q(lexeme)
-	fmt.Fprintf(&t.buf, "%d:%d\t%s\t%s\n", pos.Line, pos.Col, token, strconv.Quote(lexeme))
-}
-
-func (t *tokenDumpObserver) OnParse(production string, depth int, pos engine.Position) {
-	_ = production
-	_ = depth
-	_ = pos
-}
-
-func (t *tokenDumpObserver) OnEval(node string, result string, scope int, pos engine.Position) {
-	_ = node
-	_ = result
-	_ = scope
-	_ = pos
-}
-
-func (t *tokenDumpObserver) OnEffect(action string, target string, pos engine.Position) {
-	_ = action
-	_ = target
-	_ = pos
-}
-
-func (t *tokenDumpObserver) OnFormat(method string, output string, node string, depth int) {
-	_ = method
-	_ = output
-	_ = node
-	_ = depth
-}
-
-func (t *tokenDumpObserver) Bytes() []byte {
-	return t.buf.Bytes()
 }
 
 func dumpNode(w io.Writer, n *syntax.Node, depth int) {

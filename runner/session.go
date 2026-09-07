@@ -38,7 +38,7 @@ func NewSession() (*Session, error) {
 	userEnv := value.NewEnclosedEnvWithScope(preludeEnv, value.ScopeUser)
 	userEnv.SetAuthority(value.NoAuthority())
 
-	ev := evaluator.New(rt, nil)
+	ev := evaluator.New(rt)
 	ev.SetGrammar(g)
 
 	return &Session{
@@ -51,13 +51,13 @@ func NewSession() (*Session, error) {
 
 // Eval evaluates source code and returns the result.
 func (s *Session) Eval(source string) value.Value {
-	lexer := syntax.NewLexer(s.Grammar, "<repl>", source, nil)
+	lexer := syntax.NewLexer(s.Grammar, "<repl>", source)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		return value.NewFault("%s", err)
 	}
 
-	parser := syntax.NewParser(s.Grammar, tokens, source, nil)
+	parser := syntax.NewParser(s.Grammar, tokens, source)
 	ast, err := parser.Parse()
 	if err != nil {
 		return value.NewFault("%s", err)

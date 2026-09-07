@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"nezha/engine"
 	"nezha/engine/syntax/grammar"
 )
 
@@ -45,7 +44,7 @@ func mustCompile(pattern string) *regexp.Regexp {
 func tokenizeNoSkip(t *testing.T, src string) []Token {
 	t.Helper()
 	g := testGrammar()
-	l := NewLexer(g, "test.nez", src, nil)
+	l := NewLexer(g, "test.nez", src)
 	tokens, err := l.Tokenize()
 	if err != nil {
 		t.Fatalf("tokenize error: %v", err)
@@ -223,43 +222,11 @@ let y = 2`
 	}
 }
 
-func TestLexerObserver(t *testing.T) {
-	g := testGrammar()
-	source := `let x = 1`
-
-	var observed []string
-	obs := &testObserver{
-		onLex: func(token, lexeme string, pos engine.Position) {
-			if token == "WHITESPACE" || token == "COMMENT" {
-				return
-			}
-			observed = append(observed, token+":"+lexeme)
-		},
-	}
-
-	l := NewLexer(g, "test.nez", source, obs)
-	_, err := l.Tokenize()
-	if err != nil {
-		t.Fatalf("tokenize error: %v", err)
-	}
-
-	expected := []string{"KEYWORD:let", "NAME:x", "OPERATOR:=", "NUMBER:1"}
-	if len(observed) != len(expected) {
-		t.Fatalf("expected %d observations, got %d", len(expected), len(observed))
-	}
-
-	for i, exp := range expected {
-		if observed[i] != exp {
-			t.Errorf("observation %d: expected %q, got %q", i, exp, observed[i])
-		}
-	}
-}
-
 func TestLexerError(t *testing.T) {
 	g := testGrammar()
 	source := "let x = `invalid`"
 
-	l := NewLexer(g, "test.nez", source, nil)
+	l := NewLexer(g, "test.nez", source)
 	_, err := l.Tokenize()
 	if err == nil {
 		t.Fatal("expected error for invalid character")
@@ -301,19 +268,3 @@ func TestLexerRestParam(t *testing.T) {
 		}
 	}
 }
-
-// testObserver implements Observer for testing.
-type testObserver struct {
-	onLex func(token, lexeme string, pos engine.Position)
-}
-
-func (o *testObserver) OnLex(token, lexeme string, pos engine.Position) {
-	if o.onLex != nil {
-		o.onLex(token, lexeme, pos)
-	}
-}
-
-func (o *testObserver) OnParse(production string, depth int, pos engine.Position)  {}
-func (o *testObserver) OnEval(node, result string, scope int, pos engine.Position) {}
-func (o *testObserver) OnEffect(action, target string, pos engine.Position)        {}
-func (o *testObserver) OnFormat(method, output, node string, depth int)            {}

@@ -4,7 +4,6 @@ import (
 	"strings"
 	"testing"
 
-	"nezha/engine"
 	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
 )
@@ -82,7 +81,7 @@ func TestFormatterProductionCoverageMatchesGrammar(t *testing.T) {
 }
 
 func TestFormatterUnknownLeafCannotDisappear(t *testing.T) {
-	p := &printer{observer: engine.SilentObserver{}}
+	p := &printer{}
 	p.printNode(&syntax.Node{Type: "FUTURE_LITERAL", Value: "lost"})
 	if p.err == nil {
 		t.Fatal("expected unknown leaf to produce formatter error")

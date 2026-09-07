@@ -42,7 +42,6 @@ type Parser struct {
 	pos                  int
 	furthest             int // furthest position reached
 	source               string
-	observer             engine.Observer
 	errorProduction      string       // innermost active production carrying @error metadata
 	failure              ParseFailure // best failure so far, stored in-place
 	hasFailure           bool
@@ -51,11 +50,7 @@ type Parser struct {
 	continuationLexemes  map[string]bool
 }
 
-func NewParser(g *grammar.Grammar, tokens []Token, source string, observer engine.Observer) *Parser {
-	if observer == nil {
-		observer = engine.SilentObserver{}
-	}
-
+func NewParser(g *grammar.Grammar, tokens []Token, source string) *Parser {
 	// Apply the grammar-declared skip/newline policy through the same neutral
 	// normalization seam used by cross-implementation conformance.
 	filtered, syntheticTerminators := normalizeTokens(g, tokens)
@@ -67,11 +62,7 @@ func NewParser(g *grammar.Grammar, tokens []Token, source string, observer engin
 	continuationTokens := make(map[string]bool)
 	continuationLexemes := make(map[string]bool)
 	analysis := g.Analysis()
-	if analysis.NewlineError != nil {
-		if diagnostics, ok := observer.(engine.DiagnosticObserver); ok {
-			diagnostics.OnDiagnostic("grammar-newline-analysis", analysis.NewlineError.Error(), rule.Pos)
-		}
-	}
+	_ = rule
 	if analysis.Newline != nil {
 		for _, symbol := range analysis.Newline.Continuation {
 			if symbol.Token != "" {
@@ -88,7 +79,6 @@ func NewParser(g *grammar.Grammar, tokens []Token, source string, observer engin
 		pos:                  0,
 		furthest:             0,
 		source:               source,
-		observer:             observer,
 		syntheticTerminators: syntheticTerminators,
 		continuationTokens:   continuationTokens,
 		continuationLexemes:  continuationLexemes,
@@ -262,7 +252,6 @@ func (p *Parser) parseProduction(name string) (*Node, error) {
 
 	startPos := p.pos
 	startTok := p.peek()
-	p.observer.OnParse(name, 0, startTok.Pos)
 
 	children, err := p.parseExpr(prod.Expr)
 	if err != nil {

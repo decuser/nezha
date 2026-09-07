@@ -190,38 +190,38 @@ func evalWithScope(code string, scope value.Scope, loadPrel bool) (value.Value, 
 		env.SetAuthority(value.NoAuthority())
 	}
 
-	lexer := syntax.NewLexer(g, "<test>", code, nil)
+	lexer := syntax.NewLexer(g, "<test>", code)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		return nil, err
 	}
 
-	parser := syntax.NewParser(g, tokens, code, nil)
+	parser := syntax.NewParser(g, tokens, code)
 	ast, err := parser.Parse()
 	if err != nil {
 		return nil, err
 	}
 
-	ev := evaluator.New(rt, nil)
+	ev := evaluator.New(rt)
 
 	return ev.Eval(ast, env), nil
 }
 
 // loadPreludeInto loads prelude.nez into the environment.
 func loadPreludeInto(g *grammar.Grammar, rt *substrate.GoRuntime, env *value.Env) error {
-	lexer := syntax.NewLexer(g, "<prelude>", prelude.Source, nil)
+	lexer := syntax.NewLexer(g, "<prelude>", prelude.Source)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		return err
 	}
 
-	parser := syntax.NewParser(g, tokens, prelude.Source, nil)
+	parser := syntax.NewParser(g, tokens, prelude.Source)
 	ast, err := parser.Parse()
 	if err != nil {
 		return err
 	}
 
-	ev := evaluator.New(rt, nil)
+	ev := evaluator.New(rt)
 	result := ev.Eval(ast, env)
 	if faultVal, ok := result.(*value.Fault); ok {
 		return fmt.Errorf("%s", faultVal.Message)

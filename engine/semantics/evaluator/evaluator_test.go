@@ -12,15 +12,15 @@ import (
 
 func eval(t *testing.T, source string) value.Value {
 	g, _ := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
-	lexer := syntax.NewLexer(g, "test", source, nil)
+	lexer := syntax.NewLexer(g, "test", source)
 	tokens, _ := lexer.Tokenize()
-	parser := syntax.NewParser(g, tokens, source, nil)
+	parser := syntax.NewParser(g, tokens, source)
 	ast, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("parse: %v", err)
 	}
 	rt := substrate.NewGoRuntime()
-	ev := New(rt, nil)
+	ev := New(rt)
 	// Use prelude scope to access HAL primitives directly
 	env := value.NewEnvWithScope(value.ScopePrelude)
 	env.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
@@ -263,7 +263,7 @@ func TestBinaryOperatorMembershipComesFromGrammar(t *testing.T) {
 	if err != nil {
 		t.Fatalf("load grammar: %v", err)
 	}
-	ev := New(substrate.NewGoRuntime(), nil)
+	ev := New(substrate.NewGoRuntime())
 	ev.SetGrammar(g)
 	if !ev.isBinaryOperator("+") {
 		t.Fatal("expected grammar-declared + to be an operator")
@@ -274,7 +274,7 @@ func TestBinaryOperatorMembershipComesFromGrammar(t *testing.T) {
 }
 
 func TestNumberLiteralRealizedOncePerEvaluator(t *testing.T) {
-	ev := New(nil, nil)
+	ev := New(nil)
 	node := &syntax.Node{Type: "NUMBER", Value: "123456789/7"}
 
 	first, ok := ev.evalNumber(node, nil).(*value.Number)
@@ -294,7 +294,7 @@ func TestNumberLiteralRealizedOncePerEvaluator(t *testing.T) {
 }
 
 func TestNumberLiteralCacheKeysBySpellingWithoutRetainingASTIdentity(t *testing.T) {
-	ev := New(nil, nil)
+	ev := New(nil)
 	a := &syntax.Node{Type: "NUMBER", Value: "42"}
 	b := &syntax.Node{Type: "NUMBER", Value: "42"}
 
@@ -306,7 +306,7 @@ func TestNumberLiteralCacheKeysBySpellingWithoutRetainingASTIdentity(t *testing.
 }
 
 func TestNumberLiteralCacheConcurrentReads(t *testing.T) {
-	ev := New(nil, nil)
+	ev := New(nil)
 	node := &syntax.Node{Type: "NUMBER", Value: "987654321/13"}
 	want := ev.evalNumber(node, nil).(*value.Number)
 
@@ -336,7 +336,7 @@ func TestNumberLiteralCacheConcurrentReads(t *testing.T) {
 }
 
 func TestNumberLiteralWarmObservationDoesNotAllocate(t *testing.T) {
-	ev := New(nil, nil)
+	ev := New(nil)
 	node := &syntax.Node{Type: "NUMBER", Value: "314159265358979323846/100000000000000000000"}
 	_ = ev.evalNumber(node, nil)
 

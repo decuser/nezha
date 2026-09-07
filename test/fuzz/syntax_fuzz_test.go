@@ -41,7 +41,7 @@ func FuzzLexer(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, input string) {
 		// Should not panic
-		lexer := syntax.NewLexer(testGrammar, "<fuzz>", input, nil)
+		lexer := syntax.NewLexer(testGrammar, "<fuzz>", input)
 		_, _ = lexer.Tokenize() // errors are fine, panics are not
 	})
 }
@@ -66,14 +66,14 @@ func FuzzParser(f *testing.F) {
 	f.Add("((((")
 
 	f.Fuzz(func(t *testing.T, input string) {
-		lexer := syntax.NewLexer(testGrammar, "<fuzz>", input, nil)
+		lexer := syntax.NewLexer(testGrammar, "<fuzz>", input)
 		tokens, err := lexer.Tokenize()
 		if err != nil {
 			return // lexer error is fine
 		}
 
 		// Should not panic
-		parser := syntax.NewParser(testGrammar, tokens, input, nil)
+		parser := syntax.NewParser(testGrammar, tokens, input)
 		_, _ = parser.Parse() // errors are fine, panics are not
 	})
 }
@@ -92,7 +92,7 @@ func FuzzNumberParsing(f *testing.F) {
 	f.Add("1.5e-3")
 
 	f.Fuzz(func(t *testing.T, input string) {
-		lexer := syntax.NewLexer(testGrammar, "<fuzz>", input, nil)
+		lexer := syntax.NewLexer(testGrammar, "<fuzz>", input)
 		_, _ = lexer.Tokenize()
 	})
 }

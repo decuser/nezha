@@ -22,12 +22,12 @@ type Diagnostic struct {
 // AnalyzeStructure checks source for undefined names, shadowing, and naming conventions.
 // It is structural only: it does not evaluate code.
 func AnalyzeStructure(g *grammar.Grammar, file string, source string, lintScope value.Scope, catalog Catalog) ([]Diagnostic, error) {
-	lx := syntax.NewLexer(g, file, source, nil)
+	lx := syntax.NewLexer(g, file, source)
 	toks, err := lx.Tokenize()
 	if err != nil {
 		return nil, err
 	}
-	p := syntax.NewParser(g, toks, source, nil)
+	p := syntax.NewParser(g, toks, source)
 	node, err := p.Parse()
 	if err != nil {
 		return nil, err

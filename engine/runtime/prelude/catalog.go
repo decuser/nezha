@@ -64,12 +64,12 @@ func ValidateSources(g *grammar.Grammar, source, helpSource, docSource string) (
 }
 
 func declaredPreludeFunctions(g *grammar.Grammar, file, source string) (map[string]bool, error) {
-	lx := syntax.NewLexer(g, file, source, nil)
+	lx := syntax.NewLexer(g, file, source)
 	tokens, err := lx.Tokenize()
 	if err != nil {
 		return nil, err
 	}
-	p := syntax.NewParser(g, tokens, source, nil)
+	p := syntax.NewParser(g, tokens, source)
 	root, err := p.Parse()
 	if err != nil {
 		return nil, err
