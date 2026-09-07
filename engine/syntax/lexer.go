@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"strings"
 
-	"nezha/engine"
 	"nezha/engine/syntax/grammar"
+	"nezha/engine/syntax/position"
 )
 
 // Token represents a lexical token.
 type Token struct {
 	Type   string
 	Lexeme string
-	Pos    engine.Position
+	Pos    position.Position
 }
 
 type literalCandidate struct {
@@ -149,7 +149,7 @@ func (l *Lexer) Next() (Token, error) {
 			Kind:     "lex",
 			Pos:      startPos,
 			Message:  message,
-			Rendered: engine.FormatWithCaret(startPos, engine.GetSourceLine(l.source, startPos.Line), message),
+			Rendered: position.RenderDiagnostic(startPos, position.SourceLine(l.source, startPos.Line), message),
 		}
 	}
 
@@ -176,6 +176,6 @@ func (l *Lexer) advance(n int) {
 	}
 }
 
-func (l *Lexer) position() engine.Position {
-	return engine.Position{File: l.file, Line: l.line, Col: l.col}
+func (l *Lexer) position() position.Position {
+	return position.Position{File: l.file, Line: l.line, Col: l.col}
 }

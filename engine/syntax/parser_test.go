@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"nezha/engine"
 	"nezha/engine/syntax/grammar"
+	"nezha/engine/syntax/position"
 )
 
 func loadTestGrammar(t *testing.T) *grammar.Grammar {
@@ -186,11 +186,11 @@ func TestParserError(t *testing.T) {
 func TestParserSuppressionIgnoresUnmatchedCloser(t *testing.T) {
 	g := loadTestGrammar(t)
 	tokens := []Token{
-		{Type: "DELIMITER", Lexeme: "]", Pos: engine.Position{File: "test.nez", Line: 1, Col: 1}},
-		{Type: "DELIMITER", Lexeme: "(", Pos: engine.Position{File: "test.nez", Line: 1, Col: 2}},
-		{Type: "NUMBER", Lexeme: "1", Pos: engine.Position{File: "test.nez", Line: 1, Col: 3}},
-		{Type: "NEWLINE", Lexeme: "\n", Pos: engine.Position{File: "test.nez", Line: 1, Col: 4}},
-		{Type: "DELIMITER", Lexeme: ")", Pos: engine.Position{File: "test.nez", Line: 2, Col: 1}},
+		{Type: "DELIMITER", Lexeme: "]", Pos: position.Position{File: "test.nez", Line: 1, Col: 1}},
+		{Type: "DELIMITER", Lexeme: "(", Pos: position.Position{File: "test.nez", Line: 1, Col: 2}},
+		{Type: "NUMBER", Lexeme: "1", Pos: position.Position{File: "test.nez", Line: 1, Col: 3}},
+		{Type: "NEWLINE", Lexeme: "\n", Pos: position.Position{File: "test.nez", Line: 1, Col: 4}},
+		{Type: "DELIMITER", Lexeme: ")", Pos: position.Position{File: "test.nez", Line: 2, Col: 1}},
 	}
 
 	p := NewParser(g, tokens, "]\n(1\n)")
@@ -288,7 +288,7 @@ func TestParserNewlineContinuationDiagnosticUsesGrammarHelp(t *testing.T) {
 
 func TestRecordFailureStoresRelevantProductionWithoutStackMaterialization(t *testing.T) {
 	p := &Parser{errorProduction: "expression"}
-	pos := engine.Position{File: "test.nez", Line: 3, Col: 7}
+	pos := position.Position{File: "test.nez", Line: 3, Col: 7}
 	p.pos = 11
 	p.recordFailure(pos, "+", "term")
 
@@ -308,7 +308,7 @@ func TestRecordFailureStoresRelevantProductionWithoutStackMaterialization(t *tes
 
 func TestRecordFailureSpeculativeReplacementAllocatesZero(t *testing.T) {
 	p := &Parser{errorProduction: "expression"}
-	pos := engine.Position{File: "test.nez", Line: 1, Col: 1}
+	pos := position.Position{File: "test.nez", Line: 1, Col: 1}
 	p.pos = 1
 
 	allocs := testing.AllocsPerRun(1000, func() {
@@ -324,7 +324,7 @@ func TestTerminalMismatchUsesZeroAllocationControlFlow(t *testing.T) {
 		tokens: []Token{{
 			Type:   "IDENT",
 			Lexeme: "actual",
-			Pos:    engine.Position{File: "test.nez", Line: 1, Col: 1},
+			Pos:    position.Position{File: "test.nez", Line: 1, Col: 1},
 		}},
 	}
 	term := &grammar.Terminal{Value: "expected"}
@@ -357,13 +357,13 @@ func TestTerminalMismatchRenderingPreservesQuotedExpectation(t *testing.T) {
 		tokens: []Token{{
 			Type:   "IDENT",
 			Lexeme: "actual",
-			Pos:    engine.Position{File: "test.nez", Line: 1, Col: 1},
+			Pos:    position.Position{File: "test.nez", Line: 1, Col: 1},
 		}},
 		source: source,
 	}
 
 	parser.recordTerminalFailure(
-		engine.Position{File: "test.nez", Line: 1, Col: 1},
+		position.Position{File: "test.nez", Line: 1, Col: 1},
 		"actual",
 		"=",
 	)

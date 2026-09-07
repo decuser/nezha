@@ -18,9 +18,9 @@ import (
 
 	"nezha/cmd/internal/targetresolve"
 	"nezha/cmd/internal/testfixture"
-	nezhafmt "nezha/engine/formatter"
 	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
+	nezhafmt "nezha/internal/formatting"
 )
 
 const distributionWidth = 100

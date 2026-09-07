@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode"
 
-	"nezha/engine"
+	"nezha/engine/syntax/position"
 )
 
 type ebnfParser struct {
@@ -623,8 +623,8 @@ func (p *ebnfParser) skipWhitespaceAndComments() {
 	}
 }
 
-func (p *ebnfParser) position() engine.Position {
-	return engine.Position{File: p.file, Line: p.line, Col: p.col}
+func (p *ebnfParser) position() position.Position {
+	return position.Position{File: p.file, Line: p.line, Col: p.col}
 }
 
 func (p *ebnfParser) error(msg string) error {

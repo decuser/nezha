@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"nezha/engine"
 	"nezha/engine/syntax/grammar"
+	"nezha/engine/syntax/position"
 )
 
 // parserNoMatch is the internal speculative mismatch signal. It carries no
@@ -25,12 +25,12 @@ const (
 
 // ParseFailure captures the best error context for reporting.
 type ParseFailure struct {
-	Pos               engine.Position // where failure occurred
-	Got               string          // actual token
-	Expected          string          // what was expected
-	Production        string          // innermost production carrying @error metadata
-	Stack             []string        // legacy compatibility; parser no longer materializes this stack
-	NewlineTerminated bool            // a grammar-declared newline boundary caused this leftover continuation
+	Pos               position.Position // where failure occurred
+	Got               string            // actual token
+	Expected          string            // what was expected
+	Production        string            // innermost production carrying @error metadata
+	Stack             []string          // legacy compatibility; parser no longer materializes this stack
+	NewlineTerminated bool              // a grammar-declared newline boundary caused this leftover continuation
 
 	expectationKind failureExpectationKind
 	terminal        string
@@ -123,8 +123,8 @@ func (p *Parser) renderFailure() error {
 	}
 
 	f := &p.failure
-	line := engine.GetSourceLine(p.source, f.Pos.Line)
-	caret := engine.FormatCaret(f.Pos.Col)
+	line := position.SourceLine(p.source, f.Pos.Line)
+	caret := position.CaretLine(f.Pos.Col)
 
 	// The parser records the innermost active production carrying @error
 	// metadata at failure time. This is the only production-stack fact needed
@@ -194,7 +194,7 @@ func (p *Parser) getFile() string {
 }
 
 // recordFailure records a failure if it's at or beyond the furthest position.
-func (p *Parser) recordFailure(pos engine.Position, got, expected string) {
+func (p *Parser) recordFailure(pos position.Position, got, expected string) {
 	// Only update if this is further than previous best. Use >= to prefer later
 	// failures at the same position, preserving the existing context rule.
 	tokenPos := p.pos
@@ -217,7 +217,7 @@ func (p *Parser) recordFailure(pos engine.Position, got, expected string) {
 	p.furthest = tokenPos
 }
 
-func (p *Parser) recordTerminalFailure(pos engine.Position, got, terminal string) {
+func (p *Parser) recordTerminalFailure(pos position.Position, got, terminal string) {
 	tokenPos := p.pos
 	if p.hasFailure && tokenPos < p.furthest {
 		return
@@ -401,7 +401,7 @@ func (p *Parser) peek() Token {
 			return Token{
 				Type:   "EOF",
 				Lexeme: "",
-				Pos: engine.Position{
+				Pos: position.Position{
 					File: last.Pos.File,
 					Line: last.Pos.Line,
 					Col:  last.Pos.Col + len(last.Lexeme),

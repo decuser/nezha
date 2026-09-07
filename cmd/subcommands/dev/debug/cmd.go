@@ -13,7 +13,7 @@ import (
 	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
 
-	nezhafmt "nezha/engine/formatter"
+	nezhafmt "nezha/internal/formatting"
 )
 
 // Run executes the debug subcommand with the given arguments.

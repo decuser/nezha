@@ -1,4 +1,4 @@
-package formatter
+package formatting
 
 import "nezha/engine/syntax"
 

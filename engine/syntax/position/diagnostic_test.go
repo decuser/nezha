@@ -1,16 +1,16 @@
-package engine
+package position
 
 import (
 	"strings"
 	"testing"
 )
 
-func TestFormatWithCaret(t *testing.T) {
+func TestRenderDiagnostic(t *testing.T) {
 	pos := Position{File: "test.nez", Line: 4, Col: 10}
 	source := "let x = 1 / 0"
 	msg := "division by zero"
 
-	result := FormatWithCaret(pos, source, msg)
+	result := RenderDiagnostic(pos, source, msg)
 
 	// Check header
 	if !strings.Contains(result, "test.nez:4:10: division by zero") {
@@ -28,23 +28,23 @@ func TestFormatWithCaret(t *testing.T) {
 	}
 }
 
-func TestFormatWithCaretNoFile(t *testing.T) {
+func TestRenderDiagnosticNoFile(t *testing.T) {
 	pos := Position{Line: 1, Col: 5}
 	source := "1 + + 2"
 	msg := "unexpected '+'"
 
-	result := FormatWithCaret(pos, source, msg)
+	result := RenderDiagnostic(pos, source, msg)
 
 	if !strings.HasPrefix(result, "1:5:") {
 		t.Errorf("expected line:col format, got:\n%s", result)
 	}
 }
 
-func TestFormatWithCaretNoSource(t *testing.T) {
+func TestRenderDiagnosticNoSource(t *testing.T) {
 	pos := Position{File: "test.nez", Line: 1, Col: 1}
 	msg := "something went wrong"
 
-	result := FormatWithCaret(pos, "", msg)
+	result := RenderDiagnostic(pos, "", msg)
 
 	if strings.Contains(result, "\n") {
 		t.Errorf("expected single line without source, got:\n%s", result)
@@ -54,12 +54,12 @@ func TestFormatWithCaretNoSource(t *testing.T) {
 	}
 }
 
-func TestFormatWithCaretCol1(t *testing.T) {
+func TestRenderDiagnosticCol1(t *testing.T) {
 	pos := Position{File: "test.nez", Line: 1, Col: 1}
 	source := "let x = 1"
 	msg := "error at start"
 
-	result := FormatWithCaret(pos, source, msg)
+	result := RenderDiagnostic(pos, source, msg)
 
 	// Caret should be at start (no leading spaces)
 	lines := strings.Split(result, "\n")
@@ -72,7 +72,7 @@ func TestFormatWithCaretCol1(t *testing.T) {
 	}
 }
 
-func TestGetSourceLine(t *testing.T) {
+func TestSourceLine(t *testing.T) {
 	source := "line one\nline two\nline three"
 
 	tests := []struct {
@@ -88,9 +88,9 @@ func TestGetSourceLine(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		result := GetSourceLine(source, tt.line)
+		result := SourceLine(source, tt.line)
 		if result != tt.expected {
-			t.Errorf("GetSourceLine(%d) = %q, want %q", tt.line, result, tt.expected)
+			t.Errorf("SourceLine(%d) = %q, want %q", tt.line, result, tt.expected)
 		}
 	}
 }

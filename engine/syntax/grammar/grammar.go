@@ -4,7 +4,7 @@ package grammar
 import (
 	"regexp"
 
-	"nezha/engine"
+	"nezha/engine/syntax/position"
 )
 
 // Grammar holds token definitions, surface policy, and productions.
@@ -23,7 +23,7 @@ type NewlineRule struct {
 	AfterLexeme []string
 	SuppressIn  [][2]string
 	Meta        Meta
-	Pos         engine.Position
+	Pos         position.Position
 }
 
 // TokenDef defines a lexical token.
@@ -32,7 +32,7 @@ type TokenDef struct {
 	Pattern *regexp.Regexp
 	Literal string // for keywords/operators
 	Skip    bool
-	Pos     engine.Position
+	Pos     position.Position
 	Meta    Meta
 }
 
@@ -40,7 +40,7 @@ type TokenDef struct {
 type Production struct {
 	Name string
 	Expr Expression
-	Pos  engine.Position
+	Pos  position.Position
 	Meta Meta
 }
 

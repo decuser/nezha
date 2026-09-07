@@ -1,7 +1,7 @@
 package syntax
 
 import (
-	"nezha/engine"
+	"nezha/engine/syntax/position"
 )
 
 // Node represents an AST node.
@@ -9,7 +9,7 @@ type Node struct {
 	Type     string  // production name or token type
 	Value    string  // lexeme for terminals
 	Children []*Node // for non-terminals
-	Pos      engine.Position
+	Pos      position.Position
 }
 
 // Child returns the nth child or nil.

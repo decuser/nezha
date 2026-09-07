@@ -4,16 +4,16 @@ import (
 	"regexp"
 	"strings"
 
-	"nezha/engine"
 	"nezha/engine/runtime/prelude"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
+	"nezha/engine/syntax/position"
 )
 
 // Diagnostic is a command-side structural language finding.
 type Diagnostic struct {
-	Pos      engine.Position
+	Pos      position.Position
 	Severity string // "error" or "warning"
 	Source   string // "lex", "parse", or "lint"
 	Message  string
@@ -139,7 +139,7 @@ func (c *checker) isShadowing(name string) bool {
 	return false
 }
 
-func (c *checker) add(level string, pos engine.Position, msg string) {
+func (c *checker) add(level string, pos position.Position, msg string) {
 	c.diags = append(c.diags, Diagnostic{Pos: pos, Severity: level, Source: "lint", Message: msg})
 }
 
