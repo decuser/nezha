@@ -1,7 +1,6 @@
 package substrate
 
 import (
-	"nezha/engine"
 	"nezha/engine/runtime/hal"
 	"nezha/engine/semantics/value"
 )
@@ -77,14 +76,6 @@ func halPrepend(args []value.Value, ctx *hal.EvalContext) value.Value {
 }
 
 func halAppend(args []value.Value, ctx *hal.EvalContext) value.Value {
-	return halAppendRealized(args, nil)
-}
-
-func halAppendWithProbe(args []value.Value, probe engine.SemanticProbe) value.Value {
-	return halAppendRealized(args, probe)
-}
-
-func halAppendRealized(args []value.Value, probe engine.SemanticProbe) value.Value {
 	if len(args) != 2 {
 		return value.NewFault("append: want 2 arguments, got %d", len(args))
 	}
@@ -92,17 +83,7 @@ func halAppendRealized(args []value.Value, probe engine.SemanticProbe) value.Val
 	if !ok {
 		return value.NewFault("append: first argument must be list")
 	}
-	result, realization := list.Append(args[1])
-	if p, ok := probe.(engine.ListRealizationProbe); ok {
-		p.RecordListAppend(
-			realization.Promoted,
-			realization.Extended,
-			realization.Grown,
-			realization.Forked,
-			realization.ElementsCopied,
-			realization.SlotsAllocated,
-		)
-	}
+	result, _ := list.Append(args[1])
 	return result
 }
 
@@ -124,37 +105,6 @@ func halEmpty(args []value.Value, ctx *hal.EvalContext) value.Value {
 	default:
 		return value.NewFault("empty: expected list or string")
 	}
-}
-
-func halRange(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) < 1 || len(args) > 2 {
-		return value.NewFault("range: want 1 or 2 arguments")
-	}
-	var start, end int64
-	if len(args) == 1 {
-		n, ok := args[0].(*value.Number)
-		if !ok || !n.IsInt() {
-			return value.NewFault("range: expected integer")
-		}
-		start = 0
-		end = n.Int64Value()
-	} else {
-		s, ok := args[0].(*value.Number)
-		if !ok || !s.IsInt() {
-			return value.NewFault("range: expected integer")
-		}
-		e, ok := args[1].(*value.Number)
-		if !ok || !e.IsInt() {
-			return value.NewFault("range: expected integer")
-		}
-		start = s.Int64Value()
-		end = e.Int64Value()
-	}
-	var elems []value.Value
-	for i := start; i < end; i++ {
-		elems = append(elems, value.NewNumber(i, 1))
-	}
-	return &value.List{Elements: elems}
 }
 
 // halMakeShapedList creates a shaped list from a shape name and elements list.

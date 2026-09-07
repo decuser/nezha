@@ -4,7 +4,6 @@ package evaluator
 import (
 	"fmt"
 	"sync"
-	"time"
 
 	"nezha/engine"
 	"nezha/engine/runtime/hal"
@@ -76,8 +75,6 @@ type Evaluator struct {
 	runtime         hal.RuntimeContract
 	grammar         *grammar.Grammar
 	binaryOperators map[string]struct{}
-	EvalProbe       engine.EvalProbe // nil = AST execution observation disabled
-	Profile         *ProfileProbe    // nil = profiling disabled
 
 	// numberLiterals interns semantic realizations of immutable source NUMBER
 	// tokens by their literal spelling. sync.Map is required because spawn may
@@ -154,163 +151,9 @@ func (e *Evaluator) isBinaryOperator(s string) bool {
 	return ok
 }
 
-func (e *Evaluator) activeProbe(env *value.Env) engine.SemanticProbe {
-	if env != nil {
-		if probe := env.GetSemanticProbe(); probe != nil {
-			return probe
-		}
-	}
-	if e.Profile != nil {
-		return e.Profile
-	}
-	return nil
-}
-
-func (e *Evaluator) profileProbe(env *value.Env) *ProfileProbe {
-	probe, _ := e.activeProbe(env).(*ProfileProbe)
-	return probe
-}
-
-func semanticSite(node *syntax.Node, env *value.Env) engine.SemanticSite {
-	if node == nil || env == nil {
-		return engine.SemanticSite{}
-	}
-	site := engine.SemanticSite{
-		File: env.GetFile(),
-		Line: node.Pos.Line,
-		Col:  node.Pos.Col,
-	}
-	if frame, ok := env.CurrentFrame(); ok {
-		site.Function = frame.Name
-	}
-	if site.Line > 0 {
-		site.Source = env.GetSourceLine(site.Line)
-	}
-	return site
-}
-
-func (e *Evaluator) semanticHit(kind engine.SemanticKind, node *syntax.Node, env *value.Env) {
-	probe := e.activeProbe(env)
-	if probe == nil {
-		return
-	}
-	site := engine.SemanticSite{}
-	if attributed, ok := probe.(engine.AttributionProbe); ok && attributed.WantsSites() {
-		site = semanticSite(node, env)
-	}
-	probe.Hit(kind, site)
-}
-
-func (e *Evaluator) semanticHitDetail(kind engine.SemanticKind, detail string, node *syntax.Node, env *value.Env) {
-	probe := e.activeProbe(env)
-	if probe == nil {
-		return
-	}
-	site := engine.SemanticSite{}
-	if attributed, ok := probe.(engine.AttributionProbe); ok && attributed.WantsSites() {
-		site = semanticSite(node, env)
-		site.Detail = detail
-	}
-	probe.Hit(kind, site)
-}
-
-func (e *Evaluator) semanticCallHit(fn value.Value, node *syntax.Node, env *value.Env) engine.SemanticProbe {
-	probe := e.activeProbe(env)
-	if probe == nil {
-		return nil
-	}
-	site := engine.SemanticSite{}
-	if attributed, ok := probe.(engine.AttributionProbe); ok && attributed.WantsSites() {
-		site = semanticSite(node, env)
-		if named, ok := fn.(*value.Function); ok && named.Name != "" {
-			site.Detail = named.Name
-		} else {
-			site.Detail = fn.Inspect()
-		}
-	}
-	probe.Hit(engine.SemanticCall, site)
-	return probe
-}
-
-func (e *Evaluator) measure(fn value.Value, args []value.Value, node *syntax.Node, env *value.Env, attributed bool) (value.Value, engine.SemanticMeasurement) {
-	return e.measureWithTiming(fn, args, node, env, attributed, false)
-}
-
-func (e *Evaluator) measureTimed(fn value.Value, args []value.Value, node *syntax.Node, env *value.Env, attributed bool) (value.Value, engine.SemanticMeasurement) {
-	return e.measureWithTiming(fn, args, node, env, attributed, true)
-}
-
-func (e *Evaluator) measureWithTiming(fn value.Value, args []value.Value, node *syntax.Node, env *value.Env, attributed bool, timing bool) (value.Value, engine.SemanticMeasurement) {
-	var probe *ProfileProbe
-	if parent, ok := e.activeProbe(env).(*ProfileProbe); ok {
-		if timing {
-			probe = parent.childTimedMeasurement(attributed)
-		} else {
-			probe = parent.childMeasurement(attributed)
-		}
-	} else if timing {
-		probe = NewTimedProfileProbe(attributed)
-	} else {
-		probe = NewProfileProbe(attributed)
-	}
-	measureEnv := value.NewEnclosedEnv(env)
-	measureEnv.SetSemanticProbe(probe)
-	// Measurement is a new capture network but remains in the same node identity
-	// universe. The measured call starts causally at the caller's current node.
-	measureEnv.SetProfileCursor(env.GetProfileCursor())
-	if timing {
-		measureEnv.SetProfileTiming(probe.NewTimingStack())
-	}
-	started := time.Now()
-	result := e.applyFunction(fn, args, node, measureEnv)
-	m := probe.Measurement()
-	m.HostElapsedNS = time.Since(started).Nanoseconds()
-	return result, m
-}
-
-func (e *Evaluator) profileLabelsEnabled() bool {
-	if _, ok := e.runtime.(hal.ProfileLabeler); !ok {
-		return false
-	}
-	if state, ok := e.runtime.(hal.ProfileLabelState); ok {
-		return state.ProfileLabelsEnabled()
-	}
-	return true
-}
-
-func (e *Evaluator) withProfileLabels(labels engine.ProfileLabels, restore engine.ProfileLabels, fn func()) {
-	if labeler, ok := e.runtime.(hal.ProfileLabeler); ok {
-		labeler.WithProfileLabels(labels, restore, fn)
-		return
-	}
-	fn()
-}
-
-func semanticProfileLabels(env *value.Env) engine.ProfileLabels {
-	labels := engine.ProfileLabels{Layer: "semantic"}
-	if env == nil {
-		return labels
-	}
-	labels.File = env.GetFile()
-	if frame, ok := env.CurrentFrame(); ok {
-		labels.Function = frame.Name
-	} else {
-		labels.Function = "<main>"
-	}
-	return labels
-}
-
 // Eval evaluates an AST node.
 func (e *Evaluator) Eval(node *syntax.Node, env *value.Env) value.Value {
 	e.observer.OnEval(node.Type, "", 0, node.Pos)
-
-	if e.EvalProbe != nil && node.Pos.Line > 0 {
-		if !e.EvalProbe.Hit(&node.ObservationBinding) {
-			site := semanticSite(node, env)
-			site.Detail = node.Type
-			e.EvalProbe.BindAndHit(node.Type, site, &node.ObservationBinding)
-		}
-	}
 
 	h, ok := handlers[node.Type]
 	if !ok {

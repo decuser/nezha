@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 
-	"nezha/engine"
 	"nezha/engine/runtime/hal/substrate"
 	"nezha/engine/runtime/prelude"
 	"nezha/engine/semantics/evaluator"
@@ -58,33 +57,16 @@ func RunSource(filename, source string) error {
 }
 
 func runSourceWithRuntime(filename, source string, programArgs []string, rt *substrate.GoRuntime) error {
-	return runSourceWithRuntimeProbe(filename, source, programArgs, rt, nil)
+	return runSourceWithRuntimeDirect(filename, source, programArgs, rt)
 }
 
 // RunSourceWithRuntime executes supplied Nezha source under the given filename in
 // the supplied runtime host world. The caller owns the runtime's lifetime.
 func RunSourceWithRuntime(filename, source string, rt *substrate.GoRuntime, programArgs ...string) error {
-	return runSourceWithRuntimeProbe(filename, source, programArgs, rt, nil)
+	return runSourceWithRuntimeDirect(filename, source, programArgs, rt)
 }
 
-// RunSourceWithEvalProbeRuntime executes supplied Nezha source while routing AST
-// execution-entry observations to the supplied probe.
-func RunSourceWithEvalProbeRuntime(filename, source string, probe engine.EvalProbe, rt *substrate.GoRuntime, programArgs ...string) error {
-	return runSourceWithRuntimeProbe(filename, source, programArgs, rt, probe)
-}
-
-// RunWithEvalProbeRuntime executes a Nezha source file while routing AST
-// execution-entry observations to the supplied nervous-system endpoint. The
-// probe owns no accounting state; callers typically supply observe.EvalCapture.
-func RunWithEvalProbeRuntime(filename string, probe engine.EvalProbe, rt *substrate.GoRuntime, programArgs ...string) error {
-	source, err := os.ReadFile(filename)
-	if err != nil {
-		return fmt.Errorf("reading file: %w", err)
-	}
-	return runSourceWithRuntimeProbe(filename, string(source), programArgs, rt, probe)
-}
-
-func runSourceWithRuntimeProbe(filename, source string, programArgs []string, rt *substrate.GoRuntime, evalProbe engine.EvalProbe) error {
+func runSourceWithRuntimeDirect(filename, source string, programArgs []string, rt *substrate.GoRuntime) error {
 	// Load grammar
 	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
 	if err != nil {
@@ -125,7 +107,6 @@ func runSourceWithRuntimeProbe(filename, source string, programArgs []string, rt
 	userEnv.SetSource(source)
 	ev := evaluator.New(rt, nil)
 	ev.SetGrammar(g)
-	ev.EvalProbe = evalProbe
 	result := ev.Eval(ast, userEnv)
 	return executionResultError(result)
 }

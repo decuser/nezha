@@ -2,7 +2,6 @@ package evaluator
 
 import (
 	"fmt"
-	"nezha/engine"
 	"os"
 	"strings"
 
@@ -251,7 +250,6 @@ func (e *Evaluator) evalWhile(node *syntax.Node, env *value.Env) value.Value {
 		if !value.IsTruthy(condVal) {
 			break
 		}
-		e.semanticHit(engine.SemanticIteration, body, env)
 		result = e.Eval(body, env)
 		if ret, ok := result.(*value.Return); ok {
 			return ret

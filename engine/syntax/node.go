@@ -2,7 +2,6 @@ package syntax
 
 import (
 	"nezha/engine"
-	"nezha/engine/observe"
 )
 
 // Node represents an AST node.
@@ -11,11 +10,6 @@ type Node struct {
 	Value    string  // lexeme for terminals
 	Children []*Node // for non-terminals
 	Pos      engine.Position
-
-	// ObservationBinding caches a profiling-network node identity for this AST
-	// object. It is runtime metadata only and does not participate in syntax or
-	// static coverage identity.
-	ObservationBinding observe.NodeBinding
 }
 
 // Child returns the nth child or nil.

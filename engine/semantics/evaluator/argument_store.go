@@ -36,17 +36,12 @@ func (e *Evaluator) acquireArgValues(fn value.Value, arity int, env *value.Env) 
 	}
 
 	if !reusableArgTarget(fn) {
-		if probe := e.profileProbe(env); probe != nil {
-			probe.RecordArgDurable()
-		}
 		return evaluatedArgs{Values: make([]value.Value, arity)}
 	}
 
 	var frame *argFrame
-	reused := false
 	if cached := e.argFrames.Get(); cached != nil {
 		frame = cached.(*argFrame)
-		reused = true
 	} else {
 		frame = &argFrame{}
 	}
@@ -66,9 +61,6 @@ func (e *Evaluator) acquireArgValues(fn value.Value, arity int, env *value.Env) 
 		values = frame.spill
 	}
 
-	if probe := e.profileProbe(env); probe != nil {
-		probe.RecordArgFrame(reused, promoted)
-	}
 	return evaluatedArgs{Values: values, Frame: frame}
 }
 
@@ -134,9 +126,6 @@ func (e *Evaluator) evalCallArgsFor(fn value.Value, node *syntax.Node, env *valu
 	if hasLeading {
 		total++
 	}
-	if probe := e.profileProbe(env); probe != nil {
-		probe.RecordCallArity(total)
-	}
 	args := e.acquireArgValues(fn, total, env)
 	if total == 0 {
 		return args
@@ -160,10 +149,5 @@ func (e *Evaluator) evalCallArgsFor(fn value.Value, node *syntax.Node, env *valu
 }
 
 func (e *Evaluator) tailCallWithArgs(fn *value.Function, args evaluatedArgs, node *syntax.Node, env *value.Env) *tailCallValue {
-	if args.Frame != nil {
-		if probe := e.profileProbe(env); probe != nil {
-			probe.RecordArgTailTransfer()
-		}
-	}
 	return &tailCallValue{Fn: fn, Args: args.Values, ArgFrame: args.Frame, Node: node}
 }

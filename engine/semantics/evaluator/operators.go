@@ -2,7 +2,6 @@ package evaluator
 
 import (
 	"fmt"
-	"nezha/engine"
 
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
@@ -101,9 +100,7 @@ func (e *Evaluator) applyOperator(op string, left, right value.Value, node *synt
 
 	switch kind {
 	case operatorAdd, operatorSub, operatorMul, operatorDiv:
-		e.semanticHit(engine.SemanticArithmetic, node, env)
 	case operatorLt, operatorGt, operatorLte, operatorGte:
-		e.semanticHit(engine.SemanticComparison, node, env)
 	}
 
 	switch kind {
@@ -129,9 +126,6 @@ func (e *Evaluator) applyOperator(op string, left, right value.Value, node *synt
 }
 
 func (e *Evaluator) numberArithmeticResult(left, right, result *value.Number, env *value.Env) *value.Number {
-	if probe, ok := e.activeProbe(env).(*ProfileProbe); ok {
-		probe.NumberArithmeticResult(left, right, result)
-	}
 	return result
 }
 

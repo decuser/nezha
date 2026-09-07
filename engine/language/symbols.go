@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"nezha/engine"
-	languageobserve "nezha/engine/language/observe"
 	"nezha/engine/syntax"
 )
 
@@ -66,8 +65,6 @@ func posKey(p engine.Position) string { return fmt.Sprintf("%d:%d", p.Line, p.Co
 
 // Symbols returns all source-defined symbols in stable source order.
 func (s *Service) Symbols(doc Document) ([]Symbol, error) {
-	s.observe(languageobserve.EventSymbolsRequested, doc, "")
-	s.hit(languageobserve.MetricSymbolsRequest, 1)
 	idx, err := s.buildSymbolIndex(doc)
 	if err != nil {
 		return nil, err
@@ -84,8 +81,6 @@ func (s *Service) Symbols(doc Document) ([]Symbol, error) {
 
 // Definition resolves the name token beginning at pos to its lexical definition.
 func (s *Service) Definition(doc Document, pos engine.Position) (DefinitionResult, error) {
-	s.observe(languageobserve.EventDefinitionRequested, doc, fmt.Sprintf("%d:%d", pos.Line, pos.Col))
-	s.hit(languageobserve.MetricDefinitionRequest, 1)
 	idx, err := s.buildSymbolIndex(doc)
 	if err != nil {
 		return DefinitionResult{}, err

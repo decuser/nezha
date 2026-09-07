@@ -1,8 +1,6 @@
 package evaluator
 
 import (
-	"nezha/engine"
-
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
 )
@@ -99,7 +97,6 @@ func (e *Evaluator) evalUnary(node *syntax.Node, env *value.Env) value.Value {
 			}
 		case "-":
 			if num, ok := operand.(*value.Number); ok {
-				e.semanticHit(engine.SemanticArithmetic, node, env)
 				operand = num.Neg()
 			} else {
 				return e.makeFault(node, env, "cannot negate %s", operand.Type())

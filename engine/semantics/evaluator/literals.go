@@ -115,9 +115,6 @@ func (e *Evaluator) evalFunc(node *syntax.Node, env *value.Env) value.Value {
 		Body:            body,
 		Env:             env,
 		TailEnvReusable: bodyHasNoClosureLiteral(body),
-		ProfileFile:     env.GetFile(),
-		ProfileLine:     node.Pos.Line,
-		ProfileCol:      node.Pos.Col,
 	}
 }
 

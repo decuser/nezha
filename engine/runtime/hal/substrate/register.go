@@ -10,12 +10,11 @@ func (g *GoRuntime) registerHAL() {
 	// Evaluator/language intrinsics.
 	g.registerPrimitive("_apply", halApply)
 
-	// Language/value primitives implemented natively. Append remains context-free
-	// but accepts the active semantic probe for hidden representation counters.
-	g.registerContextFreeProbedPrimitive("_append", halAppend, halAppendWithProbe)
+	// Language/value primitives implemented natively.
+	g.registerContextFreePrimitive("_append", halAppend)
 	for name, fn := range map[string]BuiltinFunc{
 		"_first": halFirst, "_rest": halRest, "_length": halLength,
-		"_prepend": halPrepend, "_empty": halEmpty, "_range": halRange,
+		"_prepend": halPrepend, "_empty": halEmpty,
 		"_type": halType, "_equal": halEqual,
 		"_shape": halShape, "_make_shaped_list": halMakeShapedList, "_to_str": halToStr,
 	} {

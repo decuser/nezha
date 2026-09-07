@@ -9,19 +9,15 @@ import (
 const appName = "nezha"
 
 type Options struct {
-	Version    bool
-	Debug      bool
-	Expr       string
-	CPUProfile string
-	TraceFile  string
+	Version bool
+	Debug   bool
+	Expr    string
 }
 
 func parseOptions() Options {
 	showVersion := flag.Bool("v", false, "show version and exit")
 	debug := flag.Bool("d", false, "debug output")
 	expr := flag.String("e", "", "evaluate expression and exit")
-	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
-	tracefile := flag.String("trace", "", "write runtime trace to file")
 
 	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, "usage: nezha [options] <file.nez [args...]>")
@@ -43,10 +39,8 @@ func parseOptions() Options {
 	}
 
 	return Options{
-		Version:    *showVersion,
-		Debug:      *debug,
-		Expr:       *expr,
-		CPUProfile: *cpuprofile,
-		TraceFile:  *tracefile,
+		Version: *showVersion,
+		Debug:   *debug,
+		Expr:    *expr,
 	}
 }

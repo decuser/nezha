@@ -5,7 +5,6 @@ package primitives
 
 import (
 	"sort"
-	"sync"
 
 	"nezha/engine/runtime/hal"
 	"nezha/engine/semantics/value"
@@ -33,7 +32,6 @@ var nonHALRoles = map[string]Role{
 	"_prepend":          RoleRuntime,
 	"_append":           RoleRuntime,
 	"_empty":            RoleRuntime,
-	"_range":            RoleRuntime,
 	"_type":             RoleRuntime,
 	"_equal":            RoleRuntime,
 	"_shape":            RoleRuntime,
@@ -63,55 +61,6 @@ func Definitions() map[string]Role {
 		out[name] = RoleHost
 	}
 	return out
-}
-
-// ProfileDefinition is the stable, ordered primitive identity used by the
-// profiling network. Ordinal is one-based so zero remains "not a primitive".
-type ProfileDefinition struct {
-	Ordinal uint32
-	Name    string
-	Role    Role
-}
-
-var (
-	profileOnce   sync.Once
-	profileDefs   []ProfileDefinition
-	profileByName map[string]uint32
-)
-
-func initProfileDefinitions() {
-	defs := Definitions()
-	names := make([]string, 0, len(defs))
-	for name := range defs {
-		names = append(names, name)
-	}
-	sort.Strings(names)
-	profileDefs = make([]ProfileDefinition, 0, len(names))
-	profileByName = make(map[string]uint32, len(names))
-	for i, name := range names {
-		ordinal := uint32(i + 1)
-		profileDefs = append(profileDefs, ProfileDefinition{Ordinal: ordinal, Name: name, Role: defs[name]})
-		profileByName[name] = ordinal
-	}
-}
-
-// ProfileDefinitions returns the authoritative primitive catalog in stable
-// profiling order. Callers may retain the returned value; a defensive copy is
-// returned so the catalog itself remains immutable.
-func ProfileDefinitions() []ProfileDefinition {
-	profileOnce.Do(initProfileDefinitions)
-	out := make([]ProfileDefinition, len(profileDefs))
-	copy(out, profileDefs)
-	return out
-}
-
-// ProfileOrdinal resolves one primitive to its stable catalog ordinal. This is
-// intended for registration time; steady-state dispatch carries the ordinal on
-// the callable itself and does not perform a name lookup.
-func ProfileOrdinal(name string) (uint32, bool) {
-	profileOnce.Do(initProfileDefinitions)
-	id, ok := profileByName[name]
-	return id, ok
 }
 
 // NamesForScope returns the architectural runtime names visible to tooling for

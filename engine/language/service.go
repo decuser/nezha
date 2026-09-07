@@ -8,7 +8,6 @@ import (
 
 	"nezha/engine"
 	"nezha/engine/formatter"
-	languageobserve "nezha/engine/language/observe"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
@@ -24,10 +23,8 @@ type Document struct {
 
 // Service provides editor-independent queries over Nezha source.
 type Service struct {
-	grammar  *grammar.Grammar
-	catalog  Catalog
-	observer languageobserve.Observer
-	probe    languageobserve.Probe
+	grammar *grammar.Grammar
+	catalog Catalog
 }
 
 func NewService(g *grammar.Grammar, catalogs ...Catalog) *Service {
@@ -38,35 +35,14 @@ func NewService(g *grammar.Grammar, catalogs ...Catalog) *Service {
 	return &Service{grammar: g, catalog: catalog}
 }
 
-// SetObserver installs optional behavior-neutral service observation.
-func (s *Service) SetObserver(observer languageobserve.Observer) { s.observer = observer }
-
-// SetProbe installs optional service instrumentation.
-func (s *Service) SetProbe(probe languageobserve.Probe) { s.probe = probe }
-
-func (s *Service) observe(kind languageobserve.EventKind, doc Document, detail string) {
-	if s.observer != nil {
-		s.observer.ObserveLanguage(languageobserve.Event{Kind: kind, DocumentID: doc.ID, Detail: detail})
-	}
-}
-
-func (s *Service) hit(metric languageobserve.Metric, n int64) {
-	if s.probe != nil {
-		s.probe.HitLanguage(metric, n)
-	}
-}
-
 // Diagnostics returns lexical, parse, or structural findings for doc.
 // Syntax failure stops structural analysis because there is no valid tree to
 // inspect. Diagnostics use Nezha-native source positions.
 func (s *Service) Diagnostics(doc Document, scope value.Scope) []Diagnostic {
-	s.observe(languageobserve.EventDiagnosticsRequested, doc, "")
-	s.hit(languageobserve.MetricDiagnosticsRequest, 1)
 	file := doc.Path
 	if file == "" {
 		file = doc.ID
 	}
-	s.hit(languageobserve.MetricLexRun, 1)
 	lx := syntax.NewLexer(s.grammar, file, doc.Source, nil)
 	tokens, err := lx.Tokenize()
 	if err != nil {
@@ -74,7 +50,6 @@ func (s *Service) Diagnostics(doc Document, scope value.Scope) []Diagnostic {
 		s.diagnostic(doc, d)
 		return []Diagnostic{d}
 	}
-	s.hit(languageobserve.MetricParseRun, 1)
 	parser := syntax.NewParser(s.grammar, tokens, doc.Source, nil)
 	node, err := parser.Parse()
 	if err != nil {
@@ -82,7 +57,6 @@ func (s *Service) Diagnostics(doc Document, scope value.Scope) []Diagnostic {
 		s.diagnostic(doc, d)
 		return []Diagnostic{d}
 	}
-	s.hit(languageobserve.MetricAnalysisRun, 1)
 	diagnostics := analyzeNode(s.grammar, file, node, scope, s.catalog)
 	for _, d := range diagnostics {
 		s.diagnostic(doc, d)
@@ -91,8 +65,6 @@ func (s *Service) Diagnostics(doc Document, scope value.Scope) []Diagnostic {
 }
 
 func (s *Service) diagnostic(doc Document, d Diagnostic) {
-	s.hit(languageobserve.MetricDiagnostic, 1)
-	s.observe(languageobserve.EventDiagnosticProduced, doc, d.Source+":"+d.Severity)
 }
 
 func diagnosticFromSyntaxError(err error, fallback string) Diagnostic {
@@ -117,19 +89,13 @@ func diagnosticFromSyntaxError(err error, fallback string) Diagnostic {
 // parse-preservation gate remains authoritative; invalid or meaning-changing
 // transformations return an error rather than an edit.
 func (s *Service) Format(doc Document) (string, error) {
-	s.observe(languageobserve.EventFormatRequested, doc, "")
-	s.hit(languageobserve.MetricFormatRequest, 1)
 	file := doc.Path
 	if file == "" {
 		file = doc.ID
 	}
 	out, err := formatter.FormatSource(s.grammar, file, doc.Source)
 	if err != nil {
-		s.observe(languageobserve.EventFormatRejected, doc, err.Error())
-		s.hit(languageobserve.MetricFormatRejected, 1)
 		return "", err
 	}
-	s.observe(languageobserve.EventFormatProduced, doc, "")
-	s.hit(languageobserve.MetricFormatProduced, 1)
 	return out, nil
 }

@@ -5,8 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"runtime/pprof"
-	"runtime/trace"
 
 	"nezha/engine/runner"
 	"nezha/engine/semantics/value"
@@ -25,10 +23,6 @@ func Main() {
 	}
 
 	opts := parseOptions()
-	stopProfiling := startProfiling(opts)
-	if stopProfiling != nil {
-		defer stopProfiling()
-	}
 
 	if opts.Expr != "" {
 		runExpr(opts.Expr, opts)
@@ -40,47 +34,6 @@ func Main() {
 		os.Exit(2)
 	}
 	runFile(flag.Arg(0), opts)
-}
-
-func startProfiling(opts Options) func() {
-	var stops []func()
-
-	if opts.CPUProfile != "" {
-		f, err := os.Create(opts.CPUProfile)
-		if err == nil {
-			if err := pprof.StartCPUProfile(f); err == nil {
-				stops = append(stops, func() {
-					pprof.StopCPUProfile()
-					_ = f.Close()
-				})
-			} else {
-				_ = f.Close()
-			}
-		}
-	}
-
-	if opts.TraceFile != "" {
-		f, err := os.Create(opts.TraceFile)
-		if err == nil {
-			if err := trace.Start(f); err == nil {
-				stops = append(stops, func() {
-					trace.Stop()
-					_ = f.Close()
-				})
-			} else {
-				_ = f.Close()
-			}
-		}
-	}
-
-	if len(stops) == 0 {
-		return nil
-	}
-	return func() {
-		for i := len(stops) - 1; i >= 0; i-- {
-			stops[i]()
-		}
-	}
 }
 
 func runFile(filename string, opts Options) {

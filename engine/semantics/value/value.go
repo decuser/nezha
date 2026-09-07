@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"sync/atomic"
 )
 
 // Type identifies value kinds.
@@ -224,8 +223,8 @@ type listBacking struct {
 	used     int     // published frontier
 }
 
-// ListAppendRealization describes one physical append realization. It is an
-// internal profiling fact, not a Nezha semantic kind.
+// ListAppendRealization describes one physical append realization. It is
+// implementation feedback for tests, not a Nezha semantic kind.
 type ListAppendRealization struct {
 	Promoted       bool
 	Extended       bool
@@ -339,57 +338,6 @@ type Function struct {
 	Body            interface{} // *syntax.Node, but we don't import syntax here
 	Env             interface{} // *Env, set at runtime
 	TailEnvReusable bool        // body cannot create a closure capturing its call env
-
-	// Profile source identity is captured when the function literal is created.
-	// The packed binding is observation-only cache state: high 32 bits are a
-	// node-registry token and low 32 bits are the NodeID in that identity space.
-	ProfileFile     string
-	ProfileLine     int
-	ProfileCol      int
-	profileBinding  atomic.Uint64
-	profileInstance atomic.Uint64
-}
-
-var nextFunctionProfileInstance atomic.Uint64
-
-// ProfileNodeBinding returns a cached profiling NodeID for one identity space.
-func (f *Function) ProfileNodeBinding(registryToken uint32) (uint32, bool) {
-	if f == nil || registryToken == 0 {
-		return 0, false
-	}
-	packed := f.profileBinding.Load()
-	if uint32(packed>>32) != registryToken {
-		return 0, false
-	}
-	id := uint32(packed)
-	return id, id != 0
-}
-
-// SetProfileNodeBinding installs the current identity-space binding. Competing
-// profiling identity spaces may overwrite this cache, but callers always check
-// the registry token before using the ID, so this can affect cache hit rate but
-// not accounting correctness.
-func (f *Function) SetProfileNodeBinding(registryToken, nodeID uint32) {
-	if f == nil || registryToken == 0 || nodeID == 0 {
-		return
-	}
-	f.profileBinding.Store((uint64(registryToken) << 32) | uint64(nodeID))
-}
-
-// ProfileInstanceID supplies identity only for synthetic/manual functions that
-// have no source location. Source-defined functions are identified by source.
-func (f *Function) ProfileInstanceID() uint64 {
-	if f == nil {
-		return 0
-	}
-	if id := f.profileInstance.Load(); id != 0 {
-		return id
-	}
-	id := nextFunctionProfileInstance.Add(1)
-	if f.profileInstance.CompareAndSwap(0, id) {
-		return id
-	}
-	return f.profileInstance.Load()
 }
 
 func (f *Function) Type() Type { return FunctionType }

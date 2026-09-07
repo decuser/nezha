@@ -27,17 +27,16 @@ public prelude and registered runtime surface:
 - `to_number`
 - `to_symbol`
 
-## Profiling disposition
+## Profiling / observation disposition
 
-The user-facing profiling command and runner entry point are removed. The deeper
-semantic/observation machinery remains as implementation residue for a follow-up
-cut because it is entangled with evaluator internals and structural coverage.
-That remaining machinery should be audited separately as tooling/implementation,
-not as language.
+The user-facing profiling command, CPU/trace top-level flags, semantic profiling
+probe, observation network, dynamic coverage package, language-service observer
+package, and evaluator profiling hooks are removed. Debug tracing still uses the
+small `engine.Observer` interface for explicit developer commands; that is
+tooling, not language.
 
 ## Next audit targets
 
-- remaining profiling/observe/coverage boundary
 - language-service/LSP surface versus language surface
 - smoke/engine-smoke tooling surface
 - debug/tags/treecheck as development tooling

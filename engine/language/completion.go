@@ -5,7 +5,6 @@ import (
 	"sort"
 
 	"nezha/engine"
-	languageobserve "nezha/engine/language/observe"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
 )
@@ -29,8 +28,6 @@ type HoverResult struct {
 // Completion returns names visible at pos. Source-defined names come from the
 // lexical scope model; runtime/prelude names come from the catalog authority.
 func (s *Service) Completion(doc Document, pos engine.Position, scope value.Scope) ([]CompletionItem, error) {
-	s.observe(languageobserve.EventCompletionRequested, doc, fmt.Sprintf("%d:%d", pos.Line, pos.Col))
-	s.hit(languageobserve.MetricCompletionRequest, 1)
 	idx, err := s.buildSymbolIndex(doc)
 	if err != nil {
 		return nil, err
@@ -80,8 +77,6 @@ func (s *Service) Completion(doc Document, pos engine.Position, scope value.Scop
 // Hover returns authored help for runtime/prelude names or known source
 // definition information for lexical bindings.
 func (s *Service) Hover(doc Document, pos engine.Position) (HoverResult, error) {
-	s.observe(languageobserve.EventHoverRequested, doc, fmt.Sprintf("%d:%d", pos.Line, pos.Col))
-	s.hit(languageobserve.MetricHoverRequest, 1)
 	file := doc.Path
 	if file == "" {
 		file = doc.ID

@@ -1,7 +1,5 @@
 package value
 
-import "nezha/engine/observe"
-
 // Scope represents lexical/tooling role. It does not confer raw runtime authority.
 type Scope int
 
@@ -199,13 +197,7 @@ type Env struct {
 	stackLimit       *int          // shared recursion limit (non tail frames)
 	scope            Scope
 	authority        Authority
-	semanticProbe    observe.SemanticProbe // dynamic profiling context
-	profileCursor    observe.Cursor        // dynamic profiling call identity
-	profileTiming    *observe.TimingStack  // dynamic host-time call stack
 	cold             *envCold
-
-	envKind          observe.EnvKind
-	bindingHighwater uint8
 }
 
 // NewEnv creates a new environment with user scope.
@@ -217,7 +209,6 @@ func NewEnv() *Env {
 		authority:  NoAuthority(),
 		stack:      &stack,
 		stackLimit: &limit,
-		envKind:    observe.EnvKindRoot,
 	}
 }
 
@@ -231,17 +222,12 @@ func NewEnvWithScope(scope Scope) *Env {
 // NewEnclosedEnv creates a child environment, inheriting scope and shared state.
 func NewEnclosedEnv(outer *Env) *Env {
 	env := &Env{
-		outer:         outer,
-		scope:         outer.scope,
-		authority:     outer.authority,
-		stack:         outer.stack,
-		stackLimit:    outer.stackLimit,
-		semanticProbe: outer.semanticProbe,
-		profileCursor: outer.profileCursor,
-		profileTiming: outer.profileTiming,
-		envKind:       observe.EnvKindEnclosed,
+		outer:      outer,
+		scope:      outer.scope,
+		authority:  outer.authority,
+		stack:      outer.stack,
+		stackLimit: outer.stackLimit,
 	}
-	env.recordPhysical()
 	return env
 }
 
@@ -249,17 +235,12 @@ func NewEnclosedEnv(outer *Env) *Env {
 // Used to create user-scope envs enclosed by prelude-scope envs.
 func NewEnclosedEnvWithScope(outer *Env, scope Scope) *Env {
 	env := &Env{
-		outer:         outer,
-		scope:         scope,
-		authority:     outer.authority,
-		stack:         outer.stack,
-		stackLimit:    outer.stackLimit,
-		semanticProbe: outer.semanticProbe,
-		profileCursor: outer.profileCursor,
-		profileTiming: outer.profileTiming,
-		envKind:       observe.EnvKindEnclosed,
+		outer:      outer,
+		scope:      scope,
+		authority:  outer.authority,
+		stack:      outer.stack,
+		stackLimit: outer.stackLimit,
 	}
-	env.recordPhysical()
 	return env
 }
 
@@ -279,20 +260,12 @@ func NewIsolatedEnclosedEnvWithAuthority(outer *Env, authority Authority) *Env {
 	stack := make([]StackFrame, 0)
 	limit := outer.GetStackLimit()
 	env := &Env{
-		outer:         outer,
-		scope:         outer.scope,
-		authority:     authority,
-		stack:         &stack,
-		stackLimit:    &limit,
-		semanticProbe: outer.semanticProbe,
-		profileCursor: outer.profileCursor,
-		profileTiming: nil,
-		envKind:       observe.EnvKindIsolated,
+		outer:      outer,
+		scope:      outer.scope,
+		authority:  authority,
+		stack:      &stack,
+		stackLimit: &limit,
 	}
-	if outer.profileTiming != nil {
-		env.profileTiming = outer.profileTiming.Fork()
-	}
-	env.recordPhysical()
 	return env
 }
 
@@ -303,18 +276,12 @@ func NewIsolatedEnclosedEnvWithAuthority(outer *Env, authority Authority) *Env {
 // a spawned computation to the parent's call stack.
 func NewCallEnv(lexicalOuter, caller *Env) *Env {
 	env := &Env{
-		outer:         lexicalOuter,
-		scope:         lexicalOuter.scope,
-		authority:     lexicalOuter.authority,
-		stack:         caller.stack,
-		stackLimit:    caller.stackLimit,
-		semanticProbe: caller.semanticProbe,
-		profileCursor: caller.profileCursor,
-		profileTiming: caller.profileTiming,
-		envKind:       observe.EnvKindCall,
+		outer:      lexicalOuter,
+		scope:      lexicalOuter.scope,
+		authority:  lexicalOuter.authority,
+		stack:      caller.stack,
+		stackLimit: caller.stackLimit,
 	}
-	env.recordPhysical()
-	env.recordLogicalCall()
 	return env
 }
 
@@ -333,13 +300,7 @@ func (e *Env) ResetCallEnv(lexicalOuter, caller *Env) {
 	e.stackLimit = caller.stackLimit
 	e.scope = lexicalOuter.scope
 	e.authority = lexicalOuter.authority
-	e.semanticProbe = caller.semanticProbe
-	e.profileCursor = caller.profileCursor
-	e.profileTiming = caller.profileTiming
 	e.cold = nil
-	e.envKind = observe.EnvKindCall
-	e.bindingHighwater = 0
-	e.recordLogicalCall()
 }
 
 // BindCallParams binds ordinary function parameters without constructing a
@@ -394,89 +355,8 @@ func (e *Env) ensureCold() *envCold {
 func (e *Env) ensureBindings() *envBindings {
 	if e.bindings == nil {
 		e.bindings = &envBindings{}
-		if probe := e.envProbe(); probe != nil {
-			probe.RecordEnvCompactAllocation(e.envKind)
-		}
 	}
 	return e.bindings
-}
-
-func (e *Env) envProbe() observe.EnvRealizationProbe {
-	if e == nil || e.semanticProbe == nil {
-		return nil
-	}
-	probe, _ := e.semanticProbe.(observe.EnvRealizationProbe)
-	return probe
-}
-
-func (e *Env) recordPhysical() {
-	if probe := e.envProbe(); probe != nil {
-		probe.RecordEnvPhysical(e.envKind)
-	}
-}
-
-func (e *Env) recordLogicalCall() {
-	if probe := e.envProbe(); probe != nil {
-		probe.RecordEnvLogicalCall()
-	}
-}
-
-func (e *Env) recordBindingHighwater(n int) {
-	if n <= int(e.bindingHighwater) {
-		return
-	}
-	old := int(e.bindingHighwater)
-	e.bindingHighwater = uint8(n)
-	probe := e.envProbe()
-	if probe == nil {
-		return
-	}
-	for _, threshold := range []int{1, 2, 3, 5} {
-		if old < threshold && n >= threshold {
-			probe.RecordEnvBindingThreshold(e.envKind, threshold)
-		}
-	}
-}
-
-// SetSemanticProbe sets the dynamic semantic profiling context for this env.
-// A nil probe explicitly disables profiling for this dynamic branch.
-func (e *Env) SetSemanticProbe(probe observe.SemanticProbe) {
-	e.semanticProbe = probe
-}
-
-// GetSemanticProbe returns the dynamic semantic profiling context.
-func (e *Env) GetSemanticProbe() observe.SemanticProbe {
-	return e.semanticProbe
-}
-
-// SetProfileCursor sets the dynamic profiling call identity for this environment.
-func (e *Env) SetProfileCursor(cursor observe.Cursor) {
-	if e != nil {
-		e.profileCursor = cursor
-	}
-}
-
-// GetProfileCursor returns the dynamic profiling call identity.
-func (e *Env) GetProfileCursor() observe.Cursor {
-	if e == nil {
-		return observe.Cursor{}
-	}
-	return e.profileCursor
-}
-
-// SetProfileTiming sets the dynamic host-time profiling stack.
-func (e *Env) SetProfileTiming(stack *observe.TimingStack) {
-	if e != nil {
-		e.profileTiming = stack
-	}
-}
-
-// GetProfileTiming returns the dynamic host-time profiling stack.
-func (e *Env) GetProfileTiming() *observe.TimingStack {
-	if e == nil {
-		return nil
-	}
-	return e.profileTiming
 }
 
 // GetScope returns the scope.
@@ -591,18 +471,7 @@ func (e *Env) Set(name string, val Value) {
 	}
 
 	bindings := e.ensureBindings()
-	existed, count, promoted := bindings.set(name, val)
-	if promoted {
-		if probe := e.envProbe(); probe != nil {
-			probe.RecordEnvMapPromotion(e.envKind)
-		}
-	}
-	if probe := e.envProbe(); probe != nil {
-		probe.RecordEnvLocalSet(e.envKind, existed)
-	}
-	if !existed {
-		e.recordBindingHighwater(count)
-	}
+	bindings.set(name, val)
 }
 
 // Update updates an existing binding, searching outer scopes.

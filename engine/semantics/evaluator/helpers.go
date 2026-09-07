@@ -43,7 +43,6 @@ func (e *Evaluator) resolveTailCalls(v value.Value, env *value.Env) value.Value 
 		if !ok {
 			return v
 		}
-		cursor := e.profileCallCursor(tc.Fn, env, e.activeProbe(env))
-		v = e.applyUserFunctionOwned(tc.Fn, tc.Args, tc.ArgFrame, tc.Node, env, cursor)
+		v = e.applyUserFunctionOwned(tc.Fn, tc.Args, tc.ArgFrame, tc.Node, env)
 	}
 }

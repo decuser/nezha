@@ -1,8 +1,6 @@
 package substrate
 
 import (
-	"nezha/engine"
-	"nezha/engine/observe"
 	"nezha/engine/runtime/hal"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
@@ -22,43 +20,16 @@ func halApply(args []value.Value, ctx *hal.EvalContext) value.Value {
 		return value.NewFault("apply: second argument must be list, got %s", listVal.Type())
 	}
 
-	// Dispatch based on function type. The execution path remains the intrinsic's
-	// existing direct dispatch; profiling only attaches the already-resolved
-	// caller/callee cursor to that transition.
-	targetCtx := ctx
-	if ctx != nil && ctx.ProfileCall != nil {
-		child := *ctx
-		child.ProfileCursor = ctx.ProfileCall(fn, ctx.ProfileCursor)
-		targetCtx = &child
+	switch f := fn.(type) {
+	case *value.Function:
+		return applyUserFunction(f, list.Elements, ctx)
+	case hal.ContextCallable:
+		return f.CallWithContext(list.Elements, ctx)
+	case value.Callable:
+		return f.Call(list.Elements)
+	default:
+		return value.NewFault("apply: first argument must be function, got %s", fn.Type())
 	}
-	var timing *observe.TimingStack
-	if ctx != nil && targetCtx != nil && ctx.ProfileTiming != nil && targetCtx.ProfileCursor.Node() != 0 {
-		timing = ctx.ProfileTiming
-		timing.Push(ctx.ProfileCursor.Node(), targetCtx.ProfileCursor.Node())
-	}
-	call := func() value.Value {
-		switch f := fn.(type) {
-		case *value.Function:
-			semanticHitDetail(ctx, engine.SemanticCall, funcName(f))
-			return applyUserFunction(f, list.Elements, targetCtx)
-		case hal.ContextCallable:
-			return f.CallWithContext(list.Elements, targetCtx)
-		case value.Callable:
-			return f.Call(list.Elements)
-		default:
-			return value.NewFault("apply: first argument must be function, got %s", fn.Type())
-		}
-	}
-	var result value.Value
-	if ctx != nil && targetCtx != nil && ctx.ProfileAllocationCall != nil {
-		result = ctx.ProfileAllocationCall(ctx.ProfileCursor, targetCtx.ProfileCursor, call)
-	} else {
-		result = call()
-	}
-	if timing != nil {
-		timing.Pop()
-	}
-	return result
 }
 
 // funcName returns a function's name for diagnostics, or a placeholder when
@@ -87,14 +58,6 @@ func applyUserFunction(fn *value.Function, args []value.Value, ctx *hal.EvalCont
 	}
 
 	callEnv := value.NewCallEnv(fnEnv, ctx.Env)
-	callEnv.SetSemanticProbe(ctx.Probe)
-	if ctx.ProfileCursor.Node() != 0 {
-		callEnv.SetProfileCursor(ctx.ProfileCursor)
-	}
-	if ctx.ProfileTiming != nil {
-		callEnv.SetProfileTiming(ctx.ProfileTiming)
-	}
-
 	for i, param := range fn.Params {
 		callEnv.Set(param, args[i])
 	}
@@ -113,21 +76,9 @@ func applyUserFunction(fn *value.Function, args []value.Value, ctx *hal.EvalCont
 		return value.NewFault("apply: invalid function body")
 	}
 
-	var result value.Value
-	run := func() { result = ctx.Eval(body, callEnv) }
-	if ctx.WithProfileLabels != nil {
-		ctx.WithProfileLabels(engine.ProfileLabels{
-			Layer:    "semantic",
-			Function: funcName(fn),
-			File:     callEnv.GetFile(),
-		}, ctx.Labels, run)
-	} else {
-		run()
-	}
-
+	result := ctx.Eval(body, callEnv)
 	if ret, ok := result.(*value.Return); ok {
 		return ret.Val
 	}
-
 	return result
 }

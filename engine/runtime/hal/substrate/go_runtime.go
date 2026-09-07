@@ -3,15 +3,11 @@ package substrate
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"io"
 	"os"
-	"runtime/pprof"
 	"sync"
-	"sync/atomic"
 
-	"nezha/engine"
 	"nezha/engine/runtime/hal"
 	"nezha/engine/runtime/help"
 	"nezha/engine/runtime/primitives"
@@ -21,16 +17,13 @@ import (
 // BuiltinFunc is a HAL-level function that may use evaluation context.
 // Simple builtins ignore ctx; intrinsics such as apply use it.
 type BuiltinFunc func(args []value.Value, ctx *hal.EvalContext) value.Value
-type ProbeBuiltinFunc func(args []value.Value, probe engine.SemanticProbe) value.Value
 
 // Builtin is a HAL-level function implementing value.Callable.
 type Builtin struct {
-	name           string
-	profileOrdinal uint32
-	fn             BuiltinFunc
-	runtime        *GoRuntime // back-reference for context access
-	needsContext   bool
-	probeFn        ProbeBuiltinFunc
+	name         string
+	fn           BuiltinFunc
+	runtime      *GoRuntime // back-reference for context access
+	needsContext bool
 }
 
 func (b *Builtin) Type() value.Type { return value.FunctionType }
@@ -45,21 +38,12 @@ func (b *Builtin) CallWithContext(args []value.Value, ctx *hal.EvalContext) valu
 	return b.fn(args, ctx)
 }
 
-func (b *Builtin) NeedsEvalContext() bool      { return b.needsContext }
-func (b *Builtin) NeedsRealizationProbe() bool { return b.probeFn != nil }
-func (b *Builtin) CallWithProbe(args []value.Value, probe engine.SemanticProbe) value.Value {
-	if b.probeFn != nil {
-		return b.probeFn(args, probe)
-	}
-	return b.Call(args)
-}
+func (b *Builtin) NeedsEvalContext() bool { return b.needsContext }
 
 // Verify Builtin implements Callable
 var _ value.Callable = (*Builtin)(nil)
 var _ hal.ContextCallable = (*Builtin)(nil)
 var _ hal.EvalContextRequired = (*Builtin)(nil)
-var _ hal.ProbeCallable = (*Builtin)(nil)
-var _ hal.RealizationProbeRequired = (*Builtin)(nil)
 
 // GoRuntime implements hal.RuntimeContract using Go substrate bindings. Native
 // machinery is separated by architectural role, and only canonical host
@@ -79,15 +63,12 @@ type GoRuntime struct {
 	userEnv           *value.Env
 	helpRegistry      *help.Registry
 	mu                sync.RWMutex
-	profileLabels     atomic.Bool
-	labelContexts     sync.Map // map[engine.ProfileLabels]context.Context
 	asyncFaults       chan *value.Fault
 }
 
 // Verify GoRuntime implements RuntimeContract
 var _ hal.RuntimeContract = (*GoRuntime)(nil)
 var _ hal.HostOperationProvider = (*GoRuntime)(nil)
-var _ hal.ProfileLabeler = (*GoRuntime)(nil)
 
 // NewGoRuntime creates a new Go runtime substrate.
 func NewGoRuntime() *GoRuntime {
@@ -251,47 +232,6 @@ func (g *GoRuntime) registerHost(op hal.HostOperation, fn BuiltinFunc) {
 	g.registerPrimitive(op.Primitive, fn)
 	g.hostBindings[op.Primitive] = op
 }
-
-// SetProfileLabels enables or disables pprof label regions for this runtime.
-func (g *GoRuntime) SetProfileLabels(enabled bool) {
-	g.profileLabels.Store(enabled)
-}
-
-func (g *GoRuntime) ProfileLabelsEnabled() bool {
-	return g.profileLabels.Load()
-}
-
-// WithProfileLabels executes fn under a cached pprof label context. It uses
-// SetGoroutineLabels rather than pprof.Do so repeated Nezha calls do not rebuild
-// context label maps on every invocation.
-func (g *GoRuntime) WithProfileLabels(labels engine.ProfileLabels, restore engine.ProfileLabels, fn func()) {
-	if !g.profileLabels.Load() {
-		fn()
-		return
-	}
-	pprof.SetGoroutineLabels(g.profileContext(labels))
-	defer pprof.SetGoroutineLabels(g.profileContext(restore))
-	fn()
-}
-
-func (g *GoRuntime) profileContext(labels engine.ProfileLabels) context.Context {
-	if cached, ok := g.labelContexts.Load(labels); ok {
-		return cached.(context.Context)
-	}
-	pairs := []string{
-		"nezha_layer", labels.Layer,
-		"nezha_function", labels.Function,
-		"nezha_file", labels.File,
-		"nezha_line", labels.Line,
-		"nezha_primitive", labels.Primitive,
-	}
-	ctx := pprof.WithLabels(context.Background(), pprof.Labels(pairs...))
-	actual, _ := g.labelContexts.LoadOrStore(labels, ctx)
-	return actual.(context.Context)
-}
-
-func (b *Builtin) ProfileName() string             { return b.name }
-func (b *Builtin) ProfilePrimitiveOrdinal() uint32 { return b.profileOrdinal }
 
 // SetProgramArgs is retained for runner compatibility. Program argument exposure
 // belonged to the removed unregistered system builtin surface.

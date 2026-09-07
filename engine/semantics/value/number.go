@@ -16,8 +16,7 @@ const (
 	numberBinary64
 )
 
-// NumberRepresentation is a Go-side observation category for profiling and
-// tests. It is not a Nezha type and is never exposed through language
+// NumberRepresentation is a Go-side realization category for tests. It is not a Nezha type and is never exposed through language
 // semantics.
 type NumberRepresentation uint8
 
@@ -29,8 +28,8 @@ const (
 )
 
 // ProfileRepresentation reports the private realization currently carrying
-// this Number. Callers must use it only for observation; semantic behavior must
-// never branch on this result outside Number itself.
+// this Number. Semantic behavior must never branch on this result outside
+// Number itself.
 func (n *Number) ProfileRepresentation() NumberRepresentation {
 	if n == nil {
 		return NumberSmallInteger

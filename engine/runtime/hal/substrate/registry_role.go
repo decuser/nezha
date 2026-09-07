@@ -50,11 +50,6 @@ func (g *GoRuntime) registerContextFreePrimitive(name string, fn BuiltinFunc) {
 	g.registerPrimitiveWithContextPolicy(name, fn, false)
 }
 
-func (g *GoRuntime) registerContextFreeProbedPrimitive(name string, fn BuiltinFunc, probeFn ProbeBuiltinFunc) {
-	g.registerPrimitiveWithContextPolicy(name, fn, false)
-	g.registryFor(mustPrimitiveRole(name))[name].probeFn = probeFn
-}
-
 func mustPrimitiveRole(name string) primitives.Role {
 	role, ok := primitives.RoleOf(name)
 	if !ok {
@@ -74,16 +69,11 @@ func (g *GoRuntime) registerPrimitiveWithContextPolicy(name string, fn BuiltinFu
 	if _, exists := g.lookupBuiltin(name); exists {
 		panic("duplicate compatibility primitive registration: " + name)
 	}
-	ordinal, ok := primitives.ProfileOrdinal(name)
-	if !ok {
-		panic("runtime primitive has no profiling catalog identity: " + name)
-	}
 	g.registryFor(role)[name] = &Builtin{
-		name:           name,
-		profileOrdinal: ordinal,
-		fn:             fn,
-		runtime:        g,
-		needsContext:   needsContext,
+		name:         name,
+		fn:           fn,
+		runtime:      g,
+		needsContext: needsContext,
 	}
 }
 
