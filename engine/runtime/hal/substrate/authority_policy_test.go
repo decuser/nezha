@@ -48,7 +48,7 @@ func TestAuthorityPolicyMatchesTrustedSourceDependencies(t *testing.T) {
 
 		actual := map[string]bool{}
 		for _, name := range ident.FindAllString(string(data), -1) {
-			if _, registered := rt.lookupBuiltin(name); registered {
+			if _, registered := rt.lookupBuiltin(name); registered || name == "_apply" {
 				actual[name] = true
 			}
 		}

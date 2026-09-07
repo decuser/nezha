@@ -1,3 +1,5 @@
+> Historical note: this investigation records the now-removed module/import/use/export/load residue from the cleanup sequence. It is retained as cleanup history, not as current runtime state.
+
 # Module Boundary Investigation
 
 ## Cut context

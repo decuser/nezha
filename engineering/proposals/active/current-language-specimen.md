@@ -182,10 +182,17 @@ The prelude is intentionally small. It exposes list operations, shaped-value sup
 
 ## Registered runtime primitives
 
-Registered non-HAL runtime primitives:
+Evaluator-owned intrinsic:
 
 ```text
 _apply
+```
+
+`_apply` is not a substrate primitive. It is evaluator-owned because applying a Nezha function evaluates Nezha bodies and must use the evaluator's ordinary call path.
+
+Registered non-HAL runtime primitives:
+
+```text
 _first
 _rest
 _length

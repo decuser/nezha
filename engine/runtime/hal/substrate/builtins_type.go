@@ -1,21 +1,14 @@
 package substrate
 
 import (
-	"nezha/engine/runtime/hal"
 	"nezha/engine/semantics/value"
 )
 
-func halType(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("type: want 1 argument, got %d", len(args))
-	}
+func halType(args []value.Value) value.Value {
 	return &value.Symbol{Val: string(args[0].Type())}
 }
 
-func halEqual(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 2 {
-		return value.NewFault("equal: want 2 arguments, got %d", len(args))
-	}
+func halEqual(args []value.Value) value.Value {
 	if valuesEqual(args[0], args[1]) {
 		return value.TRUE
 	}

@@ -27,30 +27,25 @@ func TestRuntimeRegistrationInvariantRejectsMissingPrimitive(t *testing.T) {
 	}
 }
 
-func TestRuntimeRegistrationInvariantRejectsWrongRole(t *testing.T) {
+func TestRuntimeRegistrationInvariantRejectsUnknownPrimitive(t *testing.T) {
 	rt := substrate.NewGoRuntime()
 	actual := rt.PrimitiveRegistrations()
-	actual["_print"] = primitives.RoleRuntime
+	actual["_ghost"] = substrate.Arity{Min: 0, Max: 0}
 	err := validatePrimitiveRegistrations(primitives.Definitions(), actual)
-	if err == nil || !strings.Contains(err.Error(), "runtime primitive _print registered as runtime, architecture requires host") {
-		t.Fatalf("expected wrong-role failure, got %v", err)
+	if err == nil || !strings.Contains(err.Error(), "runtime registers primitive with no architectural definition _ghost") {
+		t.Fatalf("expected unknown primitive failure, got %v", err)
 	}
 }
 
-func validatePrimitiveRegistrations(want, actual map[string]primitives.Role) error {
+func validatePrimitiveRegistrations(want map[string]bool, actual map[string]substrate.Arity) error {
 	var problems []string
-	for name, role := range want {
-		got, ok := actual[name]
-		if !ok {
+	for name := range want {
+		if _, ok := actual[name]; !ok {
 			problems = append(problems, "missing runtime primitive "+name)
-			continue
-		}
-		if got != role {
-			problems = append(problems, fmt.Sprintf("runtime primitive %s registered as %s, architecture requires %s", name, got, role))
 		}
 	}
 	for name := range actual {
-		if _, ok := want[name]; !ok {
+		if !want[name] {
 			problems = append(problems, "runtime registers primitive with no architectural definition "+name)
 		}
 	}

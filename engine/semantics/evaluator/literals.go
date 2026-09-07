@@ -75,7 +75,12 @@ func (e *Evaluator) evalName(node *syntax.Node, env *value.Env) value.Value {
 		return val
 	}
 
-	// Then check builtins via runtime (using env's scope)
+	// Then check evaluator-owned intrinsics authorized for trusted sources.
+	if intrinsic, ok := e.evaluatorIntrinsic(name, env.GetAuthority()); ok {
+		return intrinsic
+	}
+
+	// Then check runtime leaf builtins.
 	if e.runtime != nil {
 		if builtin, ok := e.runtime.GetBuiltin(name, env.GetAuthority()); ok {
 			return builtin

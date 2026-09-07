@@ -1,15 +1,11 @@
 package substrate
 
 import (
-	"nezha/engine/runtime/hal"
 	"nezha/engine/semantics/value"
 )
 
 // halShape returns the shape of a list, or :list if unshaped.
-func halShape(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("shape: want 1 argument, got %d", len(args))
-	}
+func halShape(args []value.Value) value.Value {
 	list, ok := args[0].(*value.List)
 	if !ok {
 		return &value.Symbol{Val: "list"}
@@ -22,10 +18,7 @@ func halShape(args []value.Value, ctx *hal.EvalContext) value.Value {
 
 // halToStr converts a value to its string representation.
 // Unlike Inspect(), this returns the value content, not display format.
-func halToStr(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("to_str: want 1 argument, got %d", len(args))
-	}
+func halToStr(args []value.Value) value.Value {
 	switch v := args[0].(type) {
 	case *value.Rune:
 		return &value.String{Val: string(v.Val)}

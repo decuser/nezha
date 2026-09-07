@@ -39,7 +39,6 @@ func loadRuntimeOwnedSurface(t *testing.T) map[string]string {
 		"engine/runtime/hal/substrate/builtins_io*.go",
 		"engine/runtime/hal/substrate/builtins_system.go",
 		"engine/runtime/hal/substrate/builtins_workdir.go",
-		"engine/runtime/hal/substrate/builtins_intrinsic.go",
 		"engine/runtime/hal/substrate/builtins_process.go",
 		"engine/runtime/hal/substrate/builtins_signal.go",
 		"engine/runtime/hal/substrate/builtins_network.go",

@@ -1,14 +1,10 @@
 package substrate
 
 import (
-	"nezha/engine/runtime/hal"
 	"nezha/engine/semantics/value"
 )
 
-func halFirst(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("first: want 1 argument, got %d", len(args))
-	}
+func halFirst(args []value.Value) value.Value {
 	switch a := args[0].(type) {
 	case *value.List:
 		if a.Len() == 0 {
@@ -26,10 +22,7 @@ func halFirst(args []value.Value, ctx *hal.EvalContext) value.Value {
 	}
 }
 
-func halRest(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("rest: want 1 argument, got %d", len(args))
-	}
+func halRest(args []value.Value) value.Value {
 	switch a := args[0].(type) {
 	case *value.List:
 		if a.Len() == 0 {
@@ -47,10 +40,7 @@ func halRest(args []value.Value, ctx *hal.EvalContext) value.Value {
 	}
 }
 
-func halLength(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("length: want 1 argument, got %d", len(args))
-	}
+func halLength(args []value.Value) value.Value {
 	switch a := args[0].(type) {
 	case *value.List:
 		return value.NewNumber(int64(a.Len()), 1)
@@ -61,10 +51,7 @@ func halLength(args []value.Value, ctx *hal.EvalContext) value.Value {
 	}
 }
 
-func halPrepend(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 2 {
-		return value.NewFault("prepend: want 2 arguments, got %d", len(args))
-	}
+func halPrepend(args []value.Value) value.Value {
 	list, ok := args[0].(*value.List)
 	if !ok {
 		return value.NewFault("prepend: first argument must be list")
@@ -75,10 +62,7 @@ func halPrepend(args []value.Value, ctx *hal.EvalContext) value.Value {
 	return &value.List{Elements: newElems, Shape: list.Shape}
 }
 
-func halAppend(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 2 {
-		return value.NewFault("append: want 2 arguments, got %d", len(args))
-	}
+func halAppend(args []value.Value) value.Value {
 	list, ok := args[0].(*value.List)
 	if !ok {
 		return value.NewFault("append: first argument must be list")
@@ -87,10 +71,7 @@ func halAppend(args []value.Value, ctx *hal.EvalContext) value.Value {
 	return result
 }
 
-func halEmpty(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("empty: want 1 argument, got %d", len(args))
-	}
+func halEmpty(args []value.Value) value.Value {
 	switch a := args[0].(type) {
 	case *value.List:
 		if a.Len() == 0 {
@@ -108,10 +89,7 @@ func halEmpty(args []value.Value, ctx *hal.EvalContext) value.Value {
 }
 
 // halMakeShapedList creates a shaped list from a shape name and elements list.
-func halMakeShapedList(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 2 {
-		return value.NewFault("make_shaped_list: want 2 arguments, got %d", len(args))
-	}
+func halMakeShapedList(args []value.Value) value.Value {
 	sym, ok := args[0].(*value.Symbol)
 	if !ok {
 		return value.NewFault("make_shaped_list: expected symbol for shape, got %s", args[0].Type())

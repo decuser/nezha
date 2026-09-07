@@ -1,7 +1,6 @@
 package evaluator
 
 import (
-	"nezha/engine/runtime/hal"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
 )
@@ -23,17 +22,24 @@ func (e *Evaluator) applyFunctionOwned(fn value.Value, args []value.Value, argFr
 	switch f := fn.(type) {
 	case *value.Function:
 		return e.applyUserFunctionOwned(f, args, argFrame, node, env)
+	case *ApplyIntrinsic:
+		if argFrame != nil {
+			defer e.releaseArgFrame(argFrame)
+		}
+		result := e.applyIntrinsic(args, node, env)
+		if fault, ok := result.(*value.Fault); ok && fault.File == "" {
+			fault.File = env.GetFile()
+			fault.Line = node.Pos.Line
+			fault.Source = env.GetSourceLine(node.Pos.Line)
+			fault.Stack = env.CopyStack()
+		}
+		return result
 	case value.Callable:
 		if argFrame != nil {
 			defer e.releaseArgFrame(argFrame)
 		}
 
-		needsContext := true
-		if requirement, ok := f.(hal.EvalContextRequired); ok {
-			needsContext = requirement.NeedsEvalContext()
-		}
-
-		result := e.callSubstrateValue(f, args, node, env, needsContext)
+		result := f.Call(args)
 		// Annotate HAL faults with call site location.
 		if fault, ok := result.(*value.Fault); ok && fault.File == "" {
 			fault.File = env.GetFile()
@@ -48,20 +54,6 @@ func (e *Evaluator) applyFunctionOwned(fn value.Value, args []value.Value, argFr
 		}
 		return e.makeFault(node, env, "not a function: %s", fn.Type())
 	}
-}
-
-func (e *Evaluator) callSubstrateValue(f value.Callable, args []value.Value, node *syntax.Node, env *value.Env, needsContext bool) value.Value {
-	cf, contextCallable := f.(hal.ContextCallable)
-	if !contextCallable || !needsContext {
-		return f.Call(args)
-	}
-	ctx := &hal.EvalContext{
-		Env:     env,
-		Node:    node,
-		Grammar: e.grammar,
-		Eval:    e.Eval,
-	}
-	return cf.CallWithContext(args, ctx)
 }
 
 func (e *Evaluator) applyUserFunctionOwned(fn *value.Function, args []value.Value, initialArgFrame *argFrame, node *syntax.Node, env *value.Env) value.Value {

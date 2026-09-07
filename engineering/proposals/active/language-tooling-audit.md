@@ -11,8 +11,7 @@ pipe.
 
 ## Retained runtime support
 
-The runtime keeps HAL output for `print` / `println`, `_apply`, list primitives,
-value equality, type, shape construction/inspection, and `to_str`.
+The runtime keeps HAL output for `print` / `println`, list primitives, value equality, type, shape construction/inspection, and `to_str`. The evaluator owns `_apply` so function application has one calling convention and substrate builtins remain leaf operations.
 
 ## Removed from prelude/runtime surface
 

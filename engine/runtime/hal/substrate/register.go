@@ -1,24 +1,27 @@
 package substrate
 
-// registerHAL installs the runtime binding surface separated by architectural
-// responsibility. Only entries registered through registerHost have canonical
-// HAL identities; the remaining registries implement non-HAL runtime roles.
+// registerHAL installs the flat runtime binding surface. Substrate builtins are
+// leaf functions; canonical host metadata is attached only where a primitive
+// crosses the HAL boundary.
 func (g *GoRuntime) registerHAL() {
-	// True host-facing operations. Canonical contracts currently exist for prelude I/O and file operations.
-	g.registerHost(goHostOperation("_print"), g.halPrint)
+	g.registerHost(goHostOperation("_print"), variadicArity(0), g.halPrint)
 
-	// Evaluator/language intrinsics.
-	g.registerPrimitive("_apply", halApply)
-
-	// Language/value primitives implemented natively.
-	g.registerContextFreePrimitive("_append", halAppend)
-	for name, fn := range map[string]BuiltinFunc{
-		"_first": halFirst, "_rest": halRest, "_length": halLength,
-		"_prepend": halPrepend, "_empty": halEmpty,
-		"_type": halType, "_equal": halEqual,
-		"_shape": halShape, "_make_shaped_list": halMakeShapedList, "_to_str": halToStr,
+	for name, spec := range map[string]struct {
+		arity Arity
+		fn    BuiltinFunc
+	}{
+		"_append":           {fixedArity(2), halAppend},
+		"_empty":            {fixedArity(1), halEmpty},
+		"_equal":            {fixedArity(2), halEqual},
+		"_first":            {fixedArity(1), halFirst},
+		"_length":           {fixedArity(1), halLength},
+		"_make_shaped_list": {fixedArity(2), halMakeShapedList},
+		"_prepend":          {fixedArity(2), halPrepend},
+		"_rest":             {fixedArity(1), halRest},
+		"_shape":            {fixedArity(1), halShape},
+		"_to_str":           {fixedArity(1), halToStr},
+		"_type":             {fixedArity(1), halType},
 	} {
-		g.registerContextFreePrimitive(name, fn)
+		g.registerPrimitive(name, spec.arity, spec.fn)
 	}
-
 }
