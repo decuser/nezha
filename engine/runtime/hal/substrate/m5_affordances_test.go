@@ -4,7 +4,6 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
-	"time"
 
 	"aiki/engine/semantics/value"
 )
@@ -80,96 +79,5 @@ func TestM5TempAffordancesCreateRealPaths(t *testing.T) {
 	info, err := os.Stat(dirPath.Val)
 	if err != nil || !info.IsDir() {
 		t.Fatalf("temp_dir is not a directory: %v", err)
-	}
-}
-
-func TestM5TimeNowIsMillisecondsSinceEpoch(t *testing.T) {
-	before := time.Now().UnixMilli()
-	got := halTimeNow(nil, nil)
-	after := time.Now().UnixMilli()
-	n, ok := got.(*value.Number)
-	if !ok || !n.IsInt() || !n.IsInt64() {
-		t.Fatalf("time.now = %T %v, want integer number", got, got)
-	}
-	ms := n.Int64Value()
-	if ms < before || ms > after {
-		t.Fatalf("time.now = %d, outside [%d,%d]", ms, before, after)
-	}
-}
-
-func TestM5WorkingDirectoryIsRuntimeOwnedAndDrivesFileBindings(t *testing.T) {
-	processCwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	dir1 := t.TempDir()
-	dir2 := t.TempDir()
-	if err := os.WriteFile(filepath.Join(dir1, "only-here"), []byte("one"), 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	rt1 := NewGoRuntime()
-	rt2 := NewGoRuntime()
-	if got := rt1.halSystemChdir([]value.Value{&value.String{Val: dir1}}, nil); got != value.TRUE {
-		t.Fatalf("rt1 chdir = %s", got.Inspect())
-	}
-	if got := rt2.halSystemChdir([]value.Value{&value.String{Val: dir2}}, nil); got != value.TRUE {
-		t.Fatalf("rt2 chdir = %s", got.Inspect())
-	}
-	if got := rt1.halFileExistsPath([]value.Value{&value.String{Val: "only-here"}}, nil); got != value.TRUE {
-		t.Fatal("rt1 relative file lookup did not use rt1 cwd")
-	}
-	if got := rt2.halFileExistsPath([]value.Value{&value.String{Val: "only-here"}}, nil); got != value.FALSE {
-		t.Fatal("rt2 relative file lookup leaked rt1 cwd")
-	}
-	if cwd, _ := os.Getwd(); cwd != processCwd {
-		t.Fatalf("runtime chdir changed process cwd from %q to %q", processCwd, cwd)
-	}
-}
-
-func TestM5SystemExecCapturesOutputExitCodeAndRuntimeCwd(t *testing.T) {
-	rt := NewGoRuntime()
-	dir := t.TempDir()
-	if got := rt.halSystemChdir([]value.Value{&value.String{Val: dir}}, nil); got != value.TRUE {
-		t.Fatalf("chdir = %s", got.Inspect())
-	}
-
-	got := rt.halSystemExec([]value.Value{
-		&value.String{Val: os.Args[0]},
-		&value.List{Elements: []value.Value{
-			&value.String{Val: "-test.run=TestM5ExecHelperProcess"},
-			&value.String{Val: "--"},
-			&value.String{Val: "7"},
-		}},
-	}, nil)
-	result, ok := got.(*value.List)
-	if !ok || result.Shape != "ok" || len(result.Elements) != 3 {
-		t.Fatalf("exec = %#v, want [@ok, stdout, stderr, exit_code]", got)
-	}
-	stdout := result.Elements[0].(*value.String).Val
-	stderr := result.Elements[1].(*value.String).Val
-	if stdout != dir+"\n" {
-		t.Fatalf("stdout = %q, want runtime cwd %q", stdout, dir+"\n")
-	}
-	if stderr != "helper stderr\n" {
-		t.Fatalf("stderr = %q", stderr)
-	}
-	if result.Elements[2].Inspect() != "7" {
-		t.Fatalf("exit code = %s, want 7", result.Elements[2].Inspect())
-	}
-}
-
-func TestM5ExecHelperProcess(t *testing.T) {
-	if len(os.Args) < 2 || os.Args[len(os.Args)-2] != "--" {
-		return
-	}
-	cwd, err := os.Getwd()
-	if err != nil {
-		os.Exit(98)
-	}
-	_, _ = os.Stdout.WriteString(cwd + "\n")
-	_, _ = os.Stderr.WriteString("helper stderr\n")
-	if os.Args[len(os.Args)-1] == "7" {
-		os.Exit(7)
 	}
 }

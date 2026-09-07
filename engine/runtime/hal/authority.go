@@ -95,16 +95,6 @@ var authorityPolicy = map[string][]string{
 		"_sin_inexact",
 		"_sqrt_inexact",
 	},
-	"lib/profile/profile.ai": {
-		"_profile_counts",
-		"_profile_experiment",
-		"_profile_measure",
-		"_profile_timed",
-	},
-	"lib/random/random.ai": {
-		"_random",
-		"_seed",
-	},
 	"lib/string/ffi.ai": {
 		"_chars",
 		"_lower",
@@ -136,19 +126,6 @@ var authorityPolicy = map[string][]string{
 		"_string_is_numeric",
 		"_string_is_alphabetic",
 	},
-	"lib/system/system.ai": {
-		"_system_args",
-		"_system_chdir",
-		"_system_cwd",
-		"_system_env",
-		"_system_environ",
-		"_system_exit",
-		"_system_exec",
-		"_system_has",
-		"_system_require",
-		"_system_set_env",
-		"_system_unset_env",
-	},
 	"lib/test/test.ai": {
 		"_test_equal",
 		"_test_error",
@@ -158,11 +135,6 @@ var authorityPolicy = map[string][]string{
 		"_test_not_error",
 		"_test_run",
 		"_test_true",
-	},
-	"lib/time/time.ai": {
-		"_after",
-		"_sleep",
-		"_time_now",
 	},
 }
 

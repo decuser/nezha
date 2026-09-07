@@ -1,4 +1,0 @@
-let system = import("system")
-println("before")
-system.exit(7)
-println("after")

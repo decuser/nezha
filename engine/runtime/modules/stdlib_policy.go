@@ -62,12 +62,8 @@ var stdlibModulePolicies = []StdlibModulePolicy{
 	// Host-mediated facilities. path intentionally composes portable Aiki code
 	// with host/runtime operations and is therefore mixed.
 	{Module: "file", Role: RoleHostCapability, Realization: RealizationIntrinsic},
-	{Module: "random", Role: RoleHostCapability, Realization: RealizationIntrinsic},
-	{Module: "system", Role: RoleHostCapability, Realization: RealizationIntrinsic},
-	{Module: "time", Role: RoleHostCapability, Realization: RealizationIntrinsic},
 
 	// Tooling/runtime implementation support rather than general stdlib semantics.
-	{Module: "profile", Role: RoleInternal, Realization: RealizationMixed},
 	{Module: "test", Role: RoleInternal, Realization: RealizationIntrinsic},
 }
 

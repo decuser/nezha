@@ -4,18 +4,9 @@ package substrate
 // responsibility. Only entries registered through registerHost have canonical
 // HAL identities; the remaining registries implement non-HAL runtime roles.
 func (g *GoRuntime) registerHAL() {
-	// True host-facing operations. Canonical contracts currently exist for I/O,
-	// time, program context, file operations, and the narrowed Canvas resource/command
-	// boundary. Randomness is runtime-owned host state with canonical HAL contracts.
+	// True host-facing operations. Canonical contracts currently exist for prelude I/O and file operations.
 	g.registerHost(goHostOperation("_print"), g.halPrint)
 	g.registerHost(goHostOperation("_read"), g.halRead)
-	g.registerHost(goHostOperation("_sleep"), halSleep)
-	g.registerHost(goHostOperation("_after"), halAfter)
-	g.registerHost(goHostOperation("_system_args"), g.halSystemArgs)
-	g.registerHost(goHostOperation("_system_env"), g.halSystemEnv)
-	g.registerHost(goHostOperation("_system_environ"), g.halSystemEnviron)
-	g.registerHost(goHostOperation("_system_set_env"), g.halSystemSetEnv)
-	g.registerHost(goHostOperation("_system_unset_env"), g.halSystemUnsetEnv)
 	g.registerHost(goHostOperation("_file_open"), g.halFileOpenPath)
 	g.registerHost(goHostOperation("_file_read_text"), halFileReadText)
 	g.registerHost(goHostOperation("_file_read_bytes"), halFileReadBytes)
@@ -46,12 +37,6 @@ func (g *GoRuntime) registerHAL() {
 	g.registerHost(goHostOperation("_file_unlock"), g.halFileUnlock)
 	g.registerHost(goHostOperation("_file_permissions"), g.halFilePermissionsPath)
 	g.registerHost(goHostOperation("_file_chmod"), g.halFileChmodPath)
-	g.registerHost(goHostOperation("_time_now"), halTimeNow)
-	g.registerHost(goHostOperation("_system_cwd"), g.halSystemCwd)
-	g.registerHost(goHostOperation("_system_chdir"), g.halSystemChdir)
-	g.registerHost(goHostOperation("_system_exec"), g.halSystemExec)
-	g.registerHost(goHostOperation("_seed"), g.halSeed)
-	g.registerHost(goHostOperation("_random"), g.halRandom)
 
 	// Evaluator/language intrinsics.
 	g.registerPrimitive("_apply", halApply)
@@ -113,13 +98,8 @@ func (g *GoRuntime) registerHAL() {
 
 	// Runtime/tooling/session services.
 	for name, fn := range map[string]BuiltinFunc{
-		"_module_roots":   g.halModuleRoots,
-		"_system_exit":    g.halSystemExit,
-		"_system_has":     g.halSystemHas,
-		"_system_require": g.halSystemRequire,
-		"_profile_counts": halProfileCounts, "_profile_measure": halProfileMeasure,
-		"_profile_timed": halProfileTimed, "_profile_experiment": halProfileExperiment,
-		"_quit": g.halQuit, "_reset": g.halReset, "_delete": g.halDelete, "_help": g.halHelp, "_doc": g.halDoc,
+		"_module_roots": g.halModuleRoots,
+		"_quit":         g.halQuit, "_reset": g.halReset, "_delete": g.halDelete, "_help": g.halHelp, "_doc": g.halDoc,
 		"_test_equal": g.halTestEqual, "_test_not_equal": g.halTestNotEqual,
 		"_test_true": g.halTestTrue, "_test_false": g.halTestFalse,
 		"_test_error": g.halTestError, "_test_not_error": g.halTestNotError,

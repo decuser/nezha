@@ -75,12 +75,12 @@ func TestHALProfileGateRejectsMissingRequiredCapability(t *testing.T) {
 
 func TestHALMetadataInvariantRejectsUnknownContext(t *testing.T) {
 	ops := hal.OperationDefinitions()
-	op := ops["_random"]
+	op := ops["_file_stat"]
 	op.Context = []string{"runtime.typo"}
-	ops["_random"] = op
+	ops["_file_stat"] = op
 
 	err := hal.ValidateMetadata(ops, hal.Capabilities(), hal.RuntimeProfiles())
-	if err == nil || !strings.Contains(err.Error(), "operation _random has unknown context runtime.typo") {
+	if err == nil || !strings.Contains(err.Error(), "operation _file_stat has unknown context runtime.typo") {
 		t.Fatalf("expected unknown context failure, got %v", err)
 	}
 }
@@ -101,9 +101,9 @@ func TestHALMetadataInvariantRejectsUnknownDescriptorVocabulary(t *testing.T) {
 	for _, mutation := range mutations {
 		t.Run(mutation.name, func(t *testing.T) {
 			ops := hal.OperationDefinitions()
-			op := ops["_random"]
+			op := ops["_file_stat"]
 			mutation.edit(&op)
-			ops["_random"] = op
+			ops["_file_stat"] = op
 			err := hal.ValidateMetadata(ops, hal.Capabilities(), hal.RuntimeProfiles())
 			if err == nil || !strings.Contains(err.Error(), mutation.want) {
 				t.Fatalf("expected descriptor vocabulary failure %q, got %v", mutation.want, err)

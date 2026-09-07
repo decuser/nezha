@@ -35,14 +35,6 @@ var capabilityRegistry = map[string]Capability{
 		Name:       "permissions",
 		Operations: []string{"HAL.file.permissions", "HAL.file.chmod"},
 	},
-	"time": {
-		Name:       "time",
-		Operations: []string{"HAL.time.sleep", "HAL.time.after", "HAL.time.now"},
-	},
-	"random": {
-		Name:       "random",
-		Operations: []string{"HAL.random.seed", "HAL.random.below"},
-	},
 }
 
 // CapabilityDefinition returns an independent copy of one capability.

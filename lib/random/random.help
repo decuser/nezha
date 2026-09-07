@@ -1,9 +1,0 @@
-@summary "random - runtime-owned pseudo-random capability"
-
-@func seed
-@template "seed(n)"
-@help "Seeds the generator from integer n."
-
-@func random
-@template "random(max)"
-@help "Returns a random integer n with 0 <= n < max."

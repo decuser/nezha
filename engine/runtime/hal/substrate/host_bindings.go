@@ -13,13 +13,6 @@ import (
 var goHostProvenance = map[string]string{
 	"_print":            "go:fmt.Fprint/io.Writer",
 	"_read":             "go:bufio.Reader.ReadString/io.Reader",
-	"_sleep":            "go:time.Sleep",
-	"_after":            "go:time.AfterFunc/value.NewEventChannel",
-	"_system_args":      "go:runtime-owned programArgs",
-	"_system_env":       "go:runtime-owned environment map lookup",
-	"_system_environ":   "go:runtime-owned environment snapshot",
-	"_system_set_env":   "go:runtime-owned environment map mutation",
-	"_system_unset_env": "go:runtime-owned environment map mutation",
 	"_file_open":        "go:os.Open/os.Create/os.OpenFile",
 	"_file_read_text":   "go:io.ReadAll(*os.File)",
 	"_file_read_bytes":  "go:io.ReadAll(*os.File)",
@@ -50,12 +43,6 @@ var goHostProvenance = map[string]string{
 	"_file_unlock":      "go:github.com/gofrs/flock.Unlock",
 	"_file_permissions": "go:os.FileMode.Perm",
 	"_file_chmod":       "go:os.Chmod",
-	"_seed":             "go:runtime-owned math/rand.Rand.Seed",
-	"_random":           "go:runtime-owned math/rand.Rand.Int63n",
-	"_time_now":         "go:time.Now",
-	"_system_cwd":       "go:runtime working-directory context",
-	"_system_chdir":     "go:os.Stat + runtime working-directory context",
-	"_system_exec":      "go:os/exec.Command + pipes/wait",
 }
 
 func goHostOperation(primitive string) hal.HostOperation {

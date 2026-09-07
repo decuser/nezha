@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
 )
 
 func TestGoProvenanceCoversHALOperationDefinitions(t *testing.T) {
@@ -48,18 +47,5 @@ func TestProfileGateRejectsMissingRequiredCapability(t *testing.T) {
 	}
 	if err := rt.ValidateProfile("minimal"); err != nil {
 		t.Fatalf("minimal profile should not require host capabilities: %v", err)
-	}
-}
-
-func TestSystemCapabilityQueriesUseAikiNames(t *testing.T) {
-	rt := NewGoRuntime()
-	if got := rt.halSystemHas([]value.Value{&value.Symbol{Val: "filesystem"}}, nil); got != value.TRUE {
-		t.Fatalf("system.has(:filesystem) = %v, want true", got)
-	}
-	if got := rt.halSystemRequire([]value.Value{&value.Symbol{Val: "filesystem"}}, nil); got != value.EMPTY {
-		t.Fatalf("system.require(:filesystem) = %v, want empty", got)
-	}
-	if got := rt.halSystemRequire([]value.Value{&value.Symbol{Val: "unknown"}}, nil); !value.IsShapedError(got) {
-		t.Fatalf("unknown capability should return shaped :unsupported error, got %v", got)
 	}
 }
