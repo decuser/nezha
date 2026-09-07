@@ -37,12 +37,4 @@ func (g *GoRuntime) registerHAL() {
 		}
 	}
 
-	// Native/FFI library providers. Native realization does not imply host
-	// authority; these are alternate implementations of library behavior.
-	for name, fn := range map[string]BuiltinFunc{
-		"_sqrt_inexact": halSqrt, "_cos_inexact": halCos, "_sin_inexact": halSin,
-	} {
-		g.registerContextFreePrimitive(name, fn)
-	}
-
 }

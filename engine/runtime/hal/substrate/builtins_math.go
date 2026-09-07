@@ -1,7 +1,6 @@
 package substrate
 
 import (
-	"math"
 	"math/big"
 
 	"nezha/engine/runtime/hal"
@@ -93,27 +92,4 @@ func halModulo(args []value.Value, ctx *hal.EvalContext) value.Value {
 	product := new(big.Rat).Mul(new(big.Rat).SetInt(q), divisor)
 	result := new(big.Rat).Sub(left.Rat(), product)
 	return value.NewNumberFromRat(result)
-}
-
-func halSqrt(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("sqrt: want 1 argument, got %d", len(args))
-	}
-	n, ok := args[0].(*value.Number)
-	if !ok {
-		return value.NewFault("sqrt: expected number")
-	}
-	if n.Sign() < 0 {
-		return value.NewFault("sqrt: negative number")
-	}
-	f, exact := n.Float64()
-	if !exact && (math.IsInf(f, 0) || math.IsNaN(f)) {
-		return value.NewFault("sqrt: argument out of float64 range")
-	}
-	result := math.Sqrt(f)
-	out, ok := value.NewNumberFromFloat64(result)
-	if !ok {
-		return value.NewFault("sqrt: result is not finite")
-	}
-	return out
 }

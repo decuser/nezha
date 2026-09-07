@@ -23,7 +23,6 @@ func eval(t *testing.T, source string) value.Value {
 	rt := substrate.NewGoRuntime()
 	ev := evaluator.New(rt, nil)
 	env := value.NewEnvWithScope(value.ScopePrelude)
-	env.SetAuthority(value.NewAuthority("_sqrt_inexact", "_cos_inexact"))
 	return ev.Eval(ast, env)
 }
 
@@ -79,20 +78,6 @@ func TestNumbersKeepExactSemanticBoundary(t *testing.T) {
 				if n != nil && !n.Equal(value.NewNumber(1, 1)) {
 					t.Errorf("expected 1, got %s", n.RatString())
 				}
-			},
-		},
-		{
-			name: "sqrt returns number",
-			expr: "_sqrt_inexact(4)",
-			verify: func(t *testing.T, v value.Value) {
-				assertNumber(t, v)
-			},
-		},
-		{
-			name: "trig returns number",
-			expr: "_cos_inexact(0)",
-			verify: func(t *testing.T, v value.Value) {
-				assertNumber(t, v)
 			},
 		},
 	}

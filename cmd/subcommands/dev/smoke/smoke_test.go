@@ -34,25 +34,22 @@ func TestEncodeTranscriptCanonicalEscapes(t *testing.T) {
 		[]byte(":default\n42\n1\n"),
 		[]byte("warning\n"),
 		2,
-		[]string{"line 1", "line 2"},
-		[]string{"inspect canvas"},
+		[]string{"inspect output"},
 	)
 	want := []byte("IN:Ada\\n\n" +
 		"OUT::default\\n\n" +
 		"OUT:42\\n\n" +
 		"OUT:1\\n\n" +
 		"ERR:warning\\n\n" +
-		"CANVAS:line 1\n" +
-		"CANVAS:line 2\n" +
 		"EXIT:2\n" +
-		"DISPLAY:inspect canvas\n")
+		"DISPLAY:inspect output\n")
 	if !bytes.Equal(got, want) {
 		t.Fatalf("encoded transcript\n--- got ---\n%s--- want ---\n%s", got, want)
 	}
 }
 
 func TestEncodeTranscriptRoundTrips(t *testing.T) {
-	data := encodeTranscript([]byte("x\ny"), []byte("a\nb"), []byte("e\n"), 3, nil, nil)
+	data := encodeTranscript([]byte("x\ny"), []byte("a\nb"), []byte("e\n"), 3, nil)
 	// loadTranscript reads files, so exercise the escaping primitive directly.
 	if unescape(escapeTranscript("a\n")) != "a\n" {
 		t.Fatal("escape/unescape did not round trip newline")

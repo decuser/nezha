@@ -67,7 +67,7 @@ func blessPair(aiPath string) error {
 	var stdin []byte
 	var displays []string
 	if _, err := os.Stat(goldPath); err == nil {
-		in, _, _, _, _, ds, err := loadTranscript(goldPath)
+		in, _, _, _, ds, err := loadTranscript(goldPath)
 		if err != nil {
 			return fmt.Errorf("load existing transcript: %w", err)
 		}
@@ -77,15 +77,7 @@ func blessPair(aiPath string) error {
 		return err
 	}
 
-	f, err := os.CreateTemp("", "nezha-canvas-*.transcript")
-	if err != nil {
-		return fmt.Errorf("create canvas transcript: %w", err)
-	}
-	canvasPath := f.Name()
-	f.Close()
-	defer os.Remove(canvasPath)
-
-	stdout, stderr, exitCode, err := runNezhaFile(aiPath, stdin, canvasPath)
+	stdout, stderr, exitCode, err := runNezhaFile(aiPath, stdin)
 	if err != nil {
 		return fmt.Errorf("run error: %w", err)
 	}
@@ -93,15 +85,7 @@ func blessPair(aiPath string) error {
 		return err
 	}
 
-	var canvas []string
-	if data, err := os.ReadFile(canvasPath); err == nil {
-		text := strings.TrimRight(string(data), "\n")
-		if text != "" {
-			canvas = strings.Split(text, "\n")
-		}
-	}
-
-	data := encodeTranscript(stdin, stdout, stderr, exitCode, canvas, displays)
+	data := encodeTranscript(stdin, stdout, stderr, exitCode, displays)
 	if err := os.WriteFile(goldPath, data, 0o644); err != nil {
 		return fmt.Errorf("write gold: %w", err)
 	}
@@ -131,14 +115,11 @@ func appendTranscriptRecords(buf *bytes.Buffer, prefix string, data []byte) {
 	}
 }
 
-func encodeTranscript(stdin, stdout, stderr []byte, exitCode int, canvas, displays []string) []byte {
+func encodeTranscript(stdin, stdout, stderr []byte, exitCode int, displays []string) []byte {
 	var buf bytes.Buffer
 	appendTranscriptRecords(&buf, "IN:", stdin)
 	appendTranscriptRecords(&buf, "OUT:", stdout)
 	appendTranscriptRecords(&buf, "ERR:", stderr)
-	for _, line := range canvas {
-		fmt.Fprintf(&buf, "CANVAS:%s\n", line)
-	}
 	if exitCode != 0 {
 		fmt.Fprintf(&buf, "EXIT:%d\n", exitCode)
 	}
@@ -182,7 +163,7 @@ func runPair(aiPath string) error {
 		return err
 	}
 
-	stdin, expOut, expErr, expExit, expCanvas, displays, err := loadTranscript(goldPath)
+	stdin, expOut, expErr, expExit, displays, err := loadTranscript(goldPath)
 	if err != nil {
 		return fmt.Errorf("load transcript: %w", err)
 	}
@@ -190,21 +171,7 @@ func runPair(aiPath string) error {
 		return err
 	}
 
-	// When the gold contains CANVAS: lines, run the program with the
-	// recorder so the canvas command stream can be compared rather than
-	// requiring a human to watch it.
-	var canvasRecordPath string
-	if len(expCanvas) > 0 {
-		f, err := os.CreateTemp("", "nezha-canvas-*.transcript")
-		if err != nil {
-			return fmt.Errorf("create canvas transcript: %w", err)
-		}
-		canvasRecordPath = f.Name()
-		f.Close()
-		defer os.Remove(canvasRecordPath)
-	}
-
-	stdout, stderr, exitCode, err := runNezhaFile(aiPath, stdin, canvasRecordPath)
+	stdout, stderr, exitCode, err := runNezhaFile(aiPath, stdin)
 	if err != nil {
 		return fmt.Errorf("run error: %w", err)
 	}
@@ -229,23 +196,6 @@ func runPair(aiPath string) error {
 	if !bytes.Equal(stdTrim, expTrim) {
 		return fmt.Errorf("output mismatch\n--- expected ---\n%q\n--- got ---\n%q\n",
 			string(expOut), string(stdout))
-	}
-
-	// canvas transcript
-	if len(expCanvas) > 0 {
-		gotCanvas, err := os.ReadFile(canvasRecordPath)
-		if err != nil {
-			return fmt.Errorf("read canvas transcript: %w", err)
-		}
-		gotLines := strings.Split(strings.TrimRight(string(gotCanvas), "\n"), "\n")
-		if len(gotLines) == 1 && gotLines[0] == "" {
-			gotLines = nil
-		}
-		if !linesEqual(expCanvas, gotLines) {
-			return fmt.Errorf("canvas transcript mismatch\n--- expected %d lines ---\n%s\n--- got %d lines ---\n%s\n",
-				len(expCanvas), strings.Join(expCanvas, "\n"),
-				len(gotLines), strings.Join(gotLines, "\n"))
-		}
 	}
 
 	// DISPLAY prompts (interactive, for make visual only)
@@ -299,10 +249,10 @@ func unescape(s string) string {
 	return u
 }
 
-func loadTranscript(path string) (stdin, stdout, stderr []byte, expExit int, canvas []string, displays []string, err error) {
+func loadTranscript(path string) (stdin, stdout, stderr []byte, expExit int, displays []string, err error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, nil, nil, 0, nil, nil, err
+		return nil, nil, nil, 0, nil, err
 	}
 	var inBuf, outBuf, errBuf bytes.Buffer
 	expExit = 0
@@ -316,12 +266,10 @@ func loadTranscript(path string) (stdin, stdout, stderr []byte, expExit int, can
 			outBuf.WriteString(unescape(strings.TrimPrefix(line, "OUT:")))
 		case strings.HasPrefix(line, "ERR:"):
 			errBuf.WriteString(unescape(strings.TrimPrefix(line, "ERR:")))
-		case strings.HasPrefix(line, "CANVAS:"):
-			canvas = append(canvas, strings.TrimPrefix(line, "CANVAS:"))
 		case strings.HasPrefix(line, "EXIT:"):
 			n, e := strconv.Atoi(strings.TrimSpace(strings.TrimPrefix(line, "EXIT:")))
 			if e != nil {
-				return nil, nil, nil, 0, nil, nil, fmt.Errorf("bad EXIT line %q: %w", line, e)
+				return nil, nil, nil, 0, nil, fmt.Errorf("bad EXIT line %q: %w", line, e)
 			}
 			expExit = n
 		case strings.HasPrefix(line, "DISPLAY:"):
@@ -329,14 +277,14 @@ func loadTranscript(path string) (stdin, stdout, stderr []byte, expExit int, can
 		case strings.TrimSpace(line) == "":
 			continue
 		default:
-			return nil, nil, nil, 0, nil, nil, fmt.Errorf("invalid transcript line: %q", line)
+			return nil, nil, nil, 0, nil, fmt.Errorf("invalid transcript line: %q", line)
 		}
 	}
 
-	return inBuf.Bytes(), outBuf.Bytes(), errBuf.Bytes(), expExit, canvas, displays, nil
+	return inBuf.Bytes(), outBuf.Bytes(), errBuf.Bytes(), expExit, displays, nil
 }
 
-func runNezhaFile(path string, stdin []byte, canvasRecordPath string) (stdout []byte, stderr []byte, exitCode int, err error) {
+func runNezhaFile(path string, stdin []byte) (stdout []byte, stderr []byte, exitCode int, err error) {
 	exe, err := os.Executable()
 	if err != nil {
 		return nil, nil, 1, fmt.Errorf("locate executable: %w", err)
@@ -346,11 +294,6 @@ func runNezhaFile(path string, stdin []byte, canvasRecordPath string) (stdout []
 
 	if stdin != nil {
 		cmd.Stdin = bytes.NewReader(stdin)
-	}
-
-	cmd.Env = os.Environ()
-	if canvasRecordPath != "" {
-		cmd.Env = append(cmd.Env, "NEZHA_CANVAS=record", "NEZHA_CANVAS_RECORD="+canvasRecordPath)
 	}
 
 	var outBuf, errBuf bytes.Buffer

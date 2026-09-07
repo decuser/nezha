@@ -4,8 +4,6 @@
 
 /nezha*
 /nezha.exe
-/nezha-canvas
-/nezha-canvas.exe
 
 # Historical/local named test binaries (nezha7, nezha8, nezha9, etc.)
 /nezha[0-9]*

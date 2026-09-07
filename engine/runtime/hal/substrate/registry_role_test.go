@@ -82,7 +82,6 @@ func TestBuiltinContextPolicyDefaultsConservative(t *testing.T) {
 
 	for _, name := range []string{
 		"_first", "_rest", "_length", "_type", "_equal",
-		"_sin_inexact",
 	} {
 		b, ok := g.lookupBuiltin(name)
 		if !ok {

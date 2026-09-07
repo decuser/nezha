@@ -28,7 +28,6 @@ const (
 	FileLockType      Type = "file_lock"
 	ChannelType       Type = "channel"
 	ModuleType        Type = "module"
-	CanvasType        Type = "canvas"
 	StoreType         Type = "store"
 	ProcessType       Type = "process"
 	EndpointType      Type = "endpoint"
@@ -704,7 +703,7 @@ func DeepEqual(a, b Value) bool {
 		}
 		return true
 	default:
-		// Functions, channels, modules, canvases — identity only.
+		// Functions, channels, modules, and other opaque values — identity only.
 		return a == b
 	}
 }
