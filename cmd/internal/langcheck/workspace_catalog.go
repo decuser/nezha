@@ -1,29 +1,26 @@
-// Package workspace adapts the engine module workspace to the neutral
-// language.Catalog contract.
-package workspace
+package langcheck
 
 import (
 	"sort"
 
-	"nezha/engine/language"
 	"nezha/engine/runtime/prelude"
 	"nezha/engine/runtime/primitives"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax/grammar"
 )
 
-var _ language.Catalog = (*Catalog)(nil)
+var _ Catalog = (*WorkspaceCatalog)(nil)
 
-type Catalog struct {
+type WorkspaceCatalog struct {
 	grammar        *grammar.Grammar
 	preludeCatalog *prelude.Catalog
 }
 
-func NewCatalog(g *grammar.Grammar) *Catalog {
-	return &Catalog{grammar: g}
+func NewWorkspaceCatalog(g *grammar.Grammar) *WorkspaceCatalog {
+	return &WorkspaceCatalog{grammar: g}
 }
 
-func (c *Catalog) authoredPrelude() *prelude.Catalog {
+func (c *WorkspaceCatalog) authoredPrelude() *prelude.Catalog {
 	if c.preludeCatalog != nil {
 		return c.preludeCatalog
 	}
@@ -35,7 +32,7 @@ func (c *Catalog) authoredPrelude() *prelude.Catalog {
 	return catalog
 }
 
-func (c *Catalog) VisibleNames(scope value.Scope) []string {
+func (c *WorkspaceCatalog) VisibleNames(scope value.Scope) []string {
 	set := map[string]bool{}
 	for _, name := range primitives.NamesForScope(scope) {
 		set[name] = true
@@ -55,18 +52,18 @@ func (c *Catalog) VisibleNames(scope value.Scope) []string {
 	return out
 }
 
-func (c *Catalog) Help(name string) (language.HelpEntry, bool) {
+func (c *WorkspaceCatalog) Help(name string) (HelpEntry, bool) {
 	catalog := c.authoredPrelude()
 	if catalog == nil {
-		return language.HelpEntry{}, false
+		return HelpEntry{}, false
 	}
 	entry := catalog.Registry.GetHelp(name)
 	if entry == nil {
-		return language.HelpEntry{}, false
+		return HelpEntry{}, false
 	}
 	doc := ""
 	if d := catalog.Registry.GetDoc(name); d != nil {
 		doc = d.Doc
 	}
-	return language.HelpEntry{Name: name, Template: entry.Template, Summary: entry.Help, Doc: doc}, true
+	return HelpEntry{Name: name, Template: entry.Template, Summary: entry.Help, Doc: doc}, true
 }

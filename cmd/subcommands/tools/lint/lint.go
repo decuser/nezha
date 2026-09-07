@@ -1,17 +1,16 @@
 package lint
 
 import (
-	"nezha/engine/language"
-	"nezha/engine/language/workspace"
+	"nezha/cmd/internal/langcheck"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax/grammar"
 )
 
-// Diagnostic is the language-service diagnostic used by the lint CLI.
-type Diagnostic = language.Diagnostic
+// Diagnostic is the structural diagnostic used by the lint CLI.
+type Diagnostic = langcheck.Diagnostic
 
-// LintSource is the CLI compatibility seam over editor-independent structural
-// language analysis. New consumers should use engine/language.Service.
+// LintSource is the CLI compatibility seam over command-side structural
+// language analysis. New consumers should use cmd/internal/langcheck.
 func LintSource(g *grammar.Grammar, file string, source string, lintScope value.Scope) ([]Diagnostic, error) {
-	return language.AnalyzeStructure(g, file, source, lintScope, workspace.NewCatalog(g))
+	return langcheck.AnalyzeStructure(g, file, source, lintScope, langcheck.NewWorkspaceCatalog(g))
 }

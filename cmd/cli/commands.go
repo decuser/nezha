@@ -9,8 +9,6 @@ import (
 	nezhadistfmt "nezha/cmd/subcommands/tools/distfmt"
 	nezhafmt "nezha/cmd/subcommands/tools/fmt"
 	nezhalint "nezha/cmd/subcommands/tools/lint"
-	nezhalsp "nezha/cmd/subcommands/tools/lsp"
-	nezhatags "nezha/cmd/subcommands/tools/tags"
 	nezhatreecheck "nezha/cmd/subcommands/tools/treecheck"
 )
 
@@ -26,9 +24,7 @@ var commands = []command{
 	{Name: "enginesmoke", Description: "run structural engine specimens", Run: nezhaenginesmoke.Run},
 	{Name: "fmt", Description: "format Nezha source", Run: nezhafmt.Run},
 	{Name: "lint", Description: "lint Nezha source", Run: nezhalint.Run},
-	{Name: "lsp", Description: "run the language server", Run: nezhalsp.Run},
 	{Name: "smoke", Description: "run smoke/golden tests", Run: nezhasmoke.Run},
-	{Name: "tags", Description: "generate editor tags", Run: nezhatags.Run},
 	{Name: "treecheck", Description: "verify repository distribution relationships", Run: nezhatreecheck.Run},
 	{Name: "version", Description: "print the Nezha version", Run: func([]string) int {
 		fmt.Println(Version)

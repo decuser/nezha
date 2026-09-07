@@ -1,8 +1,8 @@
-package language
+package langcheck
 
 import "nezha/engine/semantics/value"
 
-// HelpEntry is authored help/documentation projected into language services.
+// HelpEntry is authored help/documentation projected into lint diagnostics.
 type HelpEntry struct {
 	Name     string
 	Template string
@@ -10,8 +10,8 @@ type HelpEntry struct {
 	Doc      string
 }
 
-// Catalog supplies workspace/runtime facts needed by language services without
-// coupling the service core to a concrete host substrate.
+// Catalog supplies prelude/runtime facts needed by command-side structural checks
+// without moving tool-specific analysis into engine packages.
 type Catalog interface {
 	VisibleNames(scope value.Scope) []string
 	Help(name string) (HelpEntry, bool)

@@ -1,4 +1,4 @@
-package language
+package langcheck
 
 import (
 	"go/ast"

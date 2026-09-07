@@ -74,7 +74,7 @@ func validateSubstrateImportBoundary(sources map[string]string) error {
 		if !importsSubstrate {
 			continue
 		}
-		if strings.HasPrefix(path, "engine/runtime/hal/substrate/") || strings.HasPrefix(path, "engine/runner/") {
+		if strings.HasPrefix(path, "engine/runtime/hal/substrate/") {
 			continue
 		}
 		problems = append(problems, fmt.Sprintf("%s imports concrete HAL substrate outside composition root", path))

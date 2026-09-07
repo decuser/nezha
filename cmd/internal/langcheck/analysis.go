@@ -1,4 +1,4 @@
-package language
+package langcheck
 
 import (
 	"regexp"
@@ -11,7 +11,7 @@ import (
 	"nezha/engine/syntax/grammar"
 )
 
-// Diagnostic is an editor-independent language finding.
+// Diagnostic is a command-side structural language finding.
 type Diagnostic struct {
 	Pos      engine.Position
 	Severity string // "error" or "warning"
@@ -36,8 +36,8 @@ func AnalyzeStructure(g *grammar.Grammar, file string, source string, lintScope 
 }
 
 func analyzeNode(g *grammar.Grammar, file string, node *syntax.Node, lintScope value.Scope, catalog Catalog) []Diagnostic {
-	// Build a set of all HAL builtins that exist in prelude scope.
-	// Linting should be grounded only in what the runtime exposes for the active scope.
+	// Build the names visible to structural linting.
+	// Linting should be grounded only in what the runtime/prelude exposes for the active scope.
 	c := &checker{
 		scopes:      []scopeFrame{makeGlobals(g, lintScope, catalog)},
 		diags:       nil,
