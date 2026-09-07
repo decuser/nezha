@@ -5,13 +5,6 @@ LDFLAGS := -ldflags "-X aiki/cmd/aikiapp.Version=$(VERSION)"
 
 DIST_PARENT ?= $(abspath ..)
 
-LINUX_DIST_NAME := aiki-$(VERSION)-linux-amd64
-LINUX_DIST_DIR := $(DIST_PARENT)/$(LINUX_DIST_NAME)
-LINUX_DIST_ARCHIVE := $(DIST_PARENT)/$(LINUX_DIST_NAME).tar.gz
-
-WINDOWS_DIST_NAME := aiki-$(VERSION)-windows-amd64
-WINDOWS_DIST_DIR := $(DIST_PARENT)/$(WINDOWS_DIST_NAME)
-WINDOWS_DIST_ARCHIVE := $(DIST_PARENT)/$(WINDOWS_DIST_NAME).tar.gz
 
 SOURCE_DIR_NAME := $(notdir $(CURDIR))
 BASELINE_NAME := aiki-baseline-$(VERSION)
@@ -22,8 +15,6 @@ build:
 
 clean:
 	rm -f aiki
-	rm -rf "$(LINUX_DIST_DIR)" "$(WINDOWS_DIST_DIR)"
-	rm -f "$(LINUX_DIST_ARCHIVE)" "$(WINDOWS_DIST_ARCHIVE)"
 	rm -f "$(BASELINE_ARCHIVE)"
 
 

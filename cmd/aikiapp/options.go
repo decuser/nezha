@@ -12,9 +12,6 @@ type Options struct {
 	Version    bool
 	Debug      bool
 	Expr       string
-	Canvas     bool
-	CanvasW    int
-	CanvasH    int
 	CPUProfile string
 	TraceFile  string
 }
@@ -23,9 +20,6 @@ func parseOptions() Options {
 	showVersion := flag.Bool("v", false, "show version and exit")
 	debug := flag.Bool("d", false, "debug output")
 	expr := flag.String("e", "", "evaluate expression and exit")
-	canvas := flag.Bool("canvas", false, "run as canvas child process")
-	canvasW := flag.Int("canvasw", 0, "canvas child width")
-	canvasH := flag.Int("canvash", 0, "canvas child height")
 	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
 	tracefile := flag.String("trace", "", "write runtime trace to file")
 
@@ -52,9 +46,6 @@ func parseOptions() Options {
 		Version:    *showVersion,
 		Debug:      *debug,
 		Expr:       *expr,
-		Canvas:     *canvas,
-		CanvasW:    *canvasW,
-		CanvasH:    *canvasH,
 		CPUProfile: *cpuprofile,
 		TraceFile:  *tracefile,
 	}

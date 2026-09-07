@@ -29,10 +29,6 @@ func Main() {
 	if stopProfiling != nil {
 		defer stopProfiling()
 	}
-	if opts.Canvas {
-		runCanvasChild(opts)
-		return
-	}
 
 	if opts.Expr != "" {
 		runExpr(opts.Expr, opts)
