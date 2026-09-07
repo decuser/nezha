@@ -53,22 +53,16 @@ var stdlibModulePolicies = []StdlibModulePolicy{
 	{Module: "math/native", Role: RolePortable, Realization: RealizationNative},
 	{Module: "math/ffi", Role: RolePortable, Realization: RealizationFFI, SemanticAuthority: "math/native", AccelerationSurface: []string{"floor", "ceil", "modulo"}},
 	{Module: "math/approx", Role: RoleInterop, Realization: RealizationFFI},
-	{Module: "number", Role: RolePortable, Realization: RealizationNative},
 	{Module: "string/native", Role: RolePortable, Realization: RealizationNative},
 	{Module: "string/ffi", Role: RolePortable, Realization: RealizationFFI, SemanticAuthority: "string/native"},
 	{Module: "string/case_table", Role: RoleInternal, Realization: RealizationNative},
 
 	// Runtime-owned Aiki facilities.
-	{Module: "io", Role: RoleRuntimeCapability, Realization: RealizationIntrinsic},
-	{Module: "store", Role: RoleRuntimeCapability, Realization: RealizationIntrinsic},
-	{Module: "store/ffi", Role: RoleRuntimeCapability, Realization: RealizationFFI},
 
 	// Host-mediated facilities. path intentionally composes portable Aiki code
 	// with host/runtime operations and is therefore mixed.
 	{Module: "file", Role: RoleHostCapability, Realization: RealizationIntrinsic},
-	{Module: "path", Role: RoleHostCapability, Realization: RealizationMixed},
 	{Module: "random", Role: RoleHostCapability, Realization: RealizationIntrinsic},
-	{Module: "signal", Role: RoleHostCapability, Realization: RealizationIntrinsic},
 	{Module: "system", Role: RoleHostCapability, Realization: RealizationIntrinsic},
 	{Module: "time", Role: RoleHostCapability, Realization: RealizationIntrinsic},
 

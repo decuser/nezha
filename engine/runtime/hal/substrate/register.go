@@ -9,10 +9,6 @@ func (g *GoRuntime) registerHAL() {
 	// boundary. Randomness is runtime-owned host state with canonical HAL contracts.
 	g.registerHost(goHostOperation("_print"), g.halPrint)
 	g.registerHost(goHostOperation("_read"), g.halRead)
-	g.registerHost(goHostOperation("_io_read"), g.halIORead)
-	g.registerHost(goHostOperation("_io_read_line"), g.halIOReadLine)
-	g.registerHost(goHostOperation("_io_write"), g.halIOWrite)
-	g.registerHost(goHostOperation("_io_close"), g.halIOClose)
 	g.registerHost(goHostOperation("_sleep"), halSleep)
 	g.registerHost(goHostOperation("_after"), halAfter)
 	g.registerHost(goHostOperation("_system_args"), g.halSystemArgs)
@@ -54,10 +50,6 @@ func (g *GoRuntime) registerHAL() {
 	g.registerHost(goHostOperation("_system_cwd"), g.halSystemCwd)
 	g.registerHost(goHostOperation("_system_chdir"), g.halSystemChdir)
 	g.registerHost(goHostOperation("_system_exec"), g.halSystemExec)
-	g.registerHost(goHostOperation("_signal_watch"), g.halSignalWatch)
-	g.registerHost(goHostOperation("_signal_stop"), g.halSignalStop)
-	g.registerHost(goHostOperation("_signal_send"), g.halSignalSend)
-	g.registerHost(goHostOperation("_path_separator"), halPathSeparator)
 	g.registerHost(goHostOperation("_seed"), g.halSeed)
 	g.registerHost(goHostOperation("_random"), g.halRandom)
 
@@ -83,18 +75,9 @@ func (g *GoRuntime) registerHAL() {
 		"_floor": halFloor, "_ceil": halCeil, "_truncate": halTruncate, "_modulo": halModulo,
 		"_shape": halShape, "_make_shaped_list": halMakeShapedList, "_to_str": halToStr,
 		"_to_decimal": halToDecimal, "_to_number": halToNumber, "_to_symbol": halToSymbol,
-		"_store_new": halStoreNew, "_store_get": halStoreGet, "_store_set": halStoreSet,
-		"_store_length": halStoreLength, "_store_snapshot": halStoreSnapshot,
-		"_fixed_store_new_byte": halFixedStoreNewByte, "_fixed_store_new_word": halFixedStoreNewWord,
-		"_fixed_store_new_addr18": halFixedStoreNewAddr18, "_fixed_store_new_counter": halFixedStoreNewCounter, "_fixed_store_get": halFixedStoreGet,
-		"_fixed_store_set": halFixedStoreSet, "_fixed_store_length": halFixedStoreLength,
-		"_fixed_store_snapshot": halFixedStoreSnapshot, "_fixed_store_word_read_addr": halFixedStoreWordReadAddr,
-		"_fixed_store_word_write_addr": halFixedStoreWordWriteAddr, "_fixed_store_byte_read_addr": halFixedStoreByteReadAddr,
-		"_fixed_store_byte_write_addr": halFixedStoreByteWriteAddr, "_fixed_store_counter_get": halFixedStoreCounterGet,
-		"_fixed_store_counter_set": halFixedStoreCounterSet, "_fixed_store_counter_add": halFixedStoreCounterAdd,
 	} {
 		switch name {
-		case "_stack_limit", "_store_get", "_store_set":
+		case "_stack_limit":
 			// These operations observe evaluator context for stack state or
 			// semantic profiling. Keep the conservative context path.
 			g.registerPrimitive(name, fn)

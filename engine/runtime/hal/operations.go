@@ -9,22 +9,6 @@ var operationDefinitions = map[string]HostOperation{
 		binding("read", "engine/runtime/prelude/prelude.ai"),
 		binding("input", "engine/runtime/prelude/prelude.ai"),
 	)),
-	"_io_read": hostOperation("HAL.io.read_bytes", "_io_read", "runtime.io", "may block", "fault or shaped :io/:end result", bindings(
-		binding("io.read", "lib/io/io.ai"),
-	)),
-	"_io_read_line": hostOperation("HAL.io.read_line", "_io_read_line", "runtime.io", "may block", "fault or shaped :io/:end result", bindings(
-		binding("io.read_line", "lib/io/io.ai"),
-	)),
-	"_io_write": hostOperation("HAL.io.write", "_io_write", "runtime.io", "may block", "fault or shaped :io result", bindings(
-		binding("io.write", "lib/io/io.ai"),
-	)),
-	"_io_close": {
-		Identity: "HAL.io.close", Primitive: "_io_close", Authority: "HAL.io.close",
-		Context: []string{"runtime.io", "runtime.resources"}, Effect: "state mutation",
-		Blocking: "may block", Lifetime: "operates on resource", Optionality: "constitutive",
-		ErrorContract: "fault or shaped :io result", SemanticObservation: "io.close",
-		AikiBindings: bindings(binding("io.close", "lib/io/io.ai")),
-	},
 	"_sleep": hostOperation("HAL.time.sleep", "_sleep", "runtime.clock", "waits externally", "fault", bindings(
 		binding("time.sleep", "lib/time/time.ai"),
 	)),
@@ -148,31 +132,9 @@ var operationDefinitions = map[string]HostOperation{
 		SemanticObservation: "random.random",
 		AikiBindings:        bindings(binding("random.random", "lib/random/random.ai")),
 	},
-	"_time_now":       hostOperation("HAL.time.now", "_time_now", "runtime.clock", "nonblocking", "fault", bindings(binding("time.now", "lib/time/time.ai"))),
-	"_system_cwd":     hostOperation("HAL.system.cwd", "_system_cwd", "runtime.process", "nonblocking", "fault", bindings(binding("system.cwd", "lib/system/system.ai"))),
-	"_system_chdir":   hostOperation("HAL.system.chdir", "_system_chdir", "runtime.process", "may block", "fault or shaped :io result", bindings(binding("system.chdir", "lib/system/system.ai"))),
-	"_path_separator": hostOperation("HAL.path.separator", "_path_separator", "runtime.platform", "nonblocking", "fault", bindings(binding("path.separator", "lib/path/path.ai"))),
-	"_signal_watch": {
-		Identity: "HAL.signal.watch", Primitive: "_signal_watch", Authority: "HAL.signal.watch",
-		Context: []string{"runtime.signals", "runtime.resources"}, Effect: "resource acquisition",
-		Blocking: "nonblocking", Lifetime: "returns resource", Optionality: "constitutive",
-		ErrorContract: "fault or shaped :signal/:unsupported result", SemanticObservation: "signal.watch",
-		AikiBindings: bindings(binding("signal.watch", "lib/signal/signal.ai")),
-	},
-	"_signal_stop": {
-		Identity: "HAL.signal.stop", Primitive: "_signal_stop", Authority: "HAL.signal.stop",
-		Context: []string{"runtime.signals", "runtime.resources"}, Effect: "state mutation",
-		Blocking: "nonblocking", Lifetime: "operates on resource", Optionality: "constitutive",
-		ErrorContract: "fault or shaped :signal result", SemanticObservation: "signal.stop",
-		AikiBindings: bindings(binding("signal.stop", "lib/signal/signal.ai")),
-	},
-	"_signal_send": {
-		Identity: "HAL.signal.send", Primitive: "_signal_send", Authority: "HAL.signal.send",
-		Context: []string{"runtime.signals", "runtime.process", "runtime.resources"}, Effect: "state mutation",
-		Blocking: "nonblocking", Lifetime: "operates on resource", Optionality: "constitutive",
-		ErrorContract: "fault or shaped :signal/:unsupported result", SemanticObservation: "signal.send",
-		AikiBindings: bindings(binding("signal.send", "lib/signal/signal.ai")),
-	},
+	"_time_now":     hostOperation("HAL.time.now", "_time_now", "runtime.clock", "nonblocking", "fault", bindings(binding("time.now", "lib/time/time.ai"))),
+	"_system_cwd":   hostOperation("HAL.system.cwd", "_system_cwd", "runtime.process", "nonblocking", "fault", bindings(binding("system.cwd", "lib/system/system.ai"))),
+	"_system_chdir": hostOperation("HAL.system.chdir", "_system_chdir", "runtime.process", "may block", "fault or shaped :io result", bindings(binding("system.chdir", "lib/system/system.ai"))),
 	"_system_exec": {
 		Identity:            "HAL.process.exec",
 		Primitive:           "_system_exec",

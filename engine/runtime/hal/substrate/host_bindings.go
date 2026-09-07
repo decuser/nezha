@@ -13,10 +13,6 @@ import (
 var goHostProvenance = map[string]string{
 	"_print":            "go:fmt.Fprint/io.Writer",
 	"_read":             "go:bufio.Reader.ReadString/io.Reader",
-	"_io_read":          "go:io.Reader.Read",
-	"_io_read_line":     "go:bufio.Reader.ReadString",
-	"_io_write":         "go:io.Writer.Write",
-	"_io_close":         "go:runtime-owned io.Closer",
 	"_sleep":            "go:time.Sleep",
 	"_after":            "go:time.AfterFunc/value.NewEventChannel",
 	"_system_args":      "go:runtime-owned programArgs",
@@ -59,11 +55,7 @@ var goHostProvenance = map[string]string{
 	"_time_now":         "go:time.Now",
 	"_system_cwd":       "go:runtime working-directory context",
 	"_system_chdir":     "go:os.Stat + runtime working-directory context",
-	"_path_separator":   "go:os.PathSeparator",
 	"_system_exec":      "go:os/exec.Command + pipes/wait",
-	"_signal_watch":     "go:os/signal.Notify + value.NewEventChannel",
-	"_signal_stop":      "go:os/signal.Stop",
-	"_signal_send":      "go:os.Process.Signal/Kill portable mapping",
 }
 
 func goHostOperation(primitive string) hal.HostOperation {

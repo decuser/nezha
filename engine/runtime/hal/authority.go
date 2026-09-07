@@ -85,20 +85,6 @@ var authorityPolicy = map[string][]string{
 		"_hash_keys",
 		"_hash_values",
 	},
-	"lib/path/path.ai": {
-		"_path_separator",
-	},
-	"lib/io/io.ai": {
-		"_io_read",
-		"_io_read_line",
-		"_io_write",
-		"_io_close",
-	},
-	"lib/signal/signal.ai": {
-		"_signal_watch",
-		"_signal_stop",
-		"_signal_send",
-	},
 	"lib/math/ffi.ai": {
 		"_ceil",
 		"_floor",
@@ -118,30 +104,6 @@ var authorityPolicy = map[string][]string{
 	"lib/random/random.ai": {
 		"_random",
 		"_seed",
-	},
-	"lib/store/ffi.ai": {
-		"_fixed_store_new_byte",
-		"_fixed_store_new_word",
-		"_fixed_store_new_addr18",
-		"_fixed_store_new_counter",
-		"_fixed_store_get",
-		"_fixed_store_set",
-		"_fixed_store_length",
-		"_fixed_store_snapshot",
-		"_fixed_store_word_read_addr",
-		"_fixed_store_word_write_addr",
-		"_fixed_store_byte_read_addr",
-		"_fixed_store_byte_write_addr",
-		"_fixed_store_counter_get",
-		"_fixed_store_counter_set",
-		"_fixed_store_counter_add",
-	},
-	"lib/store/store.ai": {
-		"_store_get",
-		"_store_length",
-		"_store_new",
-		"_store_set",
-		"_store_snapshot",
 	},
 	"lib/string/ffi.ai": {
 		"_chars",

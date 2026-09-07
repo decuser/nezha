@@ -10,7 +10,7 @@ type Capability struct {
 var capabilityRegistry = map[string]Capability{
 	"basic-io": {
 		Name:       "basic-io",
-		Operations: []string{"HAL.io.print", "HAL.io.read", "HAL.io.read_bytes", "HAL.io.read_line", "HAL.io.write", "HAL.io.close"},
+		Operations: []string{"HAL.io.print", "HAL.io.read"},
 	},
 	"file_lock": {
 		Name:       "file_lock",
@@ -34,10 +34,6 @@ var capabilityRegistry = map[string]Capability{
 	"permissions": {
 		Name:       "permissions",
 		Operations: []string{"HAL.file.permissions", "HAL.file.chmod"},
-	},
-	"signals": {
-		Name:       "signals",
-		Operations: []string{"HAL.signal.watch", "HAL.signal.stop", "HAL.signal.send"},
 	},
 	"time": {
 		Name:       "time",
