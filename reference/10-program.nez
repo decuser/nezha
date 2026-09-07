@@ -1,0 +1,54 @@
+# 10-program.nez — composed language specimen
+#
+# The preceding files isolate language affordances. This final program combines
+# shapes, lists, functions, lexical scope, loops, assignment, conditionals,
+# matching, pipelines, field access, and the prelude in one small computation.
+# It summarizes measurements and labels the result rather than serving as a
+# syntax zoo.
+println("== composed program ==")
+
+let @sample [name, value]
+let @summary [count, total, peak]
+
+let summarize = (samples) {
+	let i = 0
+	let total = 0
+	let peak = 0
+	while i < length(samples) {
+		let sample = samples[i]
+		total = total + sample.value
+		if sample.value > peak {
+			peak = sample.value
+		}
+		i = i + 1
+	}
+	return [@summary, length(samples), total, peak]
+}
+
+let describe = (summary) {
+	match summary {
+		[@summary, count, total, peak] {
+			return "count=" + to_str(count) + ", total=" + to_str(total) + ", peak=" + to_str(peak)
+		}
+		_ {
+			return "unexpected summary"
+		}
+	}
+}
+
+let report = (text) {
+	println(text)
+	return text
+}
+
+let samples = [
+	[@sample, :a, 3],
+	[@sample, :b, 8],
+	[@sample, :c, 5]
+]
+
+
+samples |>
+summarize |>
+describe |>
+report

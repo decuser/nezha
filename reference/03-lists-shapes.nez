@@ -1,0 +1,34 @@
+# 03-lists-shapes.nez — lists, shaped lists, indexing, and field access
+#
+# Lists are fundamental values. A shape definition names fields for a shaped
+# list, and `.field` accesses a named field. The grammar also permits a SHAPE as
+# a field entry; @colored_point demonstrates that syntactic affordance without
+# implying that `.field` can name an @-prefixed embedded-shape entry.
+println("== lists and shapes ==")
+
+# Raw list literals may be empty or contain expressions.
+let empty_list = []
+let numbers = [10, 20, 30]
+println(empty_list)
+println(numbers)
+
+# Indexing is a postfix operation on lists and strings.
+println(numbers[1])
+println("abc"[2])
+
+# Shape definitions contain NAME fields.
+let @point [x, y]
+let p = [@point, 4, 7]
+println(p)
+println(p.x)
+println(p.y)
+
+# A shape field may itself be a SHAPE token according to grammar.ebnfx.
+let @colored_point [@point, color]
+
+# Postfix forms compose: a function call can be followed immediately by access.
+let make_point = (x, y) {
+	return [@point, x, y]
+}
+
+println(make_point(8, 9).y)

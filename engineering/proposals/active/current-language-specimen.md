@@ -315,7 +315,7 @@ After the final boundary cleanup set, the core invariant is:
 only evaluator code evaluates Nezha bodies
 substrate builtins are leaf functions
 runner is the only script-with-prelude facade
-engine + runner pass cleanroom without cmd/test/engineering/samples
+engine + runner remain the cleanroom execution boundary; reference is copied only as its witness corpus
 ```
 
 The remaining registered substrate surface is a flat builtin table. `_print` is

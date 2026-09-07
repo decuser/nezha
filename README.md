@@ -80,6 +80,14 @@ Inspect lexer/parser/formatter/evaluator stages:
 ./nezha debug -stage all path/to/file.nez
 ```
 
+Run the canonical language reference corpus:
+
+```sh
+make reference
+```
+
+Each specimen under `reference/` is executable and commented to show the grammar and evaluation affordances it realizes.
+
 Validate:
 
 ```sh

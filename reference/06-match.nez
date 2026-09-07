@@ -1,0 +1,86 @@
+# 06-match.nez — complete pattern forms
+#
+# `match` accepts wildcard `_`, NAME binding, every literal kind, raw-list
+# patterns (including nested and empty lists), and shaped-list patterns. Arms
+# are tried in source order and the first matching arm executes.
+println("== match ==")
+
+let classify_literal = (v) {
+	match v {
+		42 {
+			return :number
+		}
+		"text" {
+			return :string
+		}
+		'r' {
+			return :rune
+		}
+		:symbol {
+			return :symbol
+		}
+		true {
+			return :true
+		}
+		false {
+			return :false
+		}
+		_ {
+			return :other
+		}
+	}
+}
+
+println(classify_literal(42))
+println(classify_literal("text"))
+println(classify_literal('r'))
+println(classify_literal(:symbol))
+println(classify_literal(true))
+println(classify_literal(false))
+
+# NAME patterns bind the matched value.
+match 9 {
+	n {
+		println(n)
+	}
+}
+
+# Empty, ordinary, and nested list patterns.
+match [] {
+	[] {
+		println(:empty)
+	}
+	_ {
+		println(:unexpected)
+	}
+}
+
+match [1, 2, 3] {
+	[a, b, c] {
+		println(a + b + c)
+	}
+	_ {
+		println(:unexpected)
+	}
+}
+
+match [[1, 2], 3] {
+	[[a, b], c] {
+		println(a + b + c)
+	}
+	_ {
+		println(:unexpected)
+	}
+}
+
+# Shaped-list patterns test the shape and then match element patterns.
+let @result [kind, value]
+let result = [@result, :ok, 99]
+match result {
+	[@result, :ok, value] {
+		println(value)
+	}
+	_ {
+		println(:unexpected)
+	}
+}

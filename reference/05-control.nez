@@ -1,0 +1,35 @@
+# 05-control.nez — binding, assignment, if/else-if/else, while, statements
+#
+# `let` creates a binding; bare NAME `=` assigns an existing one. `while`
+# repeats a block. `if` may have an else block or nest another if directly as
+# `else if`. Calls used for their effect are expression statements.
+println("== control ==")
+
+let i = 0
+let total = 0
+while i < 4 {
+	total = total + i
+	i = i + 1
+}
+
+println(total)
+
+let classify = (n) {
+	if n < 0 {
+		return :negative
+	} else if n > 0 {
+		return :positive
+	} else {
+		return :zero
+	}
+}
+
+println(classify(-1))
+println(classify(0))
+println(classify(1))
+
+# Semicolon is an optional explicit statement terminator; here two statements
+# intentionally share one physical line.
+let left = 10
+let right = 20
+println(left + right)

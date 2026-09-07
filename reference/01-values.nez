@@ -1,0 +1,25 @@
+# 01-values.nez — literal and primary-expression forms
+#
+# This specimen realizes every literal token in grammar.ebnfx: NUMBER in its
+# integer, decimal, and rational spellings; STRING; RUNE; SYMBOL; and the true
+# and false terminals. Grouping and unary negation are expressions rather than
+# new value kinds, so they are shown here beside the values they produce.
+println("== values ==")
+
+# NUMBER has integer, decimal, and rational spellings.
+println(42)
+println(3.14)
+println(1/3)
+
+# STRING, RUNE, and SYMBOL are distinct literal forms.
+println("nezha")
+println('N')
+println(:ready)
+
+# Booleans are keyword literals.
+println(true)
+println(false)
+
+# Parentheses group an expression; unary - and not prefix an expression.
+println(-(2 + 3))
+println(not false)

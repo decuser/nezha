@@ -1,4 +1,4 @@
-.PHONY: build clean baseline run test fmt fmt-all lint lint-all treecheck cleanroom check check-all bless validate-lang validate-all smoke smoke-all smokegold enginesmoke enginesmoke-all enginesmokegold enginecoverage enginecoverage-all rigorous fuzz
+.PHONY: build clean baseline run reference test fmt fmt-all lint lint-all treecheck cleanroom check check-all bless validate-lang validate-all smoke smoke-all smokegold enginesmoke enginesmoke-all enginesmokegold enginecoverage enginecoverage-all rigorous fuzz
 
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 LDFLAGS := -ldflags "-X nezha/cmd/cli.Version=$(VERSION)"
@@ -39,6 +39,15 @@ baseline:
 
 run: build
 	./nezha
+
+# Execute the canonical, commented language specimens through the ordinary CLI.
+# The corpus is intentionally human-readable reference material, not smoke gold.
+reference: build
+	@set -eu; \
+	for file in reference/*.nez; do \
+		echo "=== $$file ==="; \
+		./nezha "$$file"; \
+	done
 
 # Behavioral and implementation tests. Architectural invariants are run
 # separately by `make invariant` and composed back into `make check`.
@@ -99,16 +108,17 @@ enginesmokegold: build fmt
 	./nezha gate enginesmoke --stage all --gold test/structure/engine
 
 
-# Verify that the language core is self-contained: a copy containing only
-# go.mod, go.sum, engine/, and runner/ can test the packages and run a script
-# through the runner facade. The temporary tree is left in place for inspection.
+# Verify that the language core is self-contained. engine/ + runner/ remain the
+# execution boundary; reference/ is copied only as the canonical witness corpus.
+# The temporary tree tests the core packages and visibly executes every reference
+# specimen through a runner-only client. It is left in place for inspection.
 CLEANROOM_DIR ?= /tmp/nezha-cleanroom
 
 cleanroom:
 	@set -eu; \
 	rm -rf "$(CLEANROOM_DIR)"; \
 	mkdir -p "$(CLEANROOM_DIR)"; \
-	cp -a go.mod go.sum engine runner "$(CLEANROOM_DIR)/"; \
+	cp -a go.mod go.sum engine runner reference "$(CLEANROOM_DIR)/"; \
 	mkdir -p "$(CLEANROOM_DIR)/cmd/cleanrun"; \
 	printf '%s\n' \
 		'package main' \
@@ -132,16 +142,14 @@ cleanroom:
 		'}' \
 		> "$(CLEANROOM_DIR)/cmd/cleanrun/main.go"; \
 	gofmt -w "$(CLEANROOM_DIR)/cmd/cleanrun/main.go"; \
-	printf '%s\n' \
-		'let @point [x, y]' \
-		'let p = [@point, 2, 3]' \
-		'println(to_str(p.x + p.y))' \
-		> "$(CLEANROOM_DIR)/hello.nez"; \
 	cd "$(CLEANROOM_DIR)"; \
+	echo "=== cleanroom core packages ==="; \
 	go test -buildvcs=false ./engine/... ./runner/...; \
-	out="$$(go run -buildvcs=false ./cmd/cleanrun hello.nez)"; \
-	printf '%s\n' "$$out"; \
-	test "$$out" = "5"; \
+	echo "=== cleanroom reference corpus ==="; \
+	for file in reference/*.nez; do \
+		echo "=== $$file ==="; \
+		go run -buildvcs=false ./cmd/cleanrun "$$file"; \
+	done; \
 	echo "cleanroom ok: $(CLEANROOM_DIR)"
 
 # Snapshot-independent language/runtime correctness checks. This target never

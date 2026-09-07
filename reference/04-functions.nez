@@ -1,0 +1,48 @@
+# 04-functions.nez — function literals, calls, closures, rest parameters, return
+#
+# Functions are anonymous literals bound with `let`. Parameters may be empty,
+# ordinary names, or end in `...rest`. Functions close over lexical bindings,
+# and `return` exits with an expression value.
+println("== functions ==")
+
+# Zero-parameter function and ordinary call.
+let answer = () {
+	return 42
+}
+
+println(answer())
+
+# Multiple ordinary parameters.
+let add = (a, b) {
+	return a + b
+}
+
+println(add(2, 3))
+
+# A closure retains the surrounding `base` binding.
+let make_adder = (base) {
+	return (n) {
+		return base + n
+	}
+}
+
+let add_10 = make_adder(10)
+println(add_10(5))
+
+# A rest parameter gathers surplus arguments into a list.
+let gather = (head, ...tail) {
+	return [head, tail]
+}
+
+println(gather(1))
+println(gather(1, 2, 3))
+
+# Functions may call themselves recursively.
+let factorial = (n) {
+	if n <= 1 {
+		return 1
+	}
+	return n * factorial(n - 1)
+}
+
+println(factorial(5))

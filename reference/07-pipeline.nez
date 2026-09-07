@@ -1,0 +1,32 @@
+# 07-pipeline.nez — left-to-right pipeline expressions
+#
+# `|>` sends the value on its left into the postfix expression on its right.
+# A bare function receives it as its argument; a call with written arguments
+# receives the piped value together with those arguments according to Nezha's
+# pipeline calling convention. Multiple stages compose left to right.
+println("== pipeline ==")
+
+let double = (x) {
+	return x * 2
+}
+
+let add = (x, n) {
+	return x + n
+}
+
+let show = (x) {
+	println(x)
+	return x
+}
+
+# Bare postfix stage.
+5 |>
+double |>
+show
+
+
+# Call stage with an additional written argument.
+5 |>
+add(3) |>
+double |>
+show

@@ -1,0 +1,32 @@
+# 02-expressions.nez — operators and evaluation order
+#
+# Nezha's infix grammar is deliberately flat: infix operations evaluate from
+# left to right unless parentheses change the grouping. This file also realizes
+# every BINOP terminal and both unary operators. `and` and `or` are lazy.
+println("== expressions ==")
+
+# Arithmetic operators: + - * /
+println(8 + 2)
+println(8 - 2)
+println(8 * 2)
+println(8 / 2)
+
+# Comparison operators: < > <= >=
+println(1 < 2)
+println(2 > 1)
+println(2 <= 2)
+println(2 >= 2)
+
+# Flat infix evaluation: (1 + 2) * 3 = 9, not conventional-precedence 7.
+println(1 + 2 * 3)
+
+# Grouping makes the intended grouping explicit.
+println(1 + (2 * 3))
+
+# Unary negation and logical not.
+println(-5)
+println(not true)
+
+# `and` and `or` short-circuit; the divisions on the right are never evaluated.
+println(false and (1 / 0))
+println(true or (1 / 0))

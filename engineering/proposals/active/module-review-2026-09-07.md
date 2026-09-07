@@ -368,14 +368,16 @@ tests may inspect language behavior
 tests must not add runtime surface or prelude authority
 ```
 
-## samples
+## reference
 
-Status: retain only examples that exercise the current specimen.
+Status: canonical executable witness corpus for the current specimen.
 
 Boundary:
 
 ```text
-samples should not preserve removed features by nostalgia
+reference programs explain and exercise the retained language deliberately
+reference is not part of the engine + runner execution boundary
+reference should not preserve removed features by nostalgia
 ```
 
 ## Recommended next work

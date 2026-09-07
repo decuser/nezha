@@ -207,8 +207,8 @@ func (c *Checker) seedBuiltins() {
 			c.mark(p, "release note")
 		case strings.HasPrefix(p, "docs/releases/") && strings.HasSuffix(p, ".odt"):
 			c.mark(p, "frozen release document")
-		case strings.HasPrefix(p, "samples/") && strings.HasSuffix(p, ".nez"):
-			c.mark(p, "repository sample program")
+		case strings.HasPrefix(p, "reference/") && strings.HasSuffix(p, ".nez"):
+			c.mark(p, "canonical language reference specimen")
 		case strings.HasPrefix(p, "engineering/profiling/"):
 			c.mark(p, "engineering profiling workload/evidence")
 		case strings.HasPrefix(p, "engineering/evidence/"):

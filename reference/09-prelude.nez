@@ -1,0 +1,38 @@
+# 09-prelude.nez — public prelude vocabulary
+#
+# The reference language runs with the embedded prelude. This specimen invokes
+# every current public prelude procedure so the cleanroom witness covers that
+# execution surface as well as grammar forms.
+println("== prelude ==")
+
+let add = (a, b) {
+	return a + b
+}
+
+# apply, print, println
+print("apply: ")
+println(apply(add, [2, 3]))
+
+# first, rest, length, prepend, append, empty
+let xs = [2, 3]
+println(first(xs))
+println(rest(xs))
+println(length(xs))
+println(prepend(xs, 1))
+println(append(xs, 4))
+println(empty([]))
+
+# type, equal, shape, is_error, to_str
+println(type(1))
+println(equal(2, 2))
+let @point [x, y]
+let p = [@point, 1, 2]
+println(shape(p))
+println(is_error([@error, :demo, "example"]))
+println(to_str(p))
+
+# shaped constructs a shaped list from a symbol plus a raw element list.
+println(shaped(:pair, [4, 5]))
+
+# abs is implemented in Nezha itself in the prelude.
+println(abs(-7))

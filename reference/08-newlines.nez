@@ -1,0 +1,48 @@
+# 08-newlines.nez — statement termination and continuation
+#
+# NEWLINE ends a statement after NAME, literal values, `)`, `]`, true, or false.
+# Newlines are suppressed inside parentheses and brackets. A line ending in an
+# operator such as + or |> is incomplete and continues on the next line.
+println("== newlines ==")
+
+# Ordinary newline termination.
+let x = 1
+let y = 2
+println(x + y)
+
+# Parentheses suppress newline termination internally.
+let grouped = (1 + 2)
+
+println(grouped)
+
+# Brackets suppress newline termination internally.
+let items = [
+	10,
+	20,
+	30
+]
+
+
+println(items[2])
+
+# An infix operator at end of line forces continuation.
+let sum = 1 + 2 + 3
+
+println(sum)
+
+# The pipe operator likewise continues the expression.
+let identity = (v) {
+	return v
+}
+
+let piped = 7 |>
+identity |>
+identity
+
+
+println(piped)
+
+# Comments and blank lines do not create extra statements.
+let after_comment = 8  # comment ends before the terminating newline
+
+println(after_comment)
