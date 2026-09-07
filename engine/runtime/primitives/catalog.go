@@ -25,7 +25,6 @@ const (
 var nonHALRoles = map[string]Role{
 	// Evaluator/language intrinsics.
 	"_apply": RoleIntrinsic,
-	"_load":  RoleIntrinsic,
 
 	// Constitutive language/value/runtime primitives.
 	"_first":            RoleRuntime,
@@ -41,10 +40,6 @@ var nonHALRoles = map[string]Role{
 	"_equal":            RoleRuntime,
 	"_ord":              RoleRuntime,
 	"_chr":              RoleRuntime,
-	"_floor":            RoleProvider,
-	"_ceil":             RoleProvider,
-	"_truncate":         RoleRuntime,
-	"_modulo":           RoleProvider,
 	"_shape":            RoleRuntime,
 	"_make_shaped_list": RoleRuntime,
 	"_to_str":           RoleRuntime,

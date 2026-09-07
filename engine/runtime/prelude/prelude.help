@@ -5,10 +5,6 @@
 @template "apply(fn, args)"
 @help "Applies function to list of arguments."
 
-@func load
-@template "load(path)"
-@help "Loads and evaluates an nezha file."
-
 @func stack_limit
 @template "stack_limit(n)"
 @help "Sets the maximum non tail call depth. n must be an integer >= 1."
@@ -21,14 +17,6 @@
 @func println
 @template "println(val, ...)"
 @help "Prints values to stdout followed by newline."
-
-@func read
-@template "read()"
-@help "Reads a line from stdin."
-
-@func input
-@template "input()"
-@help "Reads a line from stdin (alias for read)."
 
 # List intrinsics
 @func first
@@ -59,10 +47,6 @@
 @func abs
 @template "abs(n)"
 @help "Returns absolute value of number."
-
-@func truncate
-@template "truncate(n)"
-@help "Truncate number toward zero, returning integer part."
 
 # Type operations
 @func type

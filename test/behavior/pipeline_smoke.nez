@@ -46,7 +46,7 @@ let square = (x) {
 }
 
 let is_even = (x) {
-	return equal(x - (truncate(x / 2) * 2), 0)
+	return equal(x, 2) or equal(x, 4) or equal(x, 6) or equal(x, 8) or equal(x, 10)
 }
 
 print("PIPELINE\n")

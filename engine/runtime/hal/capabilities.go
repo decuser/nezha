@@ -10,7 +10,7 @@ type Capability struct {
 var capabilityRegistry = map[string]Capability{
 	"basic-io": {
 		Name:       "basic-io",
-		Operations: []string{"HAL.io.print", "HAL.io.read"},
+		Operations: []string{"HAL.io.print"},
 	},
 }
 

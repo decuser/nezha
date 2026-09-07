@@ -6,10 +6,6 @@ let apply = (fn, args) {
 	_apply(fn, args)
 }
 
-let load = (path) {
-	_load(path)
-}
-
 let stack_limit = (n) {
 	_stack_limit(n)
 }
@@ -22,14 +18,6 @@ let print = (...args) {
 let println = (...args) {
 	apply(_print, args)
 	_print("\n")
-}
-
-let read = () {
-	_read()
-}
-
-let input = () {
-	_read()
 }
 
 # List intrinsics (wrappers over _ builtins)
@@ -112,8 +100,4 @@ let abs = (x) {
 	} else {
 		x
 	}
-}
-
-let truncate = (x) {
-	_truncate(x)
 }

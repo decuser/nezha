@@ -5,10 +5,6 @@ var operationDefinitions = map[string]HostOperation{
 		binding("print", "engine/runtime/prelude/prelude.nez"),
 		binding("println", "engine/runtime/prelude/prelude.nez"),
 	)),
-	"_read": hostOperation("HAL.io.read", "_read", "runtime.io", "may block", "fault or shaped :io/:end result", bindings(
-		binding("read", "engine/runtime/prelude/prelude.nez"),
-		binding("input", "engine/runtime/prelude/prelude.nez"),
-	)),
 }
 
 func binding(name, source string) NezhaBinding {

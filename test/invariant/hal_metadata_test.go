@@ -16,10 +16,9 @@ func TestHALCanonicalMetadataIsCoherent(t *testing.T) {
 func TestHALMetadataInvariantRejectsDuplicateIdentity(t *testing.T) {
 	ops := hal.OperationDefinitions()
 	first := ops["_print"]
-	second := ops["_read"]
-	second.Identity = first.Identity
-	second.Authority = first.Identity
-	ops["_read"] = second
+	duplicate := first
+	duplicate.Primitive = "_print_alias"
+	ops["_print_alias"] = duplicate
 
 	err := hal.ValidateMetadata(ops, hal.Capabilities(), hal.RuntimeProfiles())
 	if err == nil || !strings.Contains(err.Error(), "HAL identity "+first.Identity+" is shared") {

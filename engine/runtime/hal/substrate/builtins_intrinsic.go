@@ -1,8 +1,6 @@
 package substrate
 
 import (
-	"os"
-
 	"nezha/engine"
 	"nezha/engine/observe"
 	"nezha/engine/runtime/hal"
@@ -132,44 +130,4 @@ func applyUserFunction(fn *value.Function, args []value.Value, ctx *hal.EvalCont
 	}
 
 	return result
-}
-
-func halLoad(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("load: want 1 argument, got %d", len(args))
-	}
-
-	if ctx == nil || ctx.Grammar == nil || ctx.Eval == nil || ctx.Env == nil {
-		return value.NewFault("load: evaluation context not available")
-	}
-
-	pathStr, ok := args[0].(*value.String)
-	if !ok {
-		return value.NewFault("load: expected string path, got %s", args[0].Type())
-	}
-
-	modulePath := resolveModulePath(pathStr.Val, ctx.Env)
-	if modulePath == "" {
-		return value.NewShapedError("load", "load: cannot find '%s'", pathStr.Val)
-	}
-
-	data, err := os.ReadFile(modulePath)
-	if err != nil {
-		return value.NewShapedError("load", "load: cannot read '%s': %s", modulePath, err)
-	}
-
-	lexer := syntax.NewLexer(ctx.Grammar, modulePath, string(data), nil)
-	tokens, err := lexer.Tokenize()
-	if err != nil {
-		return value.NewShapedError("load", "load: lex error in '%s': %s", modulePath, err)
-	}
-
-	parser := syntax.NewParser(ctx.Grammar, tokens, string(data), nil)
-	ast, err := parser.Parse()
-	if err != nil {
-		return value.NewShapedError("load", "load: parse error in '%s': %s", modulePath, err)
-	}
-
-	// Evaluate in current environment
-	return ctx.Eval(ast, ctx.Env)
 }

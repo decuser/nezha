@@ -12,7 +12,6 @@ import (
 // intentionally Go-substrate-specific.
 var goHostProvenance = map[string]string{
 	"_print": "go:fmt.Fprint/io.Writer",
-	"_read":  "go:bufio.Reader.ReadString/io.Reader",
 }
 
 func goHostOperation(primitive string) hal.HostOperation {

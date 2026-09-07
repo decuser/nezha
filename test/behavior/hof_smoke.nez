@@ -114,7 +114,7 @@ let min = (xs) {
 }
 
 let is_even = (x) {
-	equal(x - (truncate(x / 2) * 2), 0)
+	equal(x, 2) or equal(x, 4) or equal(x, 6)
 }
 
 # map

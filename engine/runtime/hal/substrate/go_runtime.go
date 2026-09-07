@@ -7,9 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"runtime/pprof"
-	"strings"
 	"sync"
 	"sync/atomic"
 
@@ -21,7 +19,7 @@ import (
 )
 
 // BuiltinFunc is a HAL-level function that may use evaluation context.
-// Simple builtins ignore ctx; intrinsics such as apply and load use it.
+// Simple builtins ignore ctx; intrinsics such as apply use it.
 type BuiltinFunc func(args []value.Value, ctx *hal.EvalContext) value.Value
 type ProbeBuiltinFunc func(args []value.Value, probe engine.SemanticProbe) value.Value
 
@@ -252,33 +250,6 @@ func (g *GoRuntime) registerHost(op hal.HostOperation, fn BuiltinFunc) {
 	}
 	g.registerPrimitive(op.Primitive, fn)
 	g.hostBindings[op.Primitive] = op
-}
-
-// resolveModulePath finds an explicit source file for load(). It does not
-// consult library or distribution module roots.
-func resolveModulePath(name string, env *value.Env) string {
-	candidates := []string{name}
-	if !strings.HasSuffix(name, ".nez") {
-		candidates = append([]string{name + ".nez"}, candidates...)
-	}
-
-	currentFile := env.GetFile()
-	if currentFile != "" && currentFile != "<unknown>" {
-		dir := filepath.Dir(currentFile)
-		for _, candidate := range candidates {
-			path := filepath.Join(dir, candidate)
-			if _, err := os.Stat(path); err == nil {
-				return path
-			}
-		}
-	}
-
-	for _, candidate := range candidates {
-		if _, err := os.Stat(candidate); err == nil {
-			return candidate
-		}
-	}
-	return ""
 }
 
 // SetProfileLabels enables or disables pprof label regions for this runtime.

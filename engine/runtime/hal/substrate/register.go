@@ -6,11 +6,9 @@ package substrate
 func (g *GoRuntime) registerHAL() {
 	// True host-facing operations. Canonical contracts currently exist for prelude I/O and file operations.
 	g.registerHost(goHostOperation("_print"), g.halPrint)
-	g.registerHost(goHostOperation("_read"), g.halRead)
 
 	// Evaluator/language intrinsics.
 	g.registerPrimitive("_apply", halApply)
-	g.registerPrimitive("_load", halLoad)
 
 	// Language/value primitives implemented natively. Append remains context-free
 	// but accepts the active semantic probe for hidden representation counters.
@@ -20,7 +18,6 @@ func (g *GoRuntime) registerHAL() {
 		"_prepend": halPrepend, "_empty": halEmpty, "_range": halRange,
 		"_type": halType, "_stack_limit": halStackLimit, "_inspect": halInspect,
 		"_equal": halEqual, "_ord": halOrd, "_chr": halChr,
-		"_floor": halFloor, "_ceil": halCeil, "_truncate": halTruncate, "_modulo": halModulo,
 		"_shape": halShape, "_make_shaped_list": halMakeShapedList, "_to_str": halToStr,
 		"_to_decimal": halToDecimal, "_to_number": halToNumber, "_to_symbol": halToSymbol,
 	} {
