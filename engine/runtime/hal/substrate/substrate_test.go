@@ -3,7 +3,6 @@ package substrate
 import (
 	"bytes"
 	"testing"
-	"time"
 
 	"nezha/engine/semantics/value"
 )
@@ -106,108 +105,5 @@ func TestExplicitAuthoritySeesOnlyGrantedPrefixed(t *testing.T) {
 	b, ok := rt.GetBuiltin("_first", value.NewAuthority("_first"))
 	if !ok || b == nil {
 		t.Error("authority GetBuiltin(_first) failed")
-	}
-}
-
-func TestRandom(t *testing.T) {
-	// random returns value in range
-	rt := NewGoRuntime()
-	result := rt.halRandom([]value.Value{value.NewNumber(10, 1)}, nil)
-	n, ok := result.(*value.Number)
-	if !ok {
-		t.Fatalf("expected Number, got %T", result)
-	}
-	v := n.Int64Value()
-	if v < 0 || v >= 10 {
-		t.Errorf("random(10) returned %d, want 0-9", v)
-	}
-}
-
-func TestSeedReproducible(t *testing.T) {
-	// same seed = same sequence
-	rt := NewGoRuntime()
-	rt.halSeed([]value.Value{value.NewNumber(42, 1)}, nil)
-	r1 := rt.halRandom([]value.Value{value.NewNumber(100, 1)}, nil).(*value.Number)
-
-	rt.halSeed([]value.Value{value.NewNumber(42, 1)}, nil)
-	r2 := rt.halRandom([]value.Value{value.NewNumber(100, 1)}, nil).(*value.Number)
-
-	if r1.Compare(r2) != 0 {
-		t.Errorf("same seed gave different results: %s vs %s", r1.Inspect(), r2.Inspect())
-	}
-}
-
-func TestRandomErrors(t *testing.T) {
-	// zero max
-	rt := NewGoRuntime()
-	result := rt.halRandom([]value.Value{value.NewNumber(0, 1)}, nil)
-	if !value.IsFault(result) {
-		t.Error("random(0) should fault")
-	}
-
-	// negative max
-	result = rt.halRandom([]value.Value{value.NewNumber(-5, 1)}, nil)
-	if !value.IsFault(result) {
-		t.Error("random(-5) should fault")
-	}
-}
-
-func TestChannel(t *testing.T) {
-	result := halChannel([]value.Value{}, nil)
-	ch, ok := result.(*value.Channel)
-	if !ok {
-		t.Fatalf("expected Channel, got %T", result)
-	}
-	if ch.C == nil {
-		t.Error("channel is nil")
-	}
-}
-
-func TestSendRecv(t *testing.T) {
-	ch := value.NewChannel()
-	val := value.NewNumber(42, 1)
-
-	// Send in goroutine (blocks until recv)
-	go func() {
-		halSend([]value.Value{ch, val}, nil)
-	}()
-
-	// Recv
-	result := halRecv([]value.Value{ch}, nil)
-	n, ok := result.(*value.Number)
-	if !ok {
-		t.Fatalf("expected Number, got %T", result)
-	}
-	if n.Inspect() != "42" {
-		t.Errorf("got %s, want 42", n.Inspect())
-	}
-}
-
-func TestSendRecvBlocks(t *testing.T) {
-	ch := value.NewChannel()
-	done := make(chan bool)
-
-	go func() {
-		halRecv([]value.Value{ch}, nil)
-		done <- true
-	}()
-
-	// Should not complete yet
-	select {
-	case <-done:
-		t.Error("recv should block")
-	case <-time.After(10 * time.Millisecond):
-		// good
-	}
-
-	// Now send
-	halSend([]value.Value{ch, value.TRUE}, nil)
-
-	// Should complete
-	select {
-	case <-done:
-		// good
-	case <-time.After(100 * time.Millisecond):
-		t.Error("recv should have completed")
 	}
 }

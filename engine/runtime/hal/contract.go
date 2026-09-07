@@ -67,7 +67,7 @@ type EvalContext struct {
 	WithProfileLabels     func(labels engine.ProfileLabels, restore engine.ProfileLabels, fn func())
 	AsyncFault            <-chan *value.Fault
 	ReportAsyncFault      func(*value.Fault)
-	// Eval is a callback to evaluate AST nodes. Used by apply, spawn.
+	// Eval is a callback to evaluate AST nodes. Used by apply.
 	Eval func(*syntax.Node, *value.Env) value.Value
 }
 

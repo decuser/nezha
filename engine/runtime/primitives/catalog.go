@@ -24,15 +24,11 @@ const (
 
 var nonHALRoles = map[string]Role{
 	// Evaluator/language intrinsics.
-	"_apply":   RoleIntrinsic,
-	"_import":  RoleIntrinsic,
-	"_use":     RoleIntrinsic,
-	"_export":  RoleIntrinsic,
-	"_load":    RoleIntrinsic,
-	"_spawn":   RoleIntrinsic,
-	"_channel": RoleIntrinsic,
-	"_send":    RoleIntrinsic,
-	"_recv":    RoleIntrinsic,
+	"_apply":  RoleIntrinsic,
+	"_import": RoleIntrinsic,
+	"_use":    RoleIntrinsic,
+	"_export": RoleIntrinsic,
+	"_load":   RoleIntrinsic,
 
 	// Constitutive language/value/runtime primitives.
 	"_first":            RoleRuntime,
@@ -64,21 +60,8 @@ var nonHALRoles = map[string]Role{
 	"_cos_inexact":  RoleProvider,
 	"_sin_inexact":  RoleProvider,
 
-	// Runtime/tooling/session services.
-	"_module_roots":   RoleService,
-	"_quit":           RoleService,
-	"_reset":          RoleService,
-	"_delete":         RoleService,
-	"_help":           RoleService,
-	"_doc":            RoleService,
-	"_test_equal":     RoleService,
-	"_test_not_equal": RoleService,
-	"_test_true":      RoleService,
-	"_test_false":     RoleService,
-	"_test_error":     RoleService,
-	"_test_not_error": RoleService,
-	"_test_run":       RoleService,
-	"_test_faults":    RoleService,
+	// Runtime/module service.
+	"_module_roots": RoleService,
 }
 
 // RoleOf returns the architectural role for a primitive. Canonical HAL host

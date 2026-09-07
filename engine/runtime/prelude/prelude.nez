@@ -14,23 +14,6 @@ let stack_limit = (n) {
 	_stack_limit(n)
 }
 
-# Concurrency (requires runtime)
-let spawn = (fn, ...args) {
-	_apply(_spawn, _prepend(args, fn))
-}
-
-let channel = () {
-	_channel()
-}
-
-let send = (ch, val) {
-	_send(ch, val)
-}
-
-let recv = (ch) {
-	_recv(ch)
-}
-
 # I/O (irreducible)
 let print = (...args) {
 	apply(_print, args)
@@ -123,19 +106,6 @@ let shaped = (sym, elements) {
 	_make_shaped_list(sym, elements)
 }
 
-# REPL control (evaluator-privileged)
-let quit = () {
-	_quit()
-}
-
-let reset = () {
-	_reset()
-}
-
-let delete = (name) {
-	_delete(name)
-}
-
 let abs = (x) {
 	if x < 0 {
 		0 - x
@@ -146,16 +116,4 @@ let abs = (x) {
 
 let truncate = (x) {
 	_truncate(x)
-}
-
-let help = (...args) {
-	if empty(args) {
-		_help("")
-	} else {
-		_help(first(args))
-	}
-}
-
-let doc = (name) {
-	_doc(name)
 }

@@ -207,30 +207,6 @@ func TestLintFunctionBodyScopesBindings(t *testing.T) {
 	}
 }
 
-func TestLintSelectBindingScopedToArm(t *testing.T) {
-	src := "let ch = channel()\nselect {\n\tlet msg = recv(ch) { println(msg) }\n\tdefault { println(:idle) }\n}\nlet x = msg\n"
-	diags := lintSource(t, src)
-	found := false
-	for _, d := range diags {
-		if d.Severity == "error" && strings.Contains(d.Message, "undefined") && strings.Contains(d.Message, "msg") {
-			found = true
-		}
-	}
-	if !found {
-		t.Fatalf("expected select binding msg to be undefined outside arm, got %v", diags)
-	}
-}
-
-func TestLintSelectChannelExprUsesOuterScope(t *testing.T) {
-	src := "let ch = channel()\nselect {\n\trecv(ch) { println(:ok) }\n}\n"
-	diags := lintSource(t, src)
-	for _, d := range diags {
-		if d.Severity == "error" && strings.Contains(d.Message, "undefined") && strings.Contains(d.Message, "ch") {
-			t.Fatalf("select channel expression should see outer ch, got %v", diags)
-		}
-	}
-}
-
 func TestRunFailsOnUndeclaredMalformedFile(t *testing.T) {
 	withDistributionRoot(t)
 	dir := t.TempDir()

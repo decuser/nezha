@@ -6,7 +6,6 @@ import (
 	nezhadebug "nezha/cmd/subcommands/dev/debug"
 	nezhaenginesmoke "nezha/cmd/subcommands/dev/enginesmoke"
 	nezhasmoke "nezha/cmd/subcommands/dev/smoke"
-	nezhatest "nezha/cmd/subcommands/dev/test"
 	nezhacheck "nezha/cmd/subcommands/tools/check"
 	nezhadistfmt "nezha/cmd/subcommands/tools/distfmt"
 	nezhafmt "nezha/cmd/subcommands/tools/fmt"
@@ -34,7 +33,6 @@ var commands = []command{
 	{Name: "profile", Description: "profile a Nezha program", Run: nezhaprofile.Run},
 	{Name: "smoke", Description: "run smoke/golden tests", Run: nezhasmoke.Run},
 	{Name: "tags", Description: "generate editor tags", Run: nezhatags.Run},
-	{Name: "test", Description: "run Nezha-native tests", Run: nezhatest.Run},
 	{Name: "treecheck", Description: "verify repository distribution relationships", Run: nezhatreecheck.Run},
 	{Name: "version", Description: "print the Nezha version", Run: func([]string) int {
 		fmt.Println(Version)

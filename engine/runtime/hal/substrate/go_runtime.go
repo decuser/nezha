@@ -6,14 +6,12 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"runtime/pprof"
 	"strings"
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"nezha/engine"
 	"nezha/engine/runtime/hal"
@@ -84,25 +82,6 @@ type GoRuntime struct {
 	userEnv           *value.Env
 	moduleRegistry    *modules.ModuleRegistry
 	helpRegistry      *help.Registry
-	openCanvases      []*value.Canvas
-	canvasResources   map[*value.Canvas]*CanvasResource
-	nextCanvasID      uint64
-	programArgs       []string
-	workingDir        string
-	environment       map[string]string
-	envLookup         func(string) (string, bool)
-	rng               *rand.Rand
-	fileReaders       map[*value.File]*bufio.Reader
-	processResources  map[*value.Process]*ProcessResource
-	endpointResources map[*value.Endpoint]*EndpointResource
-	signalResources   map[*value.Channel]*SignalResource
-	listenerResources map[*value.Listener]*ListenerResource
-	datagramResources map[*value.Datagram]*DatagramResource
-	nextProcessID     uint64
-	nextEndpointID    uint64
-	nextListenerID    uint64
-	nextDatagramID    uint64
-	testState         runtimeTestState
 	mu                sync.RWMutex
 	profileLabels     atomic.Bool
 	labelContexts     sync.Map // map[engine.ProfileLabels]context.Context
@@ -116,10 +95,6 @@ var _ hal.ProfileLabeler = (*GoRuntime)(nil)
 
 // NewGoRuntime creates a new Go runtime substrate.
 func NewGoRuntime() *GoRuntime {
-	workingDir, err := os.Getwd()
-	if err != nil {
-		workingDir = "."
-	}
 	rt := &GoRuntime{
 		intrinsics:        make(map[string]*Builtin),
 		runtimePrimitives: make(map[string]*Builtin),
@@ -127,20 +102,10 @@ func NewGoRuntime() *GoRuntime {
 		hostRegistry:      make(map[string]*Builtin),
 		services:          make(map[string]*Builtin),
 		hostBindings:      make(map[string]hal.HostOperation),
-		canvasResources:   make(map[*value.Canvas]*CanvasResource),
 		stdin:             os.Stdin,
 		stdinReader:       bufio.NewReader(os.Stdin),
 		stdout:            os.Stdout,
 		stderr:            os.Stderr,
-		workingDir:        workingDir,
-		environment:       snapshotHostEnvironment(),
-		rng:               rand.New(rand.NewSource(time.Now().UnixNano())),
-		fileReaders:       make(map[*value.File]*bufio.Reader),
-		processResources:  make(map[*value.Process]*ProcessResource),
-		endpointResources: make(map[*value.Endpoint]*EndpointResource),
-		signalResources:   make(map[*value.Channel]*SignalResource),
-		listenerResources: make(map[*value.Listener]*ListenerResource),
-		datagramResources: make(map[*value.Datagram]*DatagramResource),
 		asyncFaults:       make(chan *value.Fault, 1),
 	}
 	rt.registerHAL()
@@ -184,7 +149,7 @@ func (g *GoRuntime) SetPageOutput(fn func(string) bool) {
 	g.mu.Unlock()
 }
 
-// SetUserEnv sets the session user environment used by REPL-only services such as delete.
+// SetUserEnv sets the session user environment used by REPL-only services for session-owned state.
 func (g *GoRuntime) SetUserEnv(env *value.Env) {
 	g.mu.Lock()
 	g.userEnv = env
@@ -205,24 +170,8 @@ func (g *GoRuntime) SetHelpRegistry(registry *help.Registry) {
 	g.mu.Unlock()
 }
 
-// SetProgramArgs replaces the runtime-owned argument snapshot visible to system.args.
-func (g *GoRuntime) SetProgramArgs(args []string) {
-	g.mu.Lock()
-	g.programArgs = append(g.programArgs[:0], args...)
-	g.mu.Unlock()
-}
-
-// SetEnvLookup installs an optional environment lookup override for embedding/tests.
-// A nil lookup restores the runtime-owned environment view. Child processes
-// always inherit the runtime-owned environment snapshot.
-func (g *GoRuntime) SetEnvLookup(lookup func(string) (string, bool)) {
-	g.mu.Lock()
-	g.envLookup = lookup
-	g.mu.Unlock()
-}
-
 // Execute calls a registered primitive function.
-// AsyncFaults returns the runtime's first-pending spawned fault channel.
+// AsyncFaults returns the runtime's first-pending asynchronous fault channel.
 func (g *GoRuntime) AsyncFaults() <-chan *value.Fault { return g.asyncFaults }
 
 // ReportAsyncFault records a spawned fault without blocking the failing worker.
@@ -394,3 +343,11 @@ func (g *GoRuntime) profileContext(labels engine.ProfileLabels) context.Context 
 
 func (b *Builtin) ProfileName() string             { return b.name }
 func (b *Builtin) ProfilePrimitiveOrdinal() uint32 { return b.profileOrdinal }
+
+// SetProgramArgs is retained for runner compatibility. Program argument exposure
+// belonged to the removed unregistered system builtin surface.
+func (g *GoRuntime) SetProgramArgs(args []string) {}
+
+// CloseAllResources is retained for runner compatibility after removal of
+// unregistered resource-owning builtin families.
+func (g *GoRuntime) CloseAllResources() {}

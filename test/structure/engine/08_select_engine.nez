@@ -1,16 +1,15 @@
 # 08_select_engine.nez
-# Select syntax with bound/unbound receive cases and default.
-let ch1 = channel()
-let ch2 = channel()
-
-select {
-	let value = recv(ch1) {
-		print(value, "\n")
-	}
-	recv(ch2) {
-		print("second\n")
-	}
-	default {
-		print("default\n")
+# Select syntax remains in the grammar, but concurrency prelude bindings are removed.
+# Keep coverage inside an uncalled function so evaluation does not require channels.
+let dormant_select = (ch) {
+	select {
+		recv(ch) {
+			println(:never)
+		}
+		default {
+			println(:idle)
+		}
 	}
 }
+
+println(:select_syntax_covered)

@@ -13,23 +13,6 @@
 @template "stack_limit(n)"
 @help "Sets the maximum non tail call depth. n must be an integer >= 1."
 
-# Concurrency
-@func spawn
-@template "spawn(fn, arg, ...)"
-@help "Runs function concurrently with isolated environment."
-
-@func channel
-@template "channel()"
-@help "Creates a new channel for communication."
-
-@func send
-@template "send(ch, val)"
-@help "Sends value on channel, blocks until received."
-
-@func recv
-@template "recv(ch)"
-@help "Receives value from channel, blocks until sent."
-
 # IO
 @func print
 @template "print(val, ...)"
@@ -130,24 +113,3 @@
 @func to_decimal
 @template "to_decimal(n, places)"
 @help "Formats number as decimal string."
-
-# REPL
-@func quit
-@template "quit()"
-@help "Exits the REPL."
-
-@func reset
-@template "reset()"
-@help "Resets the environment."
-
-@func delete
-@template "delete(name)"
-@help "Deletes a user binding, restoring shadowed prelude function."
-
-@func help
-@template "help(name)"
-@help "Shows help for name."
-
-@func doc
-@template "doc(name)"
-@help "Shows full documentation for name."

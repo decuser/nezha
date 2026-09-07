@@ -1,4 +1,4 @@
-.PHONY: build clean baseline run test fmt fmt-all lint lint-all treecheck check check-all bless validate-lang validate-all smoke smoke-all smokegold test-nezha test-nezha-all enginesmoke enginesmoke-all enginesmokegold enginecoverage enginecoverage-all rigorous fuzz intrinsicgate
+.PHONY: build clean baseline run test fmt fmt-all lint lint-all treecheck check check-all bless validate-lang validate-all smoke smoke-all smokegold enginesmoke enginesmoke-all enginesmokegold enginecoverage enginecoverage-all rigorous fuzz intrinsicgate
 
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 LDFLAGS := -ldflags "-X nezha/cmd/cli.Version=$(VERSION)"
@@ -82,19 +82,6 @@ smokegold: build
 	./nezha smoke --gold test/behavior/
 
 
-test-nezha:
-	@if find . -name '*_test.nez' -print -quit | grep -q .; then \
-		./nezha test ./...; \
-	else \
-		echo "nezha test: no *_test.nez files found; skipping"; \
-	fi
-
-test-nezha-all:
-	@if find . -name '*_test.nez' -print -quit | grep -q .; then \
-		./nezha test --all ./...; \
-	else \
-		echo "nezha test-all: no *_test.nez files found; skipping"; \
-	fi
 
 enginecoverage: build fmt
 	./nezha enginesmoke --stage all --coverage test/structure/engine
@@ -113,14 +100,13 @@ enginesmokegold: build fmt
 
 # Snapshot-independent language/runtime correctness checks. This target never
 # writes gold files and uses ordinary CLI target policy.
-check: build fmt lint treecheck test invariant test-nezha enginecoverage
+check: build fmt lint treecheck test invariant enginecoverage
 
 # Exhaustive snapshot-independent repository checks. Repository selection remains
 # owned by the CLI: --all bypasses .nezhaignore without teaching Make which trees
 # are normally excluded. go test ./... supplies the exhaustive ordinary Go suite.
 check-all: build fmt-all lint-all treecheck
 	go test ./...
-	$(MAKE) test-nezha-all
 	./nezha enginesmoke --all --stage all --coverage test/structure/engine
 
 # Bless the current, independently checked behavior and engine structure.

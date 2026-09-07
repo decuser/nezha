@@ -14,10 +14,6 @@ func (g *GoRuntime) registerHAL() {
 	g.registerPrimitive("_use", g.halUse)
 	g.registerPrimitive("_export", halExport)
 	g.registerPrimitive("_load", halLoad)
-	g.registerPrimitive("_spawn", halSpawn)
-	g.registerPrimitive("_channel", halChannel)
-	g.registerPrimitive("_send", halSend)
-	g.registerPrimitive("_recv", halRecv)
 
 	// Language/value primitives implemented natively. Append remains context-free
 	// but accepts the active semantic probe for hidden representation counters.
@@ -49,15 +45,6 @@ func (g *GoRuntime) registerHAL() {
 		g.registerContextFreePrimitive(name, fn)
 	}
 
-	// Runtime/tooling/session services.
-	for name, fn := range map[string]BuiltinFunc{
-		"_module_roots": g.halModuleRoots,
-		"_quit":         g.halQuit, "_reset": g.halReset, "_delete": g.halDelete, "_help": g.halHelp, "_doc": g.halDoc,
-		"_test_equal": g.halTestEqual, "_test_not_equal": g.halTestNotEqual,
-		"_test_true": g.halTestTrue, "_test_false": g.halTestFalse,
-		"_test_error": g.halTestError, "_test_not_error": g.halTestNotError,
-		"_test_run": g.halTestRun, "_test_faults": g.halTestFaults,
-	} {
-		g.registerPrimitive(name, fn)
-	}
+	// Runtime/module service.
+	g.registerPrimitive("_module_roots", g.halModuleRoots)
 }
