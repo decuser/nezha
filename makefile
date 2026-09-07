@@ -55,12 +55,12 @@ invariant:
 fmt:
 	go fmt ./...
 	./nezha fmt ./...
-	./nezha distfmt ./...
+	./nezha gate distfmt ./...
 
 fmt-all:
 	go fmt ./...
 	./nezha fmt --all ./...
-	./nezha distfmt --all ./...
+	./nezha gate distfmt --all ./...
 
 lint:
 	./nezha lint ./...
@@ -69,34 +69,34 @@ lint-all:
 	./nezha lint --all ./...
 
 treecheck: build
-	./nezha treecheck
+	./nezha gate treecheck
 
 
 smoke:
-	./nezha smoke test/behavior/
+	./nezha gate smoke test/behavior/
 
 smoke-all:
-	./nezha smoke --all test/behavior/
+	./nezha gate smoke --all test/behavior/
 
 smokegold: build
-	./nezha smoke --gold test/behavior/
+	./nezha gate smoke --gold test/behavior/
 
 
 
 enginecoverage: build fmt
-	./nezha enginesmoke --stage all --coverage test/structure/engine
+	./nezha gate enginesmoke --stage all --coverage test/structure/engine
 
 enginecoverage-all: build fmt-all
-	./nezha enginesmoke --all --stage all --coverage test/structure/engine
+	./nezha gate enginesmoke --all --stage all --coverage test/structure/engine
 
 enginesmoke: build fmt
-	./nezha enginesmoke --stage all --check test/structure/engine
+	./nezha gate enginesmoke --stage all --check test/structure/engine
 
 enginesmoke-all: build fmt-all
-	./nezha enginesmoke --all --stage all --check test/structure/engine
+	./nezha gate enginesmoke --all --stage all --check test/structure/engine
 
 enginesmokegold: build fmt
-	./nezha enginesmoke --stage all --gold test/structure/engine
+	./nezha gate enginesmoke --stage all --gold test/structure/engine
 
 
 # Verify that the language core is self-contained: a copy containing only
@@ -153,25 +153,25 @@ check: build fmt lint treecheck test invariant enginecoverage
 # are normally excluded. go test ./... supplies the exhaustive ordinary Go suite.
 check-all: build fmt-all lint-all treecheck
 	go test ./...
-	./nezha enginesmoke --all --stage all --coverage test/structure/engine
+	./nezha gate enginesmoke --all --stage all --coverage test/structure/engine
 
 # Bless the current, independently checked behavior and engine structure.
 # Blessing records a reference state; it is not validation.
 bless: check
-	./nezha smoke --gold test/behavior/
-	./nezha enginesmoke --stage all --gold test/structure/engine
+	./nezha gate smoke --gold test/behavior/
+	./nezha gate enginesmoke --stage all --gold test/structure/engine
 
 # Routine language/runtime repository gate. Ordinary CLI policy applies, so
 # repository test exclusions are honored without Make knowing their paths.
 validate-lang: check
-	./nezha smoke test/behavior/
-	./nezha enginesmoke --stage all --check test/structure/engine
+	./nezha gate smoke test/behavior/
+	./nezha gate enginesmoke --stage all --check test/structure/engine
 
 # Exhaustive applicable repository gate. --all changes target-policy selection
 # only; each CLI command retains its own source/fixture semantics.
 validate-all: check-all
-	./nezha smoke --all test/behavior/
-	./nezha enginesmoke --all --stage all --check test/structure/engine
+	./nezha gate smoke --all test/behavior/
+	./nezha gate enginesmoke --all --stage all --check test/structure/engine
 
 
 fuzz:

@@ -34,9 +34,9 @@ func TestSubcommandFmtExists(t *testing.T) {
 	}
 }
 
-// TestSubcommandDistfmtExists verifies the distfmt subcommand runs.
-func TestSubcommandDistfmtExists(t *testing.T) {
-	cmd := exec.Command("go", "run", "../../cmd/nezha", "distfmt")
+// TestGateDistfmtExists verifies the distfmt gate runs.
+func TestGateDistfmtExists(t *testing.T) {
+	cmd := exec.Command("go", "run", "../../cmd/nezha", "gate", "distfmt")
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	cmd.Run()
@@ -60,9 +60,9 @@ func TestSubcommandLintExists(t *testing.T) {
 	}
 }
 
-// TestSubcommandTreecheckExists verifies the treecheck subcommand runs.
-func TestSubcommandTreecheckExists(t *testing.T) {
-	cmd := exec.Command("go", "run", "../../cmd/nezha", "treecheck", "-root", "../..")
+// TestGateTreecheckExists verifies the treecheck gate runs.
+func TestGateTreecheckExists(t *testing.T) {
+	cmd := exec.Command("go", "run", "../../cmd/nezha", "gate", "treecheck", "-root", "../..")
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
