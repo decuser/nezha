@@ -30,14 +30,14 @@ func TestFormatGoExpandsLongPolicyLiteralAndIsStable(t *testing.T) {
 	src := `package p
 
 var policy = map[string][]string{
-	"lib/file/file.ai": {"_file_close", "_file_copy", "_file_delete", "_file_exists", "_file_list", "_file_mkdir", "_file_mkdir_all", "_file_open"},
+	"engine/runtime/prelude/prelude.ai": {"_file_close", "_file_copy", "_file_delete", "_file_exists", "_file_list", "_file_mkdir", "_file_mkdir_all", "_file_open"},
 }
 `
 	out, err := formatGo("policy.go", src)
 	if err != nil {
 		t.Fatalf("formatGo: %v", err)
 	}
-	for _, want := range []string{"\t\"lib/file/file.ai\": {\n", "\t\t\"_file_close\",\n", "\t\t\"_file_open\",\n", "\t},\n"} {
+	for _, want := range []string{"\t\"engine/runtime/prelude/prelude.ai\": {\n", "\t\t\"_file_close\",\n", "\t\t\"_file_open\",\n", "\t},\n"} {
 		if !strings.Contains(out, want) {
 			t.Fatalf("output missing %q:\n%s", want, out)
 		}
@@ -55,14 +55,14 @@ func TestFormatGoKeepsShortPolicyLiteralCompact(t *testing.T) {
 	src := `package p
 
 var policy = map[string][]string{
-	"lib/x.ai": {"_a", "_b"},
+	"engine/runtime/prelude/x.ai": {"_a", "_b"},
 }
 `
 	out, err := formatGo("policy.go", src)
 	if err != nil {
 		t.Fatalf("formatGo: %v", err)
 	}
-	if !strings.Contains(out, `"lib/x.ai": {"_a", "_b"},`) {
+	if !strings.Contains(out, `"engine/runtime/prelude/x.ai": {"_a", "_b"},`) {
 		t.Fatalf("short literal expanded unexpectedly:\n%s", out)
 	}
 }
@@ -92,7 +92,7 @@ func TestFormatPathUsesAtomicWriteAndBackupSurface(t *testing.T) {
 	src := `package p
 
 var policy = map[string][]string{
-	"lib/file/file.ai": {"_file_close", "_file_copy", "_file_delete", "_file_exists", "_file_list", "_file_mkdir", "_file_mkdir_all", "_file_open"},
+	"engine/runtime/prelude/prelude.ai": {"_file_close", "_file_copy", "_file_delete", "_file_exists", "_file_list", "_file_mkdir", "_file_mkdir_all", "_file_open"},
 }
 `
 	if err := os.WriteFile(path, []byte(src), 0644); err != nil {
@@ -118,12 +118,12 @@ var policy = map[string][]string{
 }
 
 func TestFormatGoDoesNotRestyleMapLookingRawString(t *testing.T) {
-	src := "package p\n\nvar specimen = `var policy = map[string][]string{\n\t\"lib/file/file.ai\": {\"_file_close\", \"_file_copy\", \"_file_delete\", \"_file_exists\", \"_file_list\", \"_file_mkdir\", \"_file_mkdir_all\", \"_file_open\"},\n}`\n"
+	src := "package p\n\nvar specimen = `var policy = map[string][]string{\n\t\"engine/runtime/prelude/prelude.ai\": {\"_file_close\", \"_file_copy\", \"_file_delete\", \"_file_exists\", \"_file_list\", \"_file_mkdir\", \"_file_mkdir_all\", \"_file_open\"},\n}`\n"
 	out, err := formatGo("specimen.go", src)
 	if err != nil {
 		t.Fatalf("formatGo: %v", err)
 	}
-	if !strings.Contains(out, `"lib/file/file.ai": {"_file_close", "_file_copy"`) {
+	if !strings.Contains(out, `"engine/runtime/prelude/prelude.ai": {"_file_close", "_file_copy"`) {
 		t.Fatalf("raw string contents were restyled:\n%s", out)
 	}
 }

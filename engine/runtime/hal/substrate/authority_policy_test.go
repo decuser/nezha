@@ -14,9 +14,9 @@ import (
 func TestAuthorityPolicyIsExplicitAndNarrow(t *testing.T) {
 	rt := NewGoRuntime()
 
-	unlisted := rt.AuthorityForSource("/tmp/project/lib/example/example.ai")
+	unlisted := rt.AuthorityForSource("/tmp/project/example.ai")
 	if unlisted.Allows("HAL.io.print") || unlisted.Allows("_test_run") {
-		t.Fatal("lib path alone must not confer authority")
+		t.Fatal("ordinary source path alone must not confer authority")
 	}
 }
 

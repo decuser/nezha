@@ -200,8 +200,6 @@ func (c *Checker) seedBuiltins() {
 			c.mark(p, "Go implementation/test source")
 		case filepath.Base(p) == ".gitignore":
 			c.mark(p, "directory ignore policy")
-		case strings.HasPrefix(p, "lib/") && strings.HasSuffix(p, "_test.ai"):
-			c.mark(p, "Aiki-native library test")
 		case p == "engine/runtime/prelude/prelude_test.ai":
 			c.mark(p, "Aiki-native prelude test")
 		case (strings.HasPrefix(p, "test/behavior/") || strings.HasPrefix(p, "test/visual/")) && strings.HasSuffix(p, "_smoke.ai"):
@@ -248,16 +246,6 @@ func matchedProfileDriver(p string) bool {
 
 func (c *Checker) checkStructuralPairs() {
 	for p := range c.files {
-		if strings.HasPrefix(p, "lib/") && strings.HasSuffix(p, ".ai") && !strings.HasSuffix(p, "_test.ai") {
-			stem := strings.TrimSuffix(p, ".ai")
-			c.mark(p, "standard-library module")
-			if c.files[stem+".help"] {
-				c.mark(stem+".help", "module help")
-			}
-			if c.files[stem+".doc"] {
-				c.mark(stem+".doc", "module documentation")
-			}
-		}
 		if (strings.HasPrefix(p, "test/behavior/") || strings.HasPrefix(p, "test/visual/")) && strings.HasSuffix(p, "_smoke.ai") {
 			gold := strings.TrimSuffix(p, ".ai") + ".gold"
 			if c.files[gold] {
@@ -283,10 +271,7 @@ func (c *Checker) checkStructuralPairs() {
 }
 
 func isNamedPackageSource(path string) bool {
-	if !strings.HasSuffix(path, ".ai") {
-		return false
-	}
-	return strings.HasPrefix(path, "lib/") || strings.HasPrefix(path, "vendor/")
+	return false
 }
 
 func hasProposalFiles(files map[string]bool) bool {
@@ -325,21 +310,6 @@ func (c *Checker) structuralErrors() []Finding {
 		out = append(out, Finding{Path: "engineering/proposals", Reason: "proposal disposition tree missing README.md"})
 	}
 	for p := range c.files {
-		if strings.HasPrefix(p, "lib/") && strings.HasSuffix(p, ".ai") && !strings.HasSuffix(p, "_test.ai") {
-			stem := strings.TrimSuffix(p, ".ai")
-			for _, ext := range []string{".help", ".doc"} {
-				q := stem + ext
-				if !c.files[q] {
-					out = append(out, Finding{Path: p, Reason: "module missing " + filepath.Base(q)})
-				}
-			}
-		}
-		if strings.HasPrefix(p, "lib/") && (strings.HasSuffix(p, ".help") || strings.HasSuffix(p, ".doc")) {
-			stem := strings.TrimSuffix(strings.TrimSuffix(p, ".help"), ".doc")
-			if !c.files[stem+".ai"] {
-				out = append(out, Finding{Path: p, Reason: "module companion has no .ai owner"})
-			}
-		}
 		if (strings.HasPrefix(p, "test/behavior/") || strings.HasPrefix(p, "test/visual/")) && strings.HasSuffix(p, "_smoke.ai") {
 			gold := strings.TrimSuffix(p, ".ai") + ".gold"
 			if !c.files[gold] {

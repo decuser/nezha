@@ -4,8 +4,8 @@ import "testing"
 
 func TestCoverageScopeIsRepositoryPathPolicy(t *testing.T) {
 	cases := map[string]string{
-		"lib/string/string.ai":                    "supported",
-		"samples/pipeline.ai":                     "examples",
+		"test/behavior/math_smoke.ai":             "auxiliary",
+		"samples/minimal.ai":                      "examples",
 		"examples/hello.ai":                       "examples",
 		"engineering/profiling/03-list-append.ai": "auxiliary",
 	}

@@ -3,7 +3,7 @@
 // Usage:
 //
 //	aiki test ./...
-//	aiki test lib/math
+//	aiki test test/behavior
 //	aiki test path/to/foo_test.ai
 //	aiki test -cover ./...
 //	aiki test -cover -coverview=file ./...
@@ -197,8 +197,6 @@ func coverageScope(file string) string {
 	parts := strings.Split(p, "/")
 	for _, part := range parts {
 		switch part {
-		case "lib":
-			return "supported"
 		case "samples", "examples":
 			return "examples"
 		}

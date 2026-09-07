@@ -10,7 +10,7 @@ import (
 
 // Resolve expands CLI filesystem targets into deterministic, repository-relative
 // path lists for command consumers. It preserves the target language formerly
-// shared with lib/target without depending on the Aiki library system.
+// owned by the command layer.
 func Resolve(tool string, targets []string, recursePlainDirs bool) ([]string, error) {
 	return resolve(tool, targets, recursePlainDirs, false)
 }

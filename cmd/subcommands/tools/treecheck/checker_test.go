@@ -126,7 +126,7 @@ func TestAllowPrefixSuppressesIntentionalStandaloneTree(t *testing.T) {
 	}
 }
 
-func TestBareImportJustifiesOnlyNamedPackageRoots(t *testing.T) {
+func TestBareImportDoesNotJustifyLocalPackageSource(t *testing.T) {
 	root := minimalTree(t)
 	writeTestFile(t, root, "test/behavior/import_smoke.ai", "import(\"target\", :x)\n")
 	writeTestFile(t, root, "test/behavior/import_smoke.gold", "EXIT:0\n")
@@ -134,20 +134,12 @@ func TestBareImportJustifiesOnlyNamedPackageRoots(t *testing.T) {
 	local := "test/behavior/target.ai"
 	writeTestFile(t, root, local, "package \"target\"\nexport(:x)\nlet x = 1\n")
 
-	lib := "lib/target.ai"
-	writeTestFile(t, root, lib, "package \"target\"\nexport(:x)\nlet x = 1\n")
-	writeTestFile(t, root, "lib/target.help", "")
-	writeTestFile(t, root, "lib/target.doc", "")
-
 	result, err := Check(root, "treecheck.allow")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if !hasFinding(result.Orphans, local) {
 		t.Fatalf("bare import must not justify arbitrary local package: %#v", result.Orphans)
-	}
-	if hasFinding(result.Orphans, lib) || hasFinding(result.Errors, lib) {
-		t.Fatalf("bare import should justify named package root: errors=%#v orphans=%#v", result.Errors, result.Orphans)
 	}
 }
 

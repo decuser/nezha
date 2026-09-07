@@ -7,10 +7,6 @@ import (
 	"regexp"
 	"sort"
 	"strings"
-
-	"aiki/engine/runtime/modules"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
 )
 
 var reExpect = regexp.MustCompile(`^(.+?)\s{2,}#\s+(.+)$`)
@@ -34,28 +30,6 @@ func Load(root string) ([]Example, error) {
 		files = append(files, docFile{name: "prelude", path: preludePath})
 	}
 
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
-	if err != nil {
-		return nil, fmt.Errorf("loading grammar: %w", err)
-	}
-	var roots []string
-	for _, r := range modules.DistributionModuleRoots() {
-		roots = append(roots, filepath.Join(root, r))
-	}
-	registry := modules.NewModuleRegistry(roots)
-	if err := registry.Scan(g); err != nil {
-		return nil, fmt.Errorf("scanning distribution modules: %w", err)
-	}
-	for _, name := range registry.ListCanonicalPackages() {
-		aiPath, ok := registry.Lookup(name)
-		if !ok {
-			return nil, fmt.Errorf("registry listed %s but cannot locate it", name)
-		}
-		docPath := strings.TrimSuffix(aiPath, ".ai") + ".doc"
-		if _, err := os.Stat(docPath); err == nil {
-			files = append(files, docFile{name: name, path: docPath})
-		}
-	}
 	sort.Slice(files, func(i, j int) bool { return files[i].name < files[j].name })
 
 	var out []Example

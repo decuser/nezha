@@ -86,19 +86,6 @@ func buildAiki(t *testing.T) string {
 	}
 
 	distDir := t.TempDir()
-	for _, name := range []string{"lib", "vendor"} {
-		src := filepath.Join(absRoot, name)
-		if _, err := os.Stat(src); err != nil {
-			if os.IsNotExist(err) {
-				continue
-			}
-			t.Fatalf("stat distribution dir %s: %v", name, err)
-		}
-		if err := os.Symlink(src, filepath.Join(distDir, name)); err != nil {
-			t.Fatalf("link distribution dir %s: %v", name, err)
-		}
-	}
-
 	exe := filepath.Join(distDir, "aiki-test-bin")
 	cmd := exec.Command("go", "build", "-buildvcs=false", "-o", exe, "./cmd/aiki")
 	cmd.Dir = absRoot

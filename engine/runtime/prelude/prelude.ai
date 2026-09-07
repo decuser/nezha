@@ -1,7 +1,6 @@
 # Prelude - minimal core
 # This file has explicit runtime authority for only the _prefixed primitives it uses.
 # Only evaluator-privileged and irreducible primitives belong here.
-# Everything else lives in lib/.
 # Evaluator-privileged intrinsics
 let apply = (fn, args) {
 	_apply(fn, args)

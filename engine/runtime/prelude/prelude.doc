@@ -13,7 +13,7 @@ Loads and evaluates an aiki source file.
 load(path)
 
 load("utils.ai")
-load("lib/helpers.ai")
+load("helpers.ai")
 ===
 stack_limit
 @unchecked
