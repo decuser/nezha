@@ -97,12 +97,10 @@ type GoRuntime struct {
 	signalResources   map[*value.Channel]*SignalResource
 	listenerResources map[*value.Listener]*ListenerResource
 	datagramResources map[*value.Datagram]*DatagramResource
-	fileLockResources map[*value.FileLock]*FileLockResource
 	nextProcessID     uint64
 	nextEndpointID    uint64
 	nextListenerID    uint64
 	nextDatagramID    uint64
-	nextFileLockID    uint64
 	testState         runtimeTestState
 	mu                sync.RWMutex
 	profileLabels     atomic.Bool
@@ -142,7 +140,6 @@ func NewGoRuntime() *GoRuntime {
 		signalResources:   make(map[*value.Channel]*SignalResource),
 		listenerResources: make(map[*value.Listener]*ListenerResource),
 		datagramResources: make(map[*value.Datagram]*DatagramResource),
-		fileLockResources: make(map[*value.FileLock]*FileLockResource),
 		asyncFaults:       make(chan *value.Fault, 1),
 	}
 	rt.registerHAL()

@@ -92,10 +92,18 @@ smokegold: build
 
 
 aikitest:
-	./aiki test ./...
+	@if find . -name '*_test.ai' -print -quit | grep -q .; then \
+		./aiki test ./...; \
+	else \
+		echo "aikitest: no *_test.ai files found; skipping"; \
+	fi
 
 aikitest-all:
-	./aiki test --all ./...
+	@if find . -name '*_test.ai' -print -quit | grep -q .; then \
+		./aiki test --all ./...; \
+	else \
+		echo "aikitest-all: no *_test.ai files found; skipping"; \
+	fi
 
 enginecoverage: build fmt
 	./aiki enginesmoke --stage all --coverage test/structure/engine
@@ -121,7 +129,7 @@ check: build fmt lint treecheck test invariant aikitest enginecoverage
 # are normally excluded. go test ./... supplies the exhaustive ordinary Go suite.
 check-all: build fmt-all lint-all treecheck
 	go test ./...
-	./aiki test --all ./...
+	$(MAKE) aikitest-all
 	./aiki enginesmoke --all --stage all --coverage test/structure/engine
 
 # Bless the current, independently checked behavior and engine structure.

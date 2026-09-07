@@ -55,7 +55,7 @@ func TestCompatibilityRegistrySeparatedByRole(t *testing.T) {
 		}
 	}
 
-	for _, name := range []string{"_apply", "_first", "_file_open"} {
+	for _, name := range []string{"_apply", "_first", "_print"} {
 		if _, ok := rt.lookupBuiltin(name); !ok {
 			t.Errorf("compatibility lookup lost %s", name)
 		}
@@ -82,7 +82,7 @@ func TestBuiltinContextPolicyDefaultsConservative(t *testing.T) {
 
 	for _, name := range []string{
 		"_first", "_rest", "_length", "_type", "_equal",
-		"_sin_inexact", "_hash_new", "_string_split",
+		"_sin_inexact",
 	} {
 		b, ok := g.lookupBuiltin(name)
 		if !ok {

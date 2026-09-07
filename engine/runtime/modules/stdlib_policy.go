@@ -48,23 +48,9 @@ type StdlibModulePolicy struct {
 // same truth as this declaration.
 var stdlibModulePolicies = []StdlibModulePolicy{
 	// Portable semantics.
-	{Module: "hash/native", Role: RolePortable, Realization: RealizationNative},
-	{Module: "hash/ffi", Role: RolePortable, Realization: RealizationFFI, SemanticAuthority: "hash/native"},
-	{Module: "math/native", Role: RolePortable, Realization: RealizationNative},
-	{Module: "math/ffi", Role: RolePortable, Realization: RealizationFFI, SemanticAuthority: "math/native", AccelerationSurface: []string{"floor", "ceil", "modulo"}},
-	{Module: "math/approx", Role: RoleInterop, Realization: RealizationFFI},
-	{Module: "string/native", Role: RolePortable, Realization: RealizationNative},
-	{Module: "string/ffi", Role: RolePortable, Realization: RealizationFFI, SemanticAuthority: "string/native"},
-	{Module: "string/case_table", Role: RoleInternal, Realization: RealizationNative},
 
 	// Runtime-owned Aiki facilities.
 
-	// Host-mediated facilities. path intentionally composes portable Aiki code
-	// with host/runtime operations and is therefore mixed.
-	{Module: "file", Role: RoleHostCapability, Realization: RealizationIntrinsic},
-
-	// Tooling/runtime implementation support rather than general stdlib semantics.
-	{Module: "test", Role: RoleInternal, Realization: RealizationIntrinsic},
 }
 
 // StdlibModulePolicies returns a copy of all shipped module policy declarations.

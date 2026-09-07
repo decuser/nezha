@@ -280,7 +280,6 @@ func (g *GoRuntime) CloseAllProcesses() {
 
 // CloseAllResources releases all runtime-owned external resources.
 func (g *GoRuntime) CloseAllResources() {
-	g.CloseAllFileLocks()
 	g.CloseAllSignals()
 	g.CloseAllNetwork()
 	g.CloseAllEndpoints()

@@ -18,6 +18,7 @@ import (
 	"sort"
 	"strings"
 
+	"aiki/cmd/internal/aitest"
 	"aiki/cmd/internal/targetresolve"
 	"aiki/engine/coverage"
 	"aiki/engine/observe"
@@ -75,6 +76,16 @@ func Run(args []string) int {
 		rt.ResetTestState()
 		rt.SetTestFile(f)
 
+		sourceBytes, readErr := os.ReadFile(f)
+		if readErr != nil {
+			rt.CloseAllResources()
+			fmt.Fprintf(os.Stderr, "FAIL %s\n    reading file: %v\n", f, readErr)
+			anyFailed = true
+			totalFailed++
+			continue
+		}
+		testSource := aitest.Source + "\n" + string(sourceBytes)
+
 		var runErr error
 		if *cover {
 			schema := observe.NewObservationSchema()
@@ -82,12 +93,12 @@ func Run(args []string) int {
 				Depth: observe.DepthFlat, NodeHitCapacity: 1 << 18,
 			})
 			evalCapture := observe.NewEvalCapture(network)
-			runErr = runner.RunWithEvalProbeRuntime(f, evalCapture, rt)
+			runErr = runner.RunSourceWithEvalProbeRuntime(f, testSource, evalCapture, rt)
 			if runErr == nil {
 				coverageHits = append(coverageHits, evalCapture.Hits()...)
 			}
 		} else {
-			runErr = runner.RunWithRuntime(f, rt)
+			runErr = runner.RunSourceWithRuntime(f, testSource, rt)
 		}
 
 		if runErr != nil {

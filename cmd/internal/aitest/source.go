@@ -1,11 +1,8 @@
-package "test"
+// Package aitest owns the Aiki test helper surface used by the `aiki test` command.
+package aitest
 
-# test - assertion library for aiki test
-#
-# Assertions accumulate failures rather than halting execution.
-# Use test.run to isolate test cases so a fault in one does not
-# prevent others from running.
-let equal = (actual, expected) {
+// Source is prepended by the test command. It is not a shipped Aiki module.
+const Source = `let equal = (actual, expected) {
 	_test_equal(actual, expected)
 }
 
@@ -36,5 +33,4 @@ let run = (name, fn) {
 let faults = (fn) {
 	_test_faults(fn)
 }
-
-export(:equal, :not_equal, :is_true, :is_false, :error, :not_error, :run, :faults)
+`

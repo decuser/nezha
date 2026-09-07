@@ -63,6 +63,18 @@ func runSourceWithRuntime(filename, source string, programArgs []string, rt *sub
 	return runSourceWithRuntimeProbe(filename, source, programArgs, rt, nil)
 }
 
+// RunSourceWithRuntime executes supplied Aiki source under the given filename in
+// the supplied runtime host world. The caller owns the runtime's lifetime.
+func RunSourceWithRuntime(filename, source string, rt *substrate.GoRuntime, programArgs ...string) error {
+	return runSourceWithRuntimeProbe(filename, source, programArgs, rt, nil)
+}
+
+// RunSourceWithEvalProbeRuntime executes supplied Aiki source while routing AST
+// execution-entry observations to the supplied probe.
+func RunSourceWithEvalProbeRuntime(filename, source string, probe engine.EvalProbe, rt *substrate.GoRuntime, programArgs ...string) error {
+	return runSourceWithRuntimeProbe(filename, source, programArgs, rt, probe)
+}
+
 // RunWithEvalProbeRuntime executes an Aiki source file while routing AST
 // execution-entry observations to the supplied nervous-system endpoint. The
 // probe owns no accounting state; callers typically supply observe.EvalCapture.

@@ -1,5 +1,5 @@
 # @negative parse
-use("string")
+let string = "abc"
 
 let s = string
 	.upper("abc")

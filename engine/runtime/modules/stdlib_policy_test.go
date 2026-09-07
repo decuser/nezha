@@ -69,7 +69,9 @@ func TestStdlibModulePoliciesComplete(t *testing.T) {
 		}
 		return nil
 	}); err != nil {
-		t.Fatal(err)
+		if !os.IsNotExist(err) {
+			t.Fatal(err)
+		}
 	}
 
 	declared := make(map[string]bool)

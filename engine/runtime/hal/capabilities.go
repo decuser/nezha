@@ -12,29 +12,6 @@ var capabilityRegistry = map[string]Capability{
 		Name:       "basic-io",
 		Operations: []string{"HAL.io.print", "HAL.io.read"},
 	},
-	"file_lock": {
-		Name:       "file_lock",
-		Operations: []string{"HAL.file.lock", "HAL.file.try_lock", "HAL.file.unlock"},
-	},
-	"filesystem": {
-		Name: "filesystem",
-		Operations: []string{
-			"HAL.file.open", "HAL.file.read_text", "HAL.file.read_bytes", "HAL.file.read_line",
-			"HAL.file.write_text", "HAL.file.write_bytes", "HAL.file.close", "HAL.file.exists",
-			"HAL.file.delete", "HAL.file.list", "HAL.file.read_at", "HAL.file.write_at",
-			"HAL.file.stat", "HAL.file.rename", "HAL.file.mkdir", "HAL.file.mkdir_all",
-			"HAL.file.remove_all", "HAL.file.temp", "HAL.file.temp_dir", "HAL.file.copy", "HAL.file.size", "HAL.file.walk",
-		},
-	},
-
-	"symlink": {
-		Name:       "symlink",
-		Operations: []string{"HAL.file.symlink", "HAL.file.read_link"},
-	},
-	"permissions": {
-		Name:       "permissions",
-		Operations: []string{"HAL.file.permissions", "HAL.file.chmod"},
-	},
 }
 
 // CapabilityDefinition returns an independent copy of one capability.

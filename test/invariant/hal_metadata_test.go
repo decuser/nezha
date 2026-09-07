@@ -15,11 +15,11 @@ func TestHALCanonicalMetadataIsCoherent(t *testing.T) {
 
 func TestHALMetadataInvariantRejectsDuplicateIdentity(t *testing.T) {
 	ops := hal.OperationDefinitions()
-	first := ops["_file_open"]
-	second := ops["_file_stat"]
+	first := ops["_print"]
+	second := ops["_read"]
 	second.Identity = first.Identity
 	second.Authority = first.Identity
-	ops["_file_stat"] = second
+	ops["_read"] = second
 
 	err := hal.ValidateMetadata(ops, hal.Capabilities(), hal.RuntimeProfiles())
 	if err == nil || !strings.Contains(err.Error(), "HAL identity "+first.Identity+" is shared") {
@@ -29,12 +29,12 @@ func TestHALMetadataInvariantRejectsDuplicateIdentity(t *testing.T) {
 
 func TestHALMetadataInvariantRejectsUnknownCapabilityOperation(t *testing.T) {
 	caps := hal.Capabilities()
-	capability := caps["filesystem"]
-	capability.Operations = append(capability.Operations, "HAL.file.does_not_exist")
-	caps["filesystem"] = capability
+	capability := caps["basic-io"]
+	capability.Operations = append(capability.Operations, "HAL.io.does_not_exist")
+	caps["basic-io"] = capability
 
 	err := hal.ValidateMetadata(hal.OperationDefinitions(), caps, hal.RuntimeProfiles())
-	if err == nil || !strings.Contains(err.Error(), "capability filesystem names unknown HAL operation HAL.file.does_not_exist") {
+	if err == nil || !strings.Contains(err.Error(), "capability basic-io names unknown HAL operation HAL.io.does_not_exist") {
 		t.Fatalf("expected unknown HAL operation failure, got %v", err)
 	}
 }
@@ -56,31 +56,31 @@ func TestHALCapabilityAvailabilityRejectsMissingOperation(t *testing.T) {
 	for _, op := range hal.OperationDefinitions() {
 		bound[op.Identity] = true
 	}
-	if !hal.CapabilityAvailable("filesystem", bound) {
-		t.Fatal("filesystem should be available with all canonical HAL operations bound")
+	if !hal.CapabilityAvailable("basic-io", bound) {
+		t.Fatal("basic-io should be available with all canonical HAL operations bound")
 	}
-	delete(bound, "HAL.file.stat")
-	if hal.CapabilityAvailable("filesystem", bound) {
-		t.Fatal("filesystem must be unavailable when HAL.file.stat is absent")
+	delete(bound, "HAL.io.print")
+	if hal.CapabilityAvailable("basic-io", bound) {
+		t.Fatal("basic-io must be unavailable when HAL.io.print is absent")
 	}
 }
 
 func TestHALProfileGateRejectsMissingRequiredCapability(t *testing.T) {
-	has := func(name string) bool { return name != "filesystem" }
+	has := func(name string) bool { return name != "basic-io" }
 	err := hal.ValidateProfileAvailability(hal.DefaultRuntimeProfile, has)
-	if err == nil || !strings.Contains(err.Error(), "requires unsupported capability: :filesystem") {
+	if err == nil || !strings.Contains(err.Error(), "requires unsupported capability: :basic-io") {
 		t.Fatalf("expected required-capability profile failure, got %v", err)
 	}
 }
 
 func TestHALMetadataInvariantRejectsUnknownContext(t *testing.T) {
 	ops := hal.OperationDefinitions()
-	op := ops["_file_stat"]
+	op := ops["_print"]
 	op.Context = []string{"runtime.typo"}
-	ops["_file_stat"] = op
+	ops["_print"] = op
 
 	err := hal.ValidateMetadata(ops, hal.Capabilities(), hal.RuntimeProfiles())
-	if err == nil || !strings.Contains(err.Error(), "operation _file_stat has unknown context runtime.typo") {
+	if err == nil || !strings.Contains(err.Error(), "operation _print has unknown context runtime.typo") {
 		t.Fatalf("expected unknown context failure, got %v", err)
 	}
 }
@@ -101,9 +101,9 @@ func TestHALMetadataInvariantRejectsUnknownDescriptorVocabulary(t *testing.T) {
 	for _, mutation := range mutations {
 		t.Run(mutation.name, func(t *testing.T) {
 			ops := hal.OperationDefinitions()
-			op := ops["_file_stat"]
+			op := ops["_print"]
 			mutation.edit(&op)
-			ops["_file_stat"] = op
+			ops["_print"] = op
 			err := hal.ValidateMetadata(ops, hal.Capabilities(), hal.RuntimeProfiles())
 			if err == nil || !strings.Contains(err.Error(), mutation.want) {
 				t.Fatalf("expected descriptor vocabulary failure %q, got %v", mutation.want, err)

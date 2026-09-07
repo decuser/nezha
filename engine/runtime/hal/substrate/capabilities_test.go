@@ -22,28 +22,28 @@ func TestGoProvenanceCoversHALOperationDefinitions(t *testing.T) {
 
 func TestCapabilityAvailabilityReflectsActualBindings(t *testing.T) {
 	rt := NewGoRuntime()
-	if !rt.HasCapability("filesystem") {
-		t.Fatal("default Go runtime should provide :filesystem")
+	if !rt.HasCapability("basic-io") {
+		t.Fatal("default Go runtime should provide :basic-io")
 	}
 	if rt.HasCapability("does-not-exist") {
 		t.Fatal("unknown capability must not report available")
 	}
 
 	rt.mu.Lock()
-	delete(rt.hostBindings, "_file_stat")
+	delete(rt.hostBindings, "_print")
 	rt.mu.Unlock()
-	if rt.HasCapability("filesystem") {
-		t.Fatal(":filesystem must become unavailable when a required HAL binding is absent")
+	if rt.HasCapability("basic-io") {
+		t.Fatal(":basic-io must become unavailable when a required HAL binding is absent")
 	}
 }
 
 func TestProfileGateRejectsMissingRequiredCapability(t *testing.T) {
 	rt := NewGoRuntime()
 	rt.mu.Lock()
-	delete(rt.hostBindings, "_file_stat")
+	delete(rt.hostBindings, "_print")
 	rt.mu.Unlock()
 	if err := rt.ValidateProfile(hal.DefaultRuntimeProfile); err == nil {
-		t.Fatal("desktop profile should reject missing :filesystem")
+		t.Fatal("desktop profile should reject missing :basic-io")
 	}
 	if err := rt.ValidateProfile("minimal"); err != nil {
 		t.Fatalf("minimal profile should not require host capabilities: %v", err)

@@ -5,11 +5,11 @@ import (
 	"testing"
 )
 
-func TestAnalyzeSourceCollectsLiteralImportsAndUsesNativeFFIPass(t *testing.T) {
+func TestAnalyzeSourceCollectsLiteralImportsAndUses(t *testing.T) {
 	g := testGrammar(t)
 	source := `package "sample"
-let dep = import("string/ffi")
-use("hash/ffi")
+let dep = import("example/dependency")
+use("example/helper")
 let f = () {
     let nested = import("./local")
     nested
@@ -20,13 +20,13 @@ export(:f)
 	if err != nil {
 		t.Fatalf("AnalyzeSource: %v", err)
 	}
-	want := []string{"string/ffi", "hash/ffi", "./local"}
+	want := []string{"example/dependency", "example/helper", "./local"}
 	if strings.Join(info.Imports, "\x00") != strings.Join(want, "\x00") {
 		t.Fatalf("imports = %v, want %v", info.Imports, want)
 	}
 }
 
-func TestAnalyzeSourceCollectsFunctionCallsNativeFFIPass(t *testing.T) {
+func TestAnalyzeSourceCollectsFunctionCalls(t *testing.T) {
 	g := testGrammar(t)
 	source := `package "sample"
 let helper = (x) { _provider(x) }

@@ -16,7 +16,4 @@ println(to_decimal(5/2, 0))
 # Beyond the range where a float64 round-trip keeps its digits.
 println(to_decimal(12345678901234567890123456789 + 1/3, 4))
 
-let math = import("math/native")
-println(to_decimal(math.sqrt(894, 8), 20))
-
 println("TO_DECIMAL_SMOKE_DONE")

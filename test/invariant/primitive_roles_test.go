@@ -16,18 +16,18 @@ func TestPrimitiveRolesAreCoherent(t *testing.T) {
 
 func TestPrimitiveRoleInvariantRejectsMissingHALPrimitive(t *testing.T) {
 	defs := primitives.Definitions()
-	delete(defs, "_file_stat")
+	delete(defs, "_print")
 	err := primitives.ValidateDefinitions(defs, hal.OperationDefinitions())
-	if err == nil || !strings.Contains(err.Error(), "HAL primitive _file_stat has no architectural role") {
+	if err == nil || !strings.Contains(err.Error(), "HAL primitive _print has no architectural role") {
 		t.Fatalf("expected missing HAL role failure, got %v", err)
 	}
 }
 
 func TestPrimitiveRoleInvariantRejectsWrongHALRole(t *testing.T) {
 	defs := primitives.Definitions()
-	defs["_file_stat"] = primitives.RoleRuntime
+	defs["_print"] = primitives.RoleRuntime
 	err := primitives.ValidateDefinitions(defs, hal.OperationDefinitions())
-	if err == nil || !strings.Contains(err.Error(), "HAL primitive _file_stat has role runtime, want host") {
+	if err == nil || !strings.Contains(err.Error(), "HAL primitive _print has role runtime, want host") {
 		t.Fatalf("expected wrong HAL role failure, got %v", err)
 	}
 }
