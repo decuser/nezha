@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"nezha/engine/syntax/grammar"
+	"nezha/engine/language/grammar"
 )
 
 // testGrammar creates a grammar that covers what these lexer unit tests feed it.

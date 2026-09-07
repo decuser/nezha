@@ -19,8 +19,9 @@ import (
 	nezhafmt "nezha/cmd/internal/formatting"
 	"nezha/cmd/internal/targetresolve"
 	"nezha/cmd/internal/testfixture"
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 const distributionWidth = 100
@@ -328,7 +329,7 @@ func nonSemicolonChildren(nodes []*syntax.Node) []*syntax.Node {
 }
 
 func loadGrammar() (*grammar.Grammar, error) {
-	return grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	return loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 }
 
 // restyleNezha expands long single-line comma-separated lists and calls. The

@@ -6,15 +6,16 @@ import (
 	"sort"
 	"testing"
 
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 // TestReferenceCorpusCoversGrammar keeps reference/ aligned with the authored
 // grammar. The reference programs are a positive, readable witness of the
 // language surface; behavior tests remain free to be narrower regression cases.
 func TestReferenceCorpusCoversGrammar(t *testing.T) {
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,6 +1,6 @@
 package syntax
 
-import "nezha/engine/syntax/grammar"
+import "nezha/engine/language/grammar"
 
 // NormalizeTokens applies grammar-declared skip and physical-newline policy to
 // a raw lexer stream. It is the observable normalized token surface used by

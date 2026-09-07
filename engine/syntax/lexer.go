@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"nezha/engine/syntax/grammar"
+	"nezha/engine/language/grammar"
 	"nezha/engine/syntax/position"
 )
 

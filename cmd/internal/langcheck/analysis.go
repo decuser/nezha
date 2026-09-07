@@ -4,10 +4,10 @@ import (
 	"regexp"
 	"strings"
 
+	"nezha/engine/language/grammar"
 	"nezha/engine/runtime/prelude"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 	"nezha/engine/syntax/position"
 )
 

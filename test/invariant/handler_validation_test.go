@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/semantics/evaluator"
-	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 // TestHandlerValidationPanicsOnMissingHandler verifies that missing production handlers panic at startup.
@@ -49,7 +49,7 @@ func TestHandlerValidationPanicsOnMissingTokenHandler(t *testing.T) {
 		}
 	}()
 
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		t.Fatalf("load grammar: %v", err)
 	}
@@ -67,7 +67,7 @@ func TestHandlerValidationPanicsOnMissingTokenHandler(t *testing.T) {
 // TestHandlerValidationPassesForRealGrammar verifies the real grammar has all handlers.
 func TestHandlerValidationPassesForRealGrammar(t *testing.T) {
 	// Should not panic
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		t.Fatalf("load grammar: %v", err)
 	}

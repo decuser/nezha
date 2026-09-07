@@ -4,12 +4,13 @@ import (
 	"strings"
 	"testing"
 
-	"nezha/engine/syntax/grammar"
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/syntax/position"
 )
 
 func loadTestGrammar(t *testing.T) *grammar.Grammar {
-	g, err := grammar.Load("grammar.ebnfx", EbnfxSource, "grammar.help", HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		t.Fatalf("loading grammar: %v", err)
 	}

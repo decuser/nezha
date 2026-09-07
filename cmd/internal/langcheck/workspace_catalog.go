@@ -3,10 +3,10 @@ package langcheck
 import (
 	"sort"
 
+	"nezha/engine/language/grammar"
 	"nezha/engine/runtime/prelude"
 	"nezha/engine/runtime/primitives"
 	"nezha/engine/semantics/value"
-	"nezha/engine/syntax/grammar"
 )
 
 var _ Catalog = (*WorkspaceCatalog)(nil)

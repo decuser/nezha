@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/semantics/value"
-	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 func withDistributionRoot(t *testing.T) {
@@ -57,7 +57,7 @@ func TestLint_CheckFormatting(t *testing.T) {
 
 func lintSource(t *testing.T, src string) []Diagnostic {
 	t.Helper()
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -33,7 +33,7 @@ func (g *GoRuntime) PreludeAuthority() value.Authority {
 }
 
 // PreludeAuthorityPrimitives returns the raw prelude dependency list for
-// invariant tests. It is intentionally not path-based; the runner decides when
+// invariant tests. It is intentionally not path-based; the program layer decides when
 // it is evaluating the embedded prelude.
 func PreludeAuthorityPrimitives() []string {
 	return append([]string(nil), preludePrimitiveAuthority...)

@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"testing"
 
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/runtime/hal/substrate"
 	"nezha/engine/runtime/prelude"
 	"nezha/engine/semantics/evaluator"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 // TestUserCannotSeeHAL verifies user scope cannot resolve _prefixed names.
@@ -165,7 +166,7 @@ func TestUserCannotSeeHALUpper(t *testing.T) {
 
 // evalWithScope evaluates code with the specified scope.
 func evalWithScope(code string, scope value.Scope, loadPrel bool) (value.Value, error) {
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		return nil, err
 	}

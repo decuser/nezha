@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"nezha/engine/language/grammar"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 func withDistributionRoot(t *testing.T) {

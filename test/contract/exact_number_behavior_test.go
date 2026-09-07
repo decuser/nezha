@@ -3,16 +3,17 @@ package contract
 import (
 	"testing"
 
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/runtime/hal/substrate"
 	"nezha/engine/semantics/evaluator"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 // eval helper for invariant tests
 func eval(t *testing.T, source string) value.Value {
-	g, _ := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, _ := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	lexer := syntax.NewLexer(g, "test", source)
 	tokens, _ := lexer.Tokenize()
 	parser := syntax.NewParser(g, tokens, source)

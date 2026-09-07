@@ -11,8 +11,8 @@ import (
 	formatter "nezha/cmd/internal/formatting"
 	"nezha/cmd/internal/targetresolve"
 	"nezha/cmd/internal/testfixture"
-	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 )
 
 // Config controls formatting behavior.
@@ -77,7 +77,7 @@ func formatTarget(path string, cfg Config, all bool) (bool, error) {
 }
 
 func loadGrammar() (*grammar.Grammar, error) {
-	return grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	return loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 }
 
 func formatFile(path string, cfg Config, stdout io.Writer) (bool, error) {

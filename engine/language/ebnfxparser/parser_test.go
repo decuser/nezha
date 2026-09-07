@@ -1,4 +1,4 @@
-package grammar
+package ebnfxparser
 
 import (
 	"strings"

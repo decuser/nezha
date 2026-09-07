@@ -14,12 +14,13 @@ import (
 	"strings"
 
 	"nezha/cmd/internal/targetresolve"
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/runtime/hal/substrate"
 	"nezha/engine/runtime/prelude"
 	"nezha/engine/semantics/evaluator"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 type stage string
@@ -271,21 +272,21 @@ func goldFileFor(inputPath string, s stage) string {
 
 func grammarGoldPath(grammarOverride string) string {
 	if grammarOverride == "" {
-		return filepath.Join("engine", "syntax", "grammar.ebnfx.ebnf.gold")
+		return filepath.Join("engine", "language", "grammar", "grammar.ebnfx.ebnf.gold")
 	}
 	return grammarOverride + ".ebnf.gold"
 }
 
 func loadGrammar(overridePath string) (*grammar.Grammar, error) {
 	if overridePath == "" {
-		return grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+		return loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	}
 	data, err := os.ReadFile(overridePath)
 	if err != nil {
 		return nil, fmt.Errorf("reading grammar: %w", err)
 	}
 	// Keep help stable by using embedded help, but allow overriding help later if needed.
-	return grammar.Load(overridePath, string(data), "grammar.help", syntax.HelpSource)
+	return loader.Load(overridePath, string(data), "grammar.help", grammar.HelpSource)
 }
 
 func initHelpRegistry(g *grammar.Grammar) error {

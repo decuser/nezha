@@ -29,7 +29,7 @@ future feature placeholder
 
 ```text
 engine/   language implementation
-runner/   script-with-prelude execution facade
+runner/   host-facing execution convenience
 cmd/      command clients and gate namespace
 test/     validation
 tools/gates are clients, not engine dependencies
@@ -285,17 +285,38 @@ help metadata is documentation/drift control
 help/doc are not language builtins
 ```
 
-## runner
+## engine/program
 
-Status: retain as top-level core facade.
+Status: retain as canonical program composition layer.
 
 Current role:
 
 ```text
-load grammar/help
+load grammar
 load and evaluate embedded prelude
 create user env enclosed by prelude
 evaluate one script or expression
+normalize execution faults
+```
+
+Boundary:
+
+```text
+program depends on HAL contracts, never the concrete Go substrate
+program owns canonical prelude/user scope and authority assembly
+help/doc catalog validation is not part of execution
+```
+
+## runner
+
+Status: retain as thin top-level host facade.
+
+Current role:
+
+```text
+read source files
+choose the standard Go runtime substrate
+delegate canonical execution to engine/program
 ```
 
 Removed:

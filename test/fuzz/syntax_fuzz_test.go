@@ -3,15 +3,16 @@ package fuzz
 import (
 	"testing"
 
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 var testGrammar *grammar.Grammar
 
 func init() {
 	var err error
-	testGrammar, err = grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	testGrammar, err = loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		panic(err)
 	}

@@ -6,12 +6,13 @@ import (
 	"io"
 	"os"
 
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/runtime/hal/substrate"
 	"nezha/engine/runtime/prelude"
 	"nezha/engine/semantics/evaluator"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 
 	nezhafmt "nezha/cmd/internal/formatting"
 )
@@ -43,7 +44,7 @@ func run(path, stage string, stdout, stderr io.Writer) int {
 	}
 	source := string(data)
 
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		fmt.Fprintf(stderr, "failed to load grammar: %v\n", err)
 		return 1

@@ -1,17 +1,14 @@
-package grammar
+package grammar_test
 
 import (
-	"os"
+	"nezha/engine/language/ebnfxparser"
+	"nezha/engine/language/grammar"
 	"reflect"
 	"testing"
 )
 
 func TestAnalysisCurrentGrammar(t *testing.T) {
-	source, err := os.ReadFile("../grammar.ebnfx")
-	if err != nil {
-		t.Fatal(err)
-	}
-	g, err := NewParser("grammar.ebnfx", string(source)).Parse()
+	g, err := ebnfxparser.NewParser("grammar.ebnfx", grammar.EbnfxSource).Parse()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -31,7 +28,7 @@ func TestAnalysisCurrentGrammar(t *testing.T) {
 	}
 	for name := range wantRefs {
 		if _, ok := a.ASTNodeTypes()[name]; !ok {
-			t.Errorf("ASTNodeTypes missing TokenRef %s", name)
+			t.Errorf("ASTNodeTypes missing grammar.TokenRef %s", name)
 		}
 	}
 	for _, name := range a.ProductionNames() {
@@ -59,12 +56,12 @@ func TestAnalysisCurrentGrammar(t *testing.T) {
 }
 
 func TestAnalysisStructuralFactsSurviveMissingNewlinePrerequisites(t *testing.T) {
-	g := &Grammar{Productions: map[string]*Production{
-		"program": {Name: "program", Expr: &TokenRef{Name: "NAME"}},
+	g := &grammar.Grammar{Productions: map[string]*grammar.Production{
+		"program": {Name: "program", Expr: &grammar.TokenRef{Name: "NAME"}},
 	}}
 	a := g.Reanalyze()
 	if _, ok := a.TokenRefs()["NAME"]; !ok {
-		t.Fatal("structural TokenRef missing")
+		t.Fatal("structural grammar.TokenRef missing")
 	}
 	if a.Newline != nil {
 		t.Fatal("unexpected newline analysis")
@@ -75,13 +72,13 @@ func TestAnalysisStructuralFactsSurviveMissingNewlinePrerequisites(t *testing.T)
 }
 
 func TestReanalyzeReflectsDeliberateMutation(t *testing.T) {
-	g := &Grammar{Productions: map[string]*Production{
-		"program": {Name: "program", Expr: &TokenRef{Name: "NAME"}},
+	g := &grammar.Grammar{Productions: map[string]*grammar.Production{
+		"program": {Name: "program", Expr: &grammar.TokenRef{Name: "NAME"}},
 	}}
 	g.Reanalyze()
-	g.Productions["program"].Expr = &Sequence{Exprs: []Expression{
-		&TokenRef{Name: "NAME"},
-		&TokenRef{Name: "FAKE_TOKEN"},
+	g.Productions["program"].Expr = &grammar.Sequence{Exprs: []grammar.Expression{
+		&grammar.TokenRef{Name: "NAME"},
+		&grammar.TokenRef{Name: "FAKE_TOKEN"},
 	}}
 	if _, ok := g.Analysis().TokenRefs()["FAKE_TOKEN"]; ok {
 		t.Fatal("analysis changed without explicit reanalysis")
@@ -93,11 +90,7 @@ func TestReanalyzeReflectsDeliberateMutation(t *testing.T) {
 }
 
 func TestAnalyzeNewlineRuleReturnsCachedAnalysis(t *testing.T) {
-	source, err := os.ReadFile("../grammar.ebnfx")
-	if err != nil {
-		t.Fatal(err)
-	}
-	g, err := NewParser("grammar.ebnfx", string(source)).Parse()
+	g, err := ebnfxparser.NewParser("grammar.ebnfx", grammar.EbnfxSource).Parse()
 	if err != nil {
 		t.Fatal(err)
 	}

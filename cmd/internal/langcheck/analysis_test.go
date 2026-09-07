@@ -8,8 +8,9 @@ import (
 	"strings"
 	"testing"
 
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 func TestAccessNamingAllowsConstants(t *testing.T) {
@@ -46,7 +47,7 @@ func TestGenericTraversalVisitsUnknownWrapper(t *testing.T) {
 }
 
 func TestASTTypeKnowledgeMatchesGrammar(t *testing.T) {
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,17 +1,14 @@
-package grammar
+package grammar_test
 
 import (
-	"os"
+	"nezha/engine/language/ebnfxparser"
+	"nezha/engine/language/grammar"
 	"strings"
 	"testing"
 )
 
 func TestAnalyzeNewlineRuleCurrentGrammar(t *testing.T) {
-	source, err := os.ReadFile("../grammar.ebnfx")
-	if err != nil {
-		t.Fatal(err)
-	}
-	g, err := NewParser("grammar.ebnfx", string(source)).Parse()
+	g, err := ebnfxparser.NewParser("grammar.ebnfx", grammar.EbnfxSource).Parse()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,7 +30,7 @@ func TestAnalyzeNewlineRuleCurrentGrammar(t *testing.T) {
 	assertSymbols(t, "DeclaredImpossible", got.DeclaredImpossible)
 }
 
-func assertSymbols(t *testing.T, name string, got []SurfaceSymbol, want ...string) {
+func assertSymbols(t *testing.T, name string, got []grammar.SurfaceSymbol, want ...string) {
 	t.Helper()
 	values := make([]string, len(got))
 	for i, symbol := range got {

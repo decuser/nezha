@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/semantics/value"
-	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 // Run executes lint.
@@ -35,7 +35,7 @@ func Run(args []string) int {
 		return 2
 	}
 
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "lint:", err)
 		return 1

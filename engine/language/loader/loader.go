@@ -1,13 +1,16 @@
-package grammar
+package loader
 
 import (
 	"fmt"
 	"strings"
+
+	"nezha/engine/language/ebnfxparser"
+	"nezha/engine/language/grammar"
 )
 
 // Load parses the EBNFX grammar and help file, merges them, and validates 1:1 match.
-func Load(ebnfxFile, ebnfxSource, helpFile, helpSource string) (*Grammar, error) {
-	parser := NewParser(ebnfxFile, ebnfxSource)
+func Load(ebnfxFile, ebnfxSource, helpFile, helpSource string) (*grammar.Grammar, error) {
+	parser := ebnfxparser.NewParser(ebnfxFile, ebnfxSource)
 	g, err := parser.Parse()
 	if err != nil {
 		return nil, fmt.Errorf("parsing %s: %w", ebnfxFile, err)
@@ -60,7 +63,7 @@ func ParseHelp(file, source string) (map[string]HelpEntry, error) {
 	return entries, nil
 }
 
-func mergeHelp(g *Grammar, help map[string]HelpEntry) error {
+func mergeHelp(g *grammar.Grammar, help map[string]HelpEntry) error {
 	for name, prod := range g.Productions {
 		if entry, ok := help[name]; ok {
 			prod.Meta.Doc = entry.Doc
@@ -75,7 +78,7 @@ func mergeHelp(g *Grammar, help map[string]HelpEntry) error {
 	return nil
 }
 
-func validate(g *Grammar, help map[string]HelpEntry) error {
+func validate(g *grammar.Grammar, help map[string]HelpEntry) error {
 	var errors []string
 	grammarNames := make(map[string]bool)
 	for name := range g.Productions {

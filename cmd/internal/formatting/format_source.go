@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
+	"nezha/engine/language/grammar"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 // FormatSource formats valid Nezha source to the canonical style.

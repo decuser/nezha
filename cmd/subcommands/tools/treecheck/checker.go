@@ -223,7 +223,7 @@ func (c *Checker) seedBuiltins() {
 			c.mark(p, "repository Git-hook support")
 		case p == "engineering/session-history.md" || p == "engineering/runtime-optimization-results.md":
 			c.mark(p, "durable engineering record")
-		case p == "engine/syntax/grammar.ebnfx" || p == "engine/syntax/grammar.help" || p == "engine/syntax/grammar.ebnfx.ebnf.gold":
+		case p == "engine/language/grammar/grammar.ebnfx" || p == "engine/language/grammar/grammar.help" || p == "engine/language/grammar/grammar.ebnfx.ebnf.gold":
 			c.mark(p, "authoritative grammar artifact")
 		case p == "engine/runtime/prelude/prelude.nez" || p == "engine/runtime/prelude/prelude.help" || p == "engine/runtime/prelude/prelude.doc":
 			c.mark(p, "prelude artifact")

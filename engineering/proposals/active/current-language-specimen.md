@@ -18,26 +18,27 @@ Everything else in the repository is tooling, validation, documentation, or engi
 
 ```text
 engine/
-  language implementation
+  language implementation and canonical program construction
 
 runner/
-  script-with-prelude execution facade
+  host-facing execution convenience
 
 cmd/
   command-line clients and repository gates
 ```
 
-The runner owns the current execution model:
+`engine/program` owns the canonical execution model:
 
 ```text
 load grammar
-load help metadata
-load/evaluate prelude
+load/evaluate embedded prelude
 create user environment enclosed by prelude
-evaluate one user script
+evaluate one user script or expression
 ```
 
-The `cleanroom` gate checks that this model does not depend on the rest of the repository.
+The runner chooses the standard Go substrate, handles file input, and delegates canonical execution to `engine/program`. Prelude help/doc catalog validation remains a repository invariant rather than part of program execution.
+
+The `cleanroom` gate checks that `engine + runner` remain sufficient without depending on the rest of the repository.
 
 ## Grammar surface
 

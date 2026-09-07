@@ -1,4 +1,4 @@
-package grammar
+package ebnfxparser
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"strings"
 	"unicode"
 
+	"nezha/engine/language/grammar"
 	"nezha/engine/syntax/position"
 )
 
@@ -21,8 +22,8 @@ func NewParser(file, source string) *ebnfParser {
 	return &ebnfParser{source: source, file: file, pos: 0, line: 1, col: 1}
 }
 
-func (p *ebnfParser) Parse() (*Grammar, error) {
-	g := &Grammar{Productions: make(map[string]*Production)}
+func (p *ebnfParser) Parse() (*grammar.Grammar, error) {
+	g := &grammar.Grammar{Productions: make(map[string]*grammar.Production)}
 	p.skipWhitespaceAndComments()
 
 	if p.peek() == '@' && p.lookingAt("@tokens") {
@@ -72,31 +73,31 @@ func (p *ebnfParser) Parse() (*Grammar, error) {
 	return g, nil
 }
 
-func resolveRefs(expr Expression, prods map[string]*Production) Expression {
+func resolveRefs(expr grammar.Expression, prods map[string]*grammar.Production) grammar.Expression {
 	switch e := expr.(type) {
-	case *Sequence:
+	case *grammar.Sequence:
 		for i, sub := range e.Exprs {
 			e.Exprs[i] = resolveRefs(sub, prods)
 		}
-	case *Alternative:
+	case *grammar.Alternative:
 		for i, sub := range e.Exprs {
 			e.Exprs[i] = resolveRefs(sub, prods)
 		}
-	case *Repetition:
+	case *grammar.Repetition:
 		e.Expr = resolveRefs(e.Expr, prods)
-	case *Option:
+	case *grammar.Option:
 		e.Expr = resolveRefs(e.Expr, prods)
-	case *Group:
+	case *grammar.Group:
 		e.Expr = resolveRefs(e.Expr, prods)
-	case *TokenRef:
+	case *grammar.TokenRef:
 		if _, ok := prods[e.Name]; ok {
-			return &Reference{Name: e.Name}
+			return &grammar.Reference{Name: e.Name}
 		}
 	}
 	return expr
 }
 
-func (p *ebnfParser) parseTokensBlock() ([]TokenDef, error) {
+func (p *ebnfParser) parseTokensBlock() ([]grammar.TokenDef, error) {
 	if !p.consumeString("@tokens") {
 		return nil, p.error("expected @tokens")
 	}
@@ -104,7 +105,7 @@ func (p *ebnfParser) parseTokensBlock() ([]TokenDef, error) {
 	if !p.consume('{') {
 		return nil, p.error("expected '{'")
 	}
-	var tokens []TokenDef
+	var tokens []grammar.TokenDef
 	p.skipWhitespaceAndComments()
 	for p.peek() != '}' && p.pos < len(p.source) {
 		tok, err := p.parseTokenDef()
@@ -120,7 +121,7 @@ func (p *ebnfParser) parseTokensBlock() ([]TokenDef, error) {
 	return tokens, nil
 }
 
-func (p *ebnfParser) parseNewlineBlock() (*NewlineRule, error) {
+func (p *ebnfParser) parseNewlineBlock() (*grammar.NewlineRule, error) {
 	startPos := p.position()
 	if !p.consumeString("@newline") {
 		return nil, p.error("expected @newline")
@@ -130,7 +131,7 @@ func (p *ebnfParser) parseNewlineBlock() (*NewlineRule, error) {
 		return nil, p.error("expected '{'")
 	}
 
-	rule := &NewlineRule{Pos: startPos}
+	rule := &grammar.NewlineRule{Pos: startPos}
 	p.skipWhitespaceAndComments()
 	for p.peek() != '}' && p.pos < len(p.source) {
 		if p.peek() == '@' {
@@ -188,7 +189,7 @@ func (p *ebnfParser) parseNewlineBlock() (*NewlineRule, error) {
 	return rule, nil
 }
 
-func validateNewlineDeclaration(g *Grammar) error {
+func validateNewlineDeclaration(g *grammar.Grammar) error {
 	r := g.Newline
 	if r == nil {
 		return fmt.Errorf("missing @newline declaration")
@@ -260,24 +261,24 @@ func validateNewlineDeclaration(g *Grammar) error {
 	return nil
 }
 
-func (p *ebnfParser) parseTokenDef() (TokenDef, error) {
+func (p *ebnfParser) parseTokenDef() (grammar.TokenDef, error) {
 	startPos := p.position()
 	name := p.parseIdentifier()
 	if name == "" {
-		return TokenDef{}, p.error("expected token name")
+		return grammar.TokenDef{}, p.error("expected token name")
 	}
 	p.skipSpaces()
 
-	def := TokenDef{Name: name, Pos: startPos}
+	def := grammar.TokenDef{Name: name, Pos: startPos}
 
 	if p.peek() == '/' {
 		pattern, err := p.parseRegex()
 		if err != nil {
-			return TokenDef{}, err
+			return grammar.TokenDef{}, err
 		}
 		re, err := regexp.Compile("^" + pattern)
 		if err != nil {
-			return TokenDef{}, p.error("invalid regex: " + err.Error())
+			return grammar.TokenDef{}, p.error("invalid regex: " + err.Error())
 		}
 		def.Pattern = re
 	} else {
@@ -313,7 +314,7 @@ func (p *ebnfParser) parseTokenDef() (TokenDef, error) {
 	return def, nil
 }
 
-func (p *ebnfParser) parseProduction() (*Production, error) {
+func (p *ebnfParser) parseProduction() (*grammar.Production, error) {
 	startPos := p.position()
 	name := p.parseIdentifier()
 	if name == "" {
@@ -330,7 +331,7 @@ func (p *ebnfParser) parseProduction() (*Production, error) {
 		return nil, err
 	}
 
-	prod := &Production{Name: name, Expr: expr, Pos: startPos}
+	prod := &grammar.Production{Name: name, Expr: expr, Pos: startPos}
 
 	// Parse decorations (may span multiple lines)
 	for {
@@ -354,16 +355,16 @@ func (p *ebnfParser) parseProduction() (*Production, error) {
 	return prod, nil
 }
 
-func (p *ebnfParser) parseExpression() (Expression, error) {
+func (p *ebnfParser) parseExpression() (grammar.Expression, error) {
 	return p.parseAlternative()
 }
 
-func (p *ebnfParser) parseAlternative() (Expression, error) {
+func (p *ebnfParser) parseAlternative() (grammar.Expression, error) {
 	first, err := p.parseSequenceExpr()
 	if err != nil {
 		return nil, err
 	}
-	var alts []Expression
+	var alts []grammar.Expression
 	alts = append(alts, first)
 
 	for {
@@ -382,11 +383,11 @@ func (p *ebnfParser) parseAlternative() (Expression, error) {
 	if len(alts) == 1 {
 		return alts[0], nil
 	}
-	return &Alternative{Exprs: alts}, nil
+	return &grammar.Alternative{Exprs: alts}, nil
 }
 
-func (p *ebnfParser) parseSequenceExpr() (Expression, error) {
-	var terms []Expression
+func (p *ebnfParser) parseSequenceExpr() (grammar.Expression, error) {
+	var terms []grammar.Expression
 	for {
 		p.skipSpaces()
 		term, err := p.parseTerm()
@@ -404,10 +405,10 @@ func (p *ebnfParser) parseSequenceExpr() (Expression, error) {
 	if len(terms) == 1 {
 		return terms[0], nil
 	}
-	return &Sequence{Exprs: terms}, nil
+	return &grammar.Sequence{Exprs: terms}, nil
 }
 
-func (p *ebnfParser) parseTerm() (Expression, error) {
+func (p *ebnfParser) parseTerm() (grammar.Expression, error) {
 	p.skipSpaces()
 	ch := p.peek()
 
@@ -426,7 +427,7 @@ func (p *ebnfParser) parseTerm() (Expression, error) {
 		if !p.consume(')') {
 			return nil, p.error("expected ')'")
 		}
-		return &Group{Expr: expr}, nil
+		return &grammar.Group{Expr: expr}, nil
 	}
 
 	if ch == '[' {
@@ -440,7 +441,7 @@ func (p *ebnfParser) parseTerm() (Expression, error) {
 		if !p.consume(']') {
 			return nil, p.error("expected ']'")
 		}
-		return &Option{Expr: expr}, nil
+		return &grammar.Option{Expr: expr}, nil
 	}
 
 	if ch == '{' {
@@ -454,7 +455,7 @@ func (p *ebnfParser) parseTerm() (Expression, error) {
 		if !p.consume('}') {
 			return nil, p.error("expected '}'")
 		}
-		return &Repetition{Expr: expr}, nil
+		return &grammar.Repetition{Expr: expr}, nil
 	}
 
 	if ch == '"' {
@@ -467,15 +468,15 @@ func (p *ebnfParser) parseTerm() (Expression, error) {
 		if !p.consume('"') {
 			return nil, p.error("unterminated string")
 		}
-		return &Terminal{Value: value}, nil
+		return &grammar.Terminal{Value: value}, nil
 	}
 
 	if unicode.IsLetter(rune(ch)) || ch == '_' {
 		name := p.parseIdentifier()
 		if isTokenClass(name) {
-			return &TokenRef{Name: name}, nil
+			return &grammar.TokenRef{Name: name}, nil
 		}
-		return &Reference{Name: name}, nil
+		return &grammar.Reference{Name: name}, nil
 	}
 
 	return nil, nil
@@ -533,7 +534,7 @@ func (p *ebnfParser) parseRegex() (string, error) {
 }
 
 func (p *ebnfParser) parseIdentifier() string {
-	// Grammar identifiers are intentionally ASCII today. This scanner advances
+	// grammar.Grammar identifiers are intentionally ASCII today. This scanner advances
 	// byte-by-byte; permitting Unicode identifiers would require rune-aware
 	// decoding rather than widening the character predicate here.
 	start := p.pos

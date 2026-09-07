@@ -9,8 +9,8 @@ import (
 	nezhafmt "nezha/cmd/internal/formatting"
 	"nezha/cmd/internal/targetresolve"
 	"nezha/cmd/internal/testfixture"
-	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 )
 
 // CheckFormatting returns the list of files that are not already formatted.
@@ -20,7 +20,7 @@ func CheckFormatting(args []string, includePrelude bool) ([]string, error) {
 }
 
 func checkFormatting(args []string, includePrelude, all bool) ([]string, error) {
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		return nil, err
 	}

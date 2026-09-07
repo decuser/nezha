@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"sync"
 
+	"nezha/engine/language/grammar"
 	"nezha/engine/runtime/hal"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 // handlerFunc is the signature for node handlers.

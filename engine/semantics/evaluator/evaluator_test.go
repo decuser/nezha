@@ -4,14 +4,15 @@ import (
 	"sync"
 	"testing"
 
+	"nezha/engine/language/grammar"
+	"nezha/engine/language/loader"
 	"nezha/engine/runtime/hal/substrate"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 func eval(t *testing.T, source string) value.Value {
-	g, _ := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, _ := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	lexer := syntax.NewLexer(g, "test", source)
 	tokens, _ := lexer.Tokenize()
 	parser := syntax.NewParser(g, tokens, source)
@@ -156,7 +157,7 @@ func TestEvalPipe(t *testing.T) {
 }
 
 func TestHandlerCoverageMatchesGrammarAST(t *testing.T) {
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		t.Fatalf("load grammar: %v", err)
 	}
@@ -187,7 +188,7 @@ func TestHandlerCoverageMatchesGrammarAST(t *testing.T) {
 }
 
 func TestHandlerCoverageRejectsBothDirections(t *testing.T) {
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		t.Fatalf("load grammar: %v", err)
 	}
@@ -212,7 +213,7 @@ func TestHandlerCoverageRejectsBothDirections(t *testing.T) {
 }
 
 func TestBinaryOperatorCoverageMatchesGrammar(t *testing.T) {
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		t.Fatalf("load grammar: %v", err)
 	}
@@ -232,7 +233,7 @@ func TestBinaryOperatorCoverageMatchesGrammar(t *testing.T) {
 }
 
 func TestBinaryOperatorCoverageRejectsBothDirections(t *testing.T) {
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		t.Fatalf("load grammar: %v", err)
 	}
@@ -259,7 +260,7 @@ func TestBinaryOperatorCoverageRejectsBothDirections(t *testing.T) {
 }
 
 func TestBinaryOperatorMembershipComesFromGrammar(t *testing.T) {
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
+	g, err := loader.Load("grammar.ebnfx", grammar.EbnfxSource, "grammar.help", grammar.HelpSource)
 	if err != nil {
 		t.Fatalf("load grammar: %v", err)
 	}

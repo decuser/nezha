@@ -5,9 +5,9 @@ import (
 	"sort"
 	"strings"
 
+	"nezha/engine/language/grammar"
 	"nezha/engine/runtime/help"
 	"nezha/engine/syntax"
-	"nezha/engine/syntax/grammar"
 )
 
 // Catalog is the engine-owned derived view of the authored prelude source,

@@ -2,8 +2,8 @@ package lint
 
 import (
 	"nezha/cmd/internal/langcheck"
+	"nezha/engine/language/grammar"
 	"nezha/engine/semantics/value"
-	"nezha/engine/syntax/grammar"
 )
 
 // Diagnostic is the structural diagnostic used by the lint CLI.
