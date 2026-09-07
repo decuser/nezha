@@ -59,9 +59,6 @@ var nonHALRoles = map[string]Role{
 	"_sqrt_inexact": RoleProvider,
 	"_cos_inexact":  RoleProvider,
 	"_sin_inexact":  RoleProvider,
-
-	// Runtime/module service.
-	"_module_roots": RoleService,
 }
 
 // RoleOf returns the architectural role for a primitive. Canonical HAL host

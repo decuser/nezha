@@ -45,6 +45,4 @@ func (g *GoRuntime) registerHAL() {
 		g.registerContextFreePrimitive(name, fn)
 	}
 
-	// Runtime/module service.
-	g.registerPrimitive("_module_roots", g.halModuleRoots)
 }
