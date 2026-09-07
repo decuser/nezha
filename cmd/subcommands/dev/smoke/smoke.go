@@ -9,15 +9,15 @@ import (
 	"strconv"
 	"strings"
 
-	"aiki/cmd/internal/targetresolve"
-	"aiki/cmd/internal/testfixture"
+	"nezha/cmd/internal/targetresolve"
+	"nezha/cmd/internal/testfixture"
 )
 
 func Run(args []string) int {
 	fs := flag.NewFlagSet("smoke", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
 	gold := fs.Bool("gold", false, "write blessed .gold transcripts")
-	allTargets := fs.Bool("all", false, "include targets excluded by .aikiignore")
+	allTargets := fs.Bool("all", false, "include targets excluded by .nezhaignore")
 	if err := fs.Parse(args); err != nil {
 		return 2
 	}
@@ -77,7 +77,7 @@ func blessPair(aiPath string) error {
 		return err
 	}
 
-	f, err := os.CreateTemp("", "aiki-canvas-*.transcript")
+	f, err := os.CreateTemp("", "nezha-canvas-*.transcript")
 	if err != nil {
 		return fmt.Errorf("create canvas transcript: %w", err)
 	}
@@ -85,7 +85,7 @@ func blessPair(aiPath string) error {
 	f.Close()
 	defer os.Remove(canvasPath)
 
-	stdout, stderr, exitCode, err := runAikiFile(aiPath, stdin, canvasPath)
+	stdout, stderr, exitCode, err := runNezhaFile(aiPath, stdin, canvasPath)
 	if err != nil {
 		return fmt.Errorf("run error: %w", err)
 	}
@@ -195,7 +195,7 @@ func runPair(aiPath string) error {
 	// requiring a human to watch it.
 	var canvasRecordPath string
 	if len(expCanvas) > 0 {
-		f, err := os.CreateTemp("", "aiki-canvas-*.transcript")
+		f, err := os.CreateTemp("", "nezha-canvas-*.transcript")
 		if err != nil {
 			return fmt.Errorf("create canvas transcript: %w", err)
 		}
@@ -204,7 +204,7 @@ func runPair(aiPath string) error {
 		defer os.Remove(canvasRecordPath)
 	}
 
-	stdout, stderr, exitCode, err := runAikiFile(aiPath, stdin, canvasRecordPath)
+	stdout, stderr, exitCode, err := runNezhaFile(aiPath, stdin, canvasRecordPath)
 	if err != nil {
 		return fmt.Errorf("run error: %w", err)
 	}
@@ -336,7 +336,7 @@ func loadTranscript(path string) (stdin, stdout, stderr []byte, expExit int, can
 	return inBuf.Bytes(), outBuf.Bytes(), errBuf.Bytes(), expExit, canvas, displays, nil
 }
 
-func runAikiFile(path string, stdin []byte, canvasRecordPath string) (stdout []byte, stderr []byte, exitCode int, err error) {
+func runNezhaFile(path string, stdin []byte, canvasRecordPath string) (stdout []byte, stderr []byte, exitCode int, err error) {
 	exe, err := os.Executable()
 	if err != nil {
 		return nil, nil, 1, fmt.Errorf("locate executable: %w", err)
@@ -350,7 +350,7 @@ func runAikiFile(path string, stdin []byte, canvasRecordPath string) (stdout []b
 
 	cmd.Env = os.Environ()
 	if canvasRecordPath != "" {
-		cmd.Env = append(cmd.Env, "AIKI_CANVAS=record", "AIKI_CANVAS_RECORD="+canvasRecordPath)
+		cmd.Env = append(cmd.Env, "NEZHA_CANVAS=record", "NEZHA_CANVAS_RECORD="+canvasRecordPath)
 	}
 
 	var outBuf, errBuf bytes.Buffer

@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"aiki/engine/runtime/modules"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/runtime/modules"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // Run executes static source diagnostics that do not run the target program.
@@ -19,7 +19,7 @@ func Run(args []string) int {
 		return 2
 	}
 	if !*ffiUse || fs.NArg() != 1 {
-		fmt.Fprintln(os.Stderr, "usage: aiki check --ffi-use file.ai")
+		fmt.Fprintln(os.Stderr, "usage: nezha check --ffi-use file.ai")
 		return 2
 	}
 

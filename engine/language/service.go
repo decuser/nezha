@@ -1,17 +1,17 @@
-// Package language provides editor-independent Aiki language services.
-// It depends inward on Aiki language authorities; protocol/editor adapters
+// Package language provides editor-independent Nezha language services.
+// It depends inward on Nezha language authorities; protocol/editor adapters
 // depend on this package, never the reverse.
 package language
 
 import (
 	"errors"
 
-	"aiki/engine"
-	"aiki/engine/formatter"
-	languageobserve "aiki/engine/language/observe"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/formatter"
+	languageobserve "nezha/engine/language/observe"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // Document is the neutral source unit consumed by language services.
@@ -22,7 +22,7 @@ type Document struct {
 	Version int
 }
 
-// Service provides editor-independent queries over Aiki source.
+// Service provides editor-independent queries over Nezha source.
 type Service struct {
 	grammar  *grammar.Grammar
 	catalog  Catalog
@@ -58,7 +58,7 @@ func (s *Service) hit(metric languageobserve.Metric, n int64) {
 
 // Diagnostics returns lexical, parse, or structural findings for doc.
 // Syntax failure stops structural analysis because there is no valid tree to
-// inspect. Diagnostics use Aiki-native source positions.
+// inspect. Diagnostics use Nezha-native source positions.
 func (s *Service) Diagnostics(doc Document, scope value.Scope) []Diagnostic {
 	s.observe(languageobserve.EventDiagnosticsRequested, doc, "")
 	s.hit(languageobserve.MetricDiagnosticsRequest, 1)

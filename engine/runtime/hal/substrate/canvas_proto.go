@@ -23,7 +23,7 @@ import (
 //   u8  opcode
 //   ... opcode specific fields
 //
-// The Aiki surface API remains string op based. This only changes transport.
+// The Nezha surface API remains string op based. This only changes transport.
 
 const canvasProtoVersion = 1
 
@@ -38,7 +38,7 @@ const (
 )
 
 // CanvasWireBatch groups multiple commands into a single frame.
-// This is transport internal and transparent to Aiki level code.
+// This is transport internal and transparent to Nezha level code.
 type CanvasWireBatch struct{ Cmds []any }
 
 // CanvasWireCmd carries a generic canvas command.
@@ -217,7 +217,7 @@ func (d *CanvasDecoder) Read() (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	if os.Getenv("AIKI_CANVAS_OBSERVER") == "1" {
+	if os.Getenv("NEZHA_CANVAS_OBSERVER") == "1" {
 		canvasObserveDecoded(cmd)
 	}
 	return cmd, nil

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"aiki/engine/runtime/hal"
+	"nezha/engine/runtime/hal"
 )
 
 func TestHALCanonicalMetadataIsCoherent(t *testing.T) {

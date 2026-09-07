@@ -15,7 +15,7 @@ func Run(args []string) int {
 		return 2
 	}
 	if fs.NArg() != 0 {
-		fmt.Fprintln(os.Stderr, "usage: aiki treecheck [-root dir] [-allow file]")
+		fmt.Fprintln(os.Stderr, "usage: nezha treecheck [-root dir] [-allow file]")
 		return 2
 	}
 

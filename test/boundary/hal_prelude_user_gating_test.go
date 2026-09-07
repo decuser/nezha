@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"testing"
 
-	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/runtime/prelude"
-	"aiki/engine/semantics/evaluator"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/runtime/hal/substrate"
+	"nezha/engine/runtime/prelude"
+	"nezha/engine/semantics/evaluator"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // TestUserCannotSeeHAL verifies user scope cannot resolve _prefixed names.

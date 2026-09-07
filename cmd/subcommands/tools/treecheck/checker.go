@@ -64,7 +64,7 @@ func Check(root, allowFile string) (Result, error) {
 	c.applyAllow()
 	c.seedBuiltins()
 	c.checkStructuralPairs()
-	c.resolveAikiPackageReferences()
+	c.resolveNezhaPackageReferences()
 	c.resolveTextReferences()
 	c.resolveDirectoryReadmes()
 
@@ -133,7 +133,7 @@ func (c *Checker) loadFiles() error {
 			}
 			return nil
 		}
-		if rel == "aiki" || strings.HasPrefix(rel, "profile-out/") {
+		if rel == "nezha" || strings.HasPrefix(rel, "profile-out/") {
 			return nil
 		}
 		c.files[rel] = true
@@ -201,7 +201,7 @@ func (c *Checker) seedBuiltins() {
 		case filepath.Base(p) == ".gitignore":
 			c.mark(p, "directory ignore policy")
 		case p == "engine/runtime/prelude/prelude_test.ai":
-			c.mark(p, "Aiki-native prelude test")
+			c.mark(p, "Nezha-native prelude test")
 		case (strings.HasPrefix(p, "test/behavior/") || strings.HasPrefix(p, "test/visual/")) && strings.HasSuffix(p, "_smoke.ai"):
 			c.mark(p, "smoke-test specimen")
 		case strings.HasPrefix(p, "test/structure/engine/") && strings.HasSuffix(p, "_engine.ai"):
@@ -364,13 +364,13 @@ func (c *Checker) structuralErrors() []Finding {
 		}
 		sort.Strings(paths)
 		for _, p := range paths {
-			out = append(out, Finding{Path: p, Reason: fmt.Sprintf("duplicate Aiki package %q (%s)", name, strings.Join(paths, ", "))})
+			out = append(out, Finding{Path: p, Reason: fmt.Sprintf("duplicate Nezha package %q (%s)", name, strings.Join(paths, ", "))})
 		}
 	}
 	return out
 }
 
-func (c *Checker) resolveAikiPackageReferences() {
+func (c *Checker) resolveNezhaPackageReferences() {
 	packageFiles := make(map[string][]string)
 	for p := range c.files {
 		if !isNamedPackageSource(p) {

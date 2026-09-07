@@ -1,6 +1,6 @@
 package formatter
 
-import "aiki/engine/syntax"
+import "nezha/engine/syntax"
 
 func (p *printer) printPackage(node *syntax.Node) {
 	p.observe("printPackage", "enter", "package_stmt")

@@ -1,5 +1,5 @@
 // Package hostnative is the generic registration and execution boundary for
-// host-native implementations of Aiki semantic contracts. Implementation and
+// host-native implementations of Nezha semantic contracts. Implementation and
 // operation names are resolved only during composition; steady-state calls use
 // the returned direct function value.
 package hostnative
@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"sync"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 type Operation func(args []value.Value) value.Value

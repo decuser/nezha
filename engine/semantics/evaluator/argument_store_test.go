@@ -3,7 +3,7 @@ package evaluator
 import (
 	"testing"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 func TestReusableArgTargetRequiresNonEscapingNonRestFunction(t *testing.T) {

@@ -8,18 +8,18 @@ import (
 	"testing"
 	"time"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 // Test helper child process. This is invoked by exec'ing the test binary itself.
 func TestCanvasFakeChild(t *testing.T) {
-	if os.Getenv("AIKI_CANVAS_FAKE_CHILD") != "1" {
+	if os.Getenv("NEZHA_CANVAS_FAKE_CHILD") != "1" {
 		return
 	}
 
 	fmt.Fprintln(os.Stdout, "READY")
 
-	if os.Getenv("AIKI_CANVAS_FAKE_EXIT_EARLY") == "1" {
+	if os.Getenv("NEZHA_CANVAS_FAKE_EXIT_EARLY") == "1" {
 		os.Exit(0)
 	}
 
@@ -45,7 +45,7 @@ func withFakeCanvasExec(t *testing.T) func() {
 	canvasExecCommand = func(name string, args ...string) *exec.Cmd {
 		// Ignore name and args; run this test binary as the child.
 		cmd := exec.Command(os.Args[0], "-test.run=TestCanvasFakeChild")
-		cmd.Env = append(os.Environ(), "AIKI_CANVAS_FAKE_CHILD=1")
+		cmd.Env = append(os.Environ(), "NEZHA_CANVAS_FAKE_CHILD=1")
 		return cmd
 	}
 
@@ -109,7 +109,7 @@ func TestChildExitEarlyDoesNotPanicOnSend(t *testing.T) {
 	prev := canvasExecCommand
 	canvasExecCommand = func(name string, args ...string) *exec.Cmd {
 		cmd := exec.Command(os.Args[0], "-test.run=TestCanvasFakeChild")
-		cmd.Env = append(os.Environ(), "AIKI_CANVAS_FAKE_CHILD=1", "AIKI_CANVAS_FAKE_EXIT_EARLY=1")
+		cmd.Env = append(os.Environ(), "NEZHA_CANVAS_FAKE_CHILD=1", "NEZHA_CANVAS_FAKE_EXIT_EARLY=1")
 		return cmd
 	}
 	defer func() { canvasExecCommand = prev }()

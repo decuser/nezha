@@ -3,8 +3,8 @@ package substrate
 import (
 	"testing"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/runtime/primitives"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/runtime/primitives"
 )
 
 func TestCompatibilityRegistrySeparatedByRole(t *testing.T) {

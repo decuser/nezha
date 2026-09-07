@@ -1,6 +1,6 @@
 package value
 
-// CompareNatural compares Aiki values that have a language-defined natural
+// CompareNatural compares Nezha values that have a language-defined natural
 // ordering. It returns cmp < 0 when left precedes right, cmp == 0 when equal,
 // cmp > 0 when left follows right, and ok == false when the values are not
 // naturally comparable. Natural ordering is defined only for values of the

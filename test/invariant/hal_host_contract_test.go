@@ -9,15 +9,15 @@ import (
 	"strings"
 	"testing"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/runtime/hal/substrate"
+	"nezha/engine/semantics/value"
 )
 
 // TestHALHostOperationThreeNameCoverage makes the M1 three-name relationship
 // executable. Every canonical host contract must have one compatibility
-// primitive, one substrate provenance name, and at least one Aiki-facing owner.
-// The Aiki source named by the descriptor must actually depend on that primitive.
+// primitive, one substrate provenance name, and at least one Nezha-facing owner.
+// The Nezha source named by the descriptor must actually depend on that primitive.
 func TestHALHostOperationThreeNameCoverage(t *testing.T) {
 	root := distributionRoot(t)
 	rt := substrate.NewGoRuntime()
@@ -50,7 +50,7 @@ func TestHALHostOperationThreeNameCoverage(t *testing.T) {
 			t.Errorf("%s: incomplete host contract metadata", op.Identity)
 		}
 		if op.SemanticObservation == "" {
-			t.Errorf("%s: missing Aiki-level semantic observation identity", op.Identity)
+			t.Errorf("%s: missing Nezha-level semantic observation identity", op.Identity)
 		}
 		if prior, ok := identities[op.Identity]; ok {
 			t.Errorf("duplicate HAL identity %s on %s and %s", op.Identity, prior, op.Primitive)
@@ -63,12 +63,12 @@ func TestHALHostOperationThreeNameCoverage(t *testing.T) {
 		if !visible[op.Primitive] {
 			t.Errorf("%s: compatibility primitive %s is not registered", op.Identity, op.Primitive)
 		}
-		if len(op.AikiBindings) == 0 {
-			t.Errorf("%s: no Aiki programmer-facing binding recorded", op.Identity)
+		if len(op.NezhaBindings) == 0 {
+			t.Errorf("%s: no Nezha programmer-facing binding recorded", op.Identity)
 		}
 
-		for _, b := range op.AikiBindings {
-			assertAikiBindingUsesPrimitive(t, root, b.Name, b.Source, op.Primitive)
+		for _, b := range op.NezhaBindings {
+			assertNezhaBindingUsesPrimitive(t, root, b.Name, b.Source, op.Primitive)
 			authority := rt.AuthorityForSource(b.Source)
 			if !authority.Allows(op.Identity) {
 				t.Errorf("%s: trusted source %s lacks canonical authority %s", op.Identity, b.Source, op.Identity)
@@ -80,12 +80,12 @@ func TestHALHostOperationThreeNameCoverage(t *testing.T) {
 	}
 }
 
-func assertAikiBindingUsesPrimitive(t *testing.T, root, qualifiedName, source, primitive string) {
+func assertNezhaBindingUsesPrimitive(t *testing.T, root, qualifiedName, source, primitive string) {
 	t.Helper()
 	path := filepath.Join(root, filepath.FromSlash(source))
 	data, err := os.ReadFile(path)
 	if err != nil {
-		t.Errorf("%s: read Aiki binding source %s: %v", qualifiedName, source, err)
+		t.Errorf("%s: read Nezha binding source %s: %v", qualifiedName, source, err)
 		return
 	}
 

@@ -1,4 +1,4 @@
-package aikiapp
+package cli
 
 import (
 	"errors"
@@ -8,8 +8,8 @@ import (
 	"runtime/pprof"
 	"runtime/trace"
 
-	"aiki/engine/runner"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runner"
+	"nezha/engine/semantics/value"
 )
 
 func Main() {

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"unicode"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 // halShape returns the shape of a list, or :list if unshaped.

@@ -7,22 +7,22 @@ import (
 	"sort"
 	"strings"
 
-	"aiki/cmd/internal/targetresolve"
-	"aiki/engine/language"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/cmd/internal/targetresolve"
+	"nezha/engine/language"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 func Run(args []string) int {
 	fs := flag.NewFlagSet("tags", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
 	output := fs.String("o", "tags", "output tags file ('-' for stdout)")
-	allTargets := fs.Bool("all", false, "include targets excluded by .aikiignore")
+	allTargets := fs.Bool("all", false, "include targets excluded by .nezhaignore")
 	if err := fs.Parse(args); err != nil {
 		return 2
 	}
 	if fs.NArg() == 0 {
-		fmt.Fprintln(os.Stderr, "usage: aiki tags [-o file] <file.ai|dir|path/...> [more targets]")
+		fmt.Fprintln(os.Stderr, "usage: nezha tags [-o file] <file.ai|dir|path/...> [more targets]")
 		return 2
 	}
 	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)

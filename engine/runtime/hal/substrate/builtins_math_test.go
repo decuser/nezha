@@ -3,7 +3,7 @@ package substrate
 import (
 	"testing"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 func mathNumber(t *testing.T, text string) *value.Number {

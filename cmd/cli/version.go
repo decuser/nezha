@@ -1,3 +1,3 @@
-package aikiapp
+package cli
 
 var Version = "dev"

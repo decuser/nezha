@@ -1,8 +1,8 @@
 package substrate
 
 import (
-	"aiki/engine"
-	"aiki/engine/runtime/hal"
+	"nezha/engine"
+	"nezha/engine/runtime/hal"
 )
 
 func semanticSiteFromContext(ctx *hal.EvalContext) engine.SemanticSite {

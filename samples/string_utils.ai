@@ -166,8 +166,8 @@ println("join a b c with dash:")
 println(my_join(["a", "b", "c"], "-"))
 println("")
 
-println("replace world with aiki:")
-println(my_replace("hello world", "world", "aiki"))
+println("replace world with nezha:")
+println(my_replace("hello world", "world", "nezha"))
 println("")
 
 println("trim with spaces:")

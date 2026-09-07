@@ -1,15 +1,15 @@
 # ----------------------------------------------------------------------
-# Local Aiki build products
+# Local Nezha build products
 # ----------------------------------------------------------------------
 
-/aiki*
-/aiki.exe
-/aiki-canvas
-/aiki-canvas.exe
+/nezha*
+/nezha.exe
+/nezha-canvas
+/nezha-canvas.exe
 
-# Historical/local named test binaries (aiki7, aiki8, aiki9, etc.)
-/aiki[0-9]*
-/aiki-cut*
+# Historical/local named test binaries (nezha7, nezha8, nezha9, etc.)
+/nezha[0-9]*
+/nezha-cut*
 
 # ----------------------------------------------------------------------
 # Generated profiling / coverage output

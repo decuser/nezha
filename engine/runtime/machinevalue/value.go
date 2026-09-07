@@ -1,9 +1,9 @@
 // Package machinevalue owns the interned fixed-width scalar values used at
 // machine/realization boundaries. The finite domains are allocated once so hot
-// register/address traffic does not allocate ordinary Aiki values.
+// register/address traffic does not allocate ordinary Nezha values.
 package machinevalue
 
-import "aiki/engine/semantics/value"
+import "nezha/engine/semantics/value"
 
 const Provider = "machine/ffi"
 

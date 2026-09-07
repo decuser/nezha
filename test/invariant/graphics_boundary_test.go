@@ -10,14 +10,14 @@ import (
 	"testing"
 )
 
-// Aiki's architecture places host facilities behind the HAL, so that the
+// Nezha's architecture places host facilities behind the HAL, so that the
 // language itself does not depend on any particular host library. Graphics is
 // the host facility with the largest dependency and the one most able to leak:
 // the ebiten package fails in a package-level init when no display is
 // available, which takes down any program that links it, including programs
 // that never draw.
 //
-// These tests hold that boundary. The text-facing aiki executable must not link
+// These tests hold that boundary. The text-facing nezha executable must not link
 // Ebitengine at all; only the dedicated canvas renderer may import it. This is
 // stronger than merely confining the import to one file, because package init
 // still runs for every process that links that file.
@@ -108,7 +108,7 @@ func TestLanguageCoreFreeOfGraphics(t *testing.T) {
 	root := distributionRoot(t)
 
 	for _, pkg := range languageCorePackages {
-		for _, prefix := range []string{graphicsImportPath, "aiki/engine/runtime/hal/substrate"} {
+		for _, prefix := range []string{graphicsImportPath, "nezha/engine/runtime/hal/substrate"} {
 			if files := goFilesImporting(t, root, pkg, prefix, false); len(files) > 0 {
 				t.Errorf("%s must not depend on %s, but %s does",
 					pkg, prefix, strings.Join(files, ", "))
@@ -122,15 +122,15 @@ func TestLanguageCoreFreeOfGraphics(t *testing.T) {
 // package can be imported indirectly and initialize GLFW before main runs.
 func TestTextExecutableFreeOfGraphics(t *testing.T) {
 	root := distributionRoot(t)
-	cmd := exec.Command("go", "list", "-deps", "-f", "{{.ImportPath}}", "./cmd/aiki")
+	cmd := exec.Command("go", "list", "-deps", "-f", "{{.ImportPath}}", "./cmd/nezha")
 	cmd.Dir = root
 	out, err := cmd.Output()
 	if err != nil {
-		t.Fatalf("go list ./cmd/aiki: %v", err)
+		t.Fatalf("go list ./cmd/nezha: %v", err)
 	}
 	for _, dep := range strings.Fields(string(out)) {
 		if strings.HasPrefix(dep, graphicsImportPath) {
-			t.Fatalf("cmd/aiki must not link host graphics package, found dependency %s", dep)
+			t.Fatalf("cmd/nezha must not link host graphics package, found dependency %s", dep)
 		}
 	}
 }

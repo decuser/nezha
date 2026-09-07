@@ -16,16 +16,16 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"aiki/cmd/internal/targetresolve"
-	"aiki/cmd/internal/testfixture"
-	aikifmt "aiki/cmd/subcommands/tools/fmt"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/cmd/internal/targetresolve"
+	"nezha/cmd/internal/testfixture"
+	nezhafmt "nezha/cmd/subcommands/tools/fmt"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 const distributionWidth = 100
 
-// Config mirrors the safety/user interaction surface of aiki fmt.
+// Config mirrors the safety/user interaction surface of nezha fmt.
 type Config struct {
 	Write         bool
 	ListOnly      bool
@@ -94,7 +94,7 @@ func formatFile(path string, cfg Config, stdout io.Writer) (bool, error) {
 	case ".go":
 		formatted, err = formatGo(path, string(data))
 	case ".ai":
-		formatted, err = formatAiki(path, string(data))
+		formatted, err = formatNezha(path, string(data))
 	default:
 		return false, fmt.Errorf("unsupported file type: %s", path)
 	}
@@ -250,43 +250,43 @@ func restyleGoMapValues(source string) string {
 	return out
 }
 
-func formatAiki(path, source string) (string, error) {
+func formatNezha(path, source string) (string, error) {
 	g, err := loadGrammar()
 	if err != nil {
 		return "", err
 	}
-	canonical, err := aikifmt.FormatSource(g, path, source)
+	canonical, err := nezhafmt.FormatSource(g, path, source)
 	if err != nil {
 		return "", err
 	}
-	before, err := parseAikiAST(g, path, canonical)
+	before, err := parseNezhaAST(g, path, canonical)
 	if err != nil {
 		return "", err
 	}
 
 	current := canonical
 	for pass := 0; pass < 8; pass++ {
-		restyled := restyleAiki(current)
-		normalized, err := aikifmt.FormatSource(g, path, restyled)
+		restyled := restyleNezha(current)
+		normalized, err := nezhafmt.FormatSource(g, path, restyled)
 		if err != nil {
-			return "", fmt.Errorf("restyle produced invalid Aiki: %w", err)
+			return "", fmt.Errorf("restyle produced invalid Nezha: %w", err)
 		}
-		after, err := parseAikiAST(g, path, normalized)
+		after, err := parseNezhaAST(g, path, normalized)
 		if err != nil {
 			return "", err
 		}
-		if !aikiASTEqual(before, after) {
-			return "", fmt.Errorf("distfmt changed Aiki syntax tree; refusing to write")
+		if !nezhaASTEqual(before, after) {
+			return "", fmt.Errorf("distfmt changed Nezha syntax tree; refusing to write")
 		}
 		if normalized == current {
 			return normalized, nil
 		}
 		current = normalized
 	}
-	return "", fmt.Errorf("distfmt Aiki layout did not reach a fixed point")
+	return "", fmt.Errorf("distfmt Nezha layout did not reach a fixed point")
 }
 
-func parseAikiAST(g *grammar.Grammar, path, source string) (*syntax.Node, error) {
+func parseNezhaAST(g *grammar.Grammar, path, source string) (*syntax.Node, error) {
 	lx := syntax.NewLexer(g, path, source, nil)
 	tokens, err := lx.Tokenize()
 	if err != nil {
@@ -296,7 +296,7 @@ func parseAikiAST(g *grammar.Grammar, path, source string) (*syntax.Node, error)
 	return ps.Parse()
 }
 
-func aikiASTEqual(a, b *syntax.Node) bool {
+func nezhaASTEqual(a, b *syntax.Node) bool {
 	if a == nil || b == nil {
 		return a == b
 	}
@@ -309,7 +309,7 @@ func aikiASTEqual(a, b *syntax.Node) bool {
 		return false
 	}
 	for i := range ac {
-		if !aikiASTEqual(ac[i], bc[i]) {
+		if !nezhaASTEqual(ac[i], bc[i]) {
 			return false
 		}
 	}
@@ -331,10 +331,10 @@ func loadGrammar() (*grammar.Grammar, error) {
 	return grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
 }
 
-// restyleAiki expands long single-line comma-separated lists and calls. The
+// restyleNezha expands long single-line comma-separated lists and calls. The
 // canonical formatter preserves these explicit multiline layouts, so distfmt
-// output remains stable under subsequent aiki fmt passes.
-func restyleAiki(source string) string {
+// output remains stable under subsequent nezha fmt passes.
+func restyleNezha(source string) string {
 	lines := strings.Split(source, "\n")
 	var out []string
 	for _, line := range lines {
@@ -342,9 +342,9 @@ func restyleAiki(source string) string {
 			out = append(out, line)
 			continue
 		}
-		restyled, ok := expandAikiDelimited(line, '[', ']')
+		restyled, ok := expandNezhaDelimited(line, '[', ']')
 		if !ok {
-			restyled, ok = expandAikiDelimited(line, '(', ')')
+			restyled, ok = expandNezhaDelimited(line, '(', ')')
 		}
 		if ok {
 			out = append(out, restyled...)
@@ -355,7 +355,7 @@ func restyleAiki(source string) string {
 	return strings.Join(out, "\n")
 }
 
-func expandAikiDelimited(line string, openRune, closeRune rune) ([]string, bool) {
+func expandNezhaDelimited(line string, openRune, closeRune rune) ([]string, bool) {
 	open := strings.IndexRune(line, openRune)
 	close := strings.LastIndex(line, string(closeRune))
 	if open < 0 || close <= open {

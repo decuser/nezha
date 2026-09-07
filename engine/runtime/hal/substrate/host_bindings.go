@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"aiki/engine/runtime/hal"
+	"nezha/engine/runtime/hal"
 )
 
 // goHostProvenance records how this substrate realizes each architectural HAL
@@ -37,7 +37,7 @@ func (g *GoRuntime) HostOperations() []hal.HostOperation {
 	for _, op := range g.hostBindings {
 		copyOp := op
 		copyOp.Context = append([]string(nil), op.Context...)
-		copyOp.AikiBindings = append([]hal.AikiBinding(nil), op.AikiBindings...)
+		copyOp.NezhaBindings = append([]hal.NezhaBinding(nil), op.NezhaBindings...)
 		out = append(out, copyOp)
 	}
 	g.mu.RUnlock()

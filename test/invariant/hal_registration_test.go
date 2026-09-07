@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/runtime/primitives"
+	"nezha/engine/runtime/hal/substrate"
+	"nezha/engine/runtime/primitives"
 )
 
 func TestRuntimePrimitiveRegistrationsMatchArchitecture(t *testing.T) {

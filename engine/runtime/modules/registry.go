@@ -7,10 +7,10 @@ import (
 	"sort"
 	"strings"
 
-	"aiki/engine/runtime/help"
-	"aiki/engine/runtime/libpath"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/runtime/help"
+	"nezha/engine/runtime/libpath"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax/grammar"
 )
 
 // ModuleHelp holds help and doc data for a module.

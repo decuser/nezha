@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 func TestStripDocMarkers(t *testing.T) {

@@ -105,11 +105,11 @@ func TestFaultMessage(t *testing.T) {
 }
 
 func TestFaultAt(t *testing.T) {
-	stack := []StackFrame{{Name: "foo", File: "test.aiki", Line: 5, Scope: ScopeUser}}
-	f := NewFaultAt("test.aiki", 10, "let x = 1/0", stack, "division by zero")
+	stack := []StackFrame{{Name: "foo", File: "test.nezha", Line: 5, Scope: ScopeUser}}
+	f := NewFaultAt("test.nezha", 10, "let x = 1/0", stack, "division by zero")
 
-	if f.File != "test.aiki" {
-		t.Errorf("expected file 'test.aiki', got %s", f.File)
+	if f.File != "test.nezha" {
+		t.Errorf("expected file 'test.nezha', got %s", f.File)
 	}
 	if f.Line != 10 {
 		t.Errorf("expected line 10, got %d", f.Line)
@@ -124,14 +124,14 @@ func TestFaultAt(t *testing.T) {
 
 func TestFaultInspect(t *testing.T) {
 	stack := []StackFrame{
-		{Name: "outer", File: "test.aiki", Line: 1, Scope: ScopeUser},
-		{Name: "inner", File: "test.aiki", Line: 10, Scope: ScopeUser},
+		{Name: "outer", File: "test.nezha", Line: 1, Scope: ScopeUser},
+		{Name: "inner", File: "test.nezha", Line: 10, Scope: ScopeUser},
 	}
-	f := NewFaultAt("test.aiki", 10, "let x = 1/0", stack, "division by zero")
+	f := NewFaultAt("test.nezha", 10, "let x = 1/0", stack, "division by zero")
 	inspect := f.Inspect()
 
 	// Should contain file:line:in 'func': message
-	if !contains(inspect, "test.aiki:10:in 'inner': division by zero") {
+	if !contains(inspect, "test.nezha:10:in 'inner': division by zero") {
 		t.Errorf("inspect missing header, got: %s", inspect)
 	}
 	// Should contain source line
@@ -139,7 +139,7 @@ func TestFaultInspect(t *testing.T) {
 		t.Errorf("inspect missing source, got: %s", inspect)
 	}
 	// Should contain stack trace
-	if !contains(inspect, "from test.aiki:1:in 'outer'") {
+	if !contains(inspect, "from test.nezha:1:in 'outer'") {
 		t.Errorf("inspect missing stack trace, got: %s", inspect)
 	}
 }

@@ -3,10 +3,10 @@ package runner
 import (
 	"testing"
 
-	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/runtime/hal/substrate"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // This is a focused unit test for the same invariant that smoke exercises:

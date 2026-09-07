@@ -5,7 +5,7 @@ import (
 	"os/exec"
 )
 
-func runAikiFile(exe, path, workDir string) (stdout, stderr string, exitCode int, err error) {
+func runNezhaFile(exe, path, workDir string) (stdout, stderr string, exitCode int, err error) {
 	cmd := exec.Command(exe, path)
 	cmd.Dir = workDir
 

@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
-	"aiki/cmd/internal/targetresolve"
-	"aiki/cmd/internal/testfixture"
-	aikifmt "aiki/engine/formatter"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/cmd/internal/targetresolve"
+	"nezha/cmd/internal/testfixture"
+	nezhafmt "nezha/engine/formatter"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // CheckFormatting returns the list of files that are not already formatted.
@@ -66,7 +66,7 @@ func checkFile(g *grammar.Grammar, path string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	formatted, err := aikifmt.FormatSource(g, path, string(data))
+	formatted, err := nezhafmt.FormatSource(g, path, string(data))
 	if err != nil {
 		return false, err
 	}

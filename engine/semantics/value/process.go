@@ -2,7 +2,7 @@ package value
 
 import "fmt"
 
-// Process is an opaque Aiki-visible handle to a runtime-owned child process.
+// Process is an opaque Nezha-visible handle to a runtime-owned child process.
 type Process struct{ ID uint64 }
 
 func (p *Process) Type() Type { return ProcessType }
@@ -13,7 +13,7 @@ func (p *Process) Inspect() string {
 	return fmt.Sprintf("<process:%d>", p.ID)
 }
 
-// Endpoint is an opaque Aiki-visible sequential I/O endpoint. Concrete reader,
+// Endpoint is an opaque Nezha-visible sequential I/O endpoint. Concrete reader,
 // writer, and lifecycle state belongs to the active runtime substrate.
 type Endpoint struct {
 	ID    uint64

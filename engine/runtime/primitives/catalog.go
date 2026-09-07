@@ -1,4 +1,4 @@
-// Package primitives owns the architectural classification of Aiki runtime
+// Package primitives owns the architectural classification of Nezha runtime
 // primitives. Concrete substrates bind implementations to these stable names;
 // the role classification is not substrate metadata.
 package primitives
@@ -7,8 +7,8 @@ import (
 	"sort"
 	"sync"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 // Role identifies why a runtime primitive exists.

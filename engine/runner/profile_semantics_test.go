@@ -3,7 +3,7 @@ package runner
 import (
 	"testing"
 
-	"aiki/engine/semantics/evaluator"
+	"nezha/engine/semantics/evaluator"
 )
 
 func TestSemanticProfileSendRecvAcrossSpawn(t *testing.T) {

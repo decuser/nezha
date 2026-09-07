@@ -1,7 +1,7 @@
 package evaluator
 
 import (
-	"aiki/engine/syntax"
+	"nezha/engine/syntax"
 	"testing"
 )
 

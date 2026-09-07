@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 // resolveHostPath interprets relative host paths in the runtime-owned working

@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"sync"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 type ListenerResource struct {
@@ -291,7 +291,7 @@ func (g *GoRuntime) halNetUDPSend(args []value.Value, ctx *hal.EvalContext) valu
 	if fault != nil {
 		return fault
 	}
-	data, err := bytesFromAiki(args[3])
+	data, err := bytesFromNezha(args[3])
 	if err != nil {
 		return value.NewFault("net.udp_send: %v", err)
 	}

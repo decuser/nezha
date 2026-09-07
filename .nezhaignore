@@ -1,4 +1,4 @@
-# Aiki CLI recursive-target policy.
+# Nezha CLI recursive-target policy.
 [lint]
 **/.*
 

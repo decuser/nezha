@@ -3,9 +3,9 @@ package contract
 import (
 	"testing"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/runtime/hal/substrate"
+	"nezha/engine/semantics/value"
 )
 
 // TestGoRuntimeImplementsRuntimeContract verifies GoRuntime satisfies RuntimeContract.

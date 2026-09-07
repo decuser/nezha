@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"aiki/engine"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/syntax/grammar"
 )
 
 // Token represents a lexical token.

@@ -5,8 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 func (g *GoRuntime) halQuit(args []value.Value, ctx *hal.EvalContext) value.Value {
@@ -61,7 +61,7 @@ func (g *GoRuntime) outputHelp(text string) {
 
 func (g *GoRuntime) showHelpIndex(ctx *hal.EvalContext) value.Value {
 	var sb strings.Builder
-	sb.WriteString("Aiki Help\n\n")
+	sb.WriteString("Nezha Help\n\n")
 
 	// Categories from grammar
 	sb.WriteString("Syntax:\n")

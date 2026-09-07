@@ -6,7 +6,7 @@ import (
 )
 
 // snapshotHostEnvironment captures ambient host environment once, when a
-// GoRuntime is constructed. Aiki-facing system operations use the runtime-owned
+// GoRuntime is constructed. Nezha-facing system operations use the runtime-owned
 // copy thereafter and never consult or mutate process-global environment state.
 func snapshotHostEnvironment() map[string]string {
 	out := make(map[string]string)

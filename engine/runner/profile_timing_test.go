@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"aiki/engine/observe"
+	"nezha/engine/observe"
 )
 
 func writeProfileTimingProgram(t *testing.T, source string) string {

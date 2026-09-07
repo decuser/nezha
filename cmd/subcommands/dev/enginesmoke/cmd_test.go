@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 func withDistributionRoot(t *testing.T) {

@@ -1,7 +1,7 @@
-// Package aitest owns the Aiki test helper surface used by the `aiki test` command.
+// Package aitest owns the Nezha test helper surface used by the `nezha test` command.
 package aitest
 
-// Source is prepended by the test command. It is not a shipped Aiki module.
+// Source is prepended by the test command. It is not a shipped Nezha module.
 const Source = `let equal = (actual, expected) {
 	_test_equal(actual, expected)
 }

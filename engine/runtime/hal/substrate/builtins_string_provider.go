@@ -3,11 +3,11 @@ package substrate
 import (
 	"strings"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
-func trimAikiWhitespace(s string, left, right bool) string {
+func trimNezhaWhitespace(s string, left, right bool) string {
 	runes := []rune(s)
 	start := 0
 	end := len(runes)
@@ -331,7 +331,7 @@ func halStringReverse(args []value.Value, ctx *hal.EvalContext) value.Value {
 	return &value.String{Val: string(runes)}
 }
 
-func aikiWhitespace(r rune) bool {
+func nezhaWhitespace(r rune) bool {
 	return r == ' ' || r == '\t' || r == '\n' || r == '\r'
 }
 
@@ -339,12 +339,12 @@ func trimRunes(s string, left, right bool) string {
 	runes := []rune(s)
 	start, end := 0, len(runes)
 	if left {
-		for start < end && aikiWhitespace(runes[start]) {
+		for start < end && nezhaWhitespace(runes[start]) {
 			start++
 		}
 	}
 	if right {
-		for end > start && aikiWhitespace(runes[end-1]) {
+		for end > start && nezhaWhitespace(runes[end-1]) {
 			end--
 		}
 	}

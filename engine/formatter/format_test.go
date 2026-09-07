@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"aiki/engine"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 func testGrammar(t *testing.T) *grammar.Grammar {

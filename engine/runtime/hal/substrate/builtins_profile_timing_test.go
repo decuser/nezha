@@ -3,10 +3,10 @@ package substrate
 import (
 	"testing"
 
-	"aiki/engine"
-	"aiki/engine/observe"
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine"
+	"nezha/engine/observe"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 func TestProfileTimedReturnsCountsElapsedAndResolvedTimingRows(t *testing.T) {

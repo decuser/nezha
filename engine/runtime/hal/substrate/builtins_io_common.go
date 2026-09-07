@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"io"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 func (g *GoRuntime) ioReader(endpoint value.Value) (io.Reader, string, *value.List) {

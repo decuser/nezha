@@ -1,17 +1,17 @@
 // Package coverage defines the static anatomy used by runtime coverage.
 // Dynamic execution truth belongs to engine/observe's profiling network; this
-// package describes what parsed Aiki source could be covered.
+// package describes what parsed Nezha source could be covered.
 package coverage
 
 import (
 	"fmt"
 	"sort"
 
-	"aiki/engine/observe"
-	"aiki/engine/syntax"
+	"nezha/engine/observe"
+	"nezha/engine/syntax"
 )
 
-// Site is one static, source-backed Aiki syntax site. Sites deliberately use
+// Site is one static, source-backed Nezha syntax site. Sites deliberately use
 // source/AST identity rather than runtime NodeIDs so never-executed code exists
 // without being manufactured in the dynamic profiling network.
 type Site struct {
@@ -29,7 +29,7 @@ type Model struct {
 	Sites []Site
 }
 
-// FromAST derives static coverable sites from parsed Aiki structure.
+// FromAST derives static coverable sites from parsed Nezha structure.
 //
 // Coverage is source-structure coverage, not punctuation coverage: TERMINAL
 // nodes are excluded. Every remaining source-backed AST node is a static site;

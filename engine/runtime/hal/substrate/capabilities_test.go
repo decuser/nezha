@@ -3,7 +3,7 @@ package substrate
 import (
 	"testing"
 
-	"aiki/engine/runtime/hal"
+	"nezha/engine/runtime/hal"
 )
 
 func TestGoProvenanceCoversHALOperationDefinitions(t *testing.T) {

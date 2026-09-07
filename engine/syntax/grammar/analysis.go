@@ -13,7 +13,7 @@ type Analysis struct {
 	astNodeTypes         map[string]struct{}
 	terminalAlternatives map[string]map[string]struct{}
 
-	// Newline is present when Aiki-style newline analysis can be derived.
+	// Newline is present when Nezha-style newline analysis can be derived.
 	// NewlineError records why it could not be derived without making general
 	// structural analysis unavailable.
 	Newline      *NewlineAnalysis

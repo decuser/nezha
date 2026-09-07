@@ -5,7 +5,7 @@ import (
 	"sync"
 )
 
-// CanvasResource is the Go substrate realization of an Aiki canvas handle.
+// CanvasResource is the Go substrate realization of a Nezha canvas handle.
 // It is owned by one GoRuntime (or by the dedicated canvas child process).
 type CanvasResource struct {
 	Width    int

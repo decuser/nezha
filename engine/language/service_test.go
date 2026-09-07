@@ -1,17 +1,17 @@
 package language
 
 import (
-	"aiki/engine/formatter"
+	"nezha/engine/formatter"
 	"reflect"
 	"strings"
 	"testing"
 
-	"aiki/engine"
+	"nezha/engine"
 
-	languageobserve "aiki/engine/language/observe"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	languageobserve "nezha/engine/language/observe"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 func testService(t *testing.T) *Service {

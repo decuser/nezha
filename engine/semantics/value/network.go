@@ -2,7 +2,7 @@ package value
 
 import "fmt"
 
-// Listener is an opaque Aiki-visible handle to a runtime-owned network listener.
+// Listener is an opaque Nezha-visible handle to a runtime-owned network listener.
 type Listener struct{ ID uint64 }
 
 func (l *Listener) Type() Type { return ListenerType }
@@ -13,7 +13,7 @@ func (l *Listener) Inspect() string {
 	return fmt.Sprintf("<listener:%d>", l.ID)
 }
 
-// Datagram is an opaque Aiki-visible handle to a runtime-owned datagram socket.
+// Datagram is an opaque Nezha-visible handle to a runtime-owned datagram socket.
 type Datagram struct{ ID uint64 }
 
 func (d *Datagram) Type() Type { return DatagramType }

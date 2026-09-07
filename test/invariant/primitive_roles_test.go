@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/runtime/primitives"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/runtime/primitives"
 )
 
 func TestPrimitiveRolesAreCoherent(t *testing.T) {

@@ -1,20 +1,20 @@
-// Package runner provides the runner for executing Aiki programs.
+// Package runner provides the runner for executing Nezha programs.
 package runner
 
 import (
 	"fmt"
 	"os"
 
-	"aiki/engine"
-	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/runtime/prelude"
-	"aiki/engine/semantics/evaluator"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/runtime/hal/substrate"
+	"nezha/engine/runtime/prelude"
+	"nezha/engine/semantics/evaluator"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
-// ExitStatusError carries a requested nonzero Aiki program exit status back to the CLI.
+// ExitStatusError carries a requested nonzero Nezha program exit status back to the CLI.
 type ExitStatusError struct{ Code int }
 
 func (e *ExitStatusError) Error() string { return fmt.Sprintf("exit status %d", e.Code) }
@@ -32,7 +32,7 @@ func executionResultError(result value.Value) error {
 	return nil
 }
 
-// Run executes an Aiki source file. programArgs are exposed to the program
+// Run executes a Nezha source file. programArgs are exposed to the program
 // through system.args(), excluding the interpreter and source filename.
 func Run(filename string, programArgs ...string) error {
 	rt := substrate.NewGoRuntime()
@@ -40,7 +40,7 @@ func Run(filename string, programArgs ...string) error {
 	return RunWithRuntime(filename, rt, programArgs...)
 }
 
-// RunWithRuntime executes an Aiki source file in the supplied runtime host
+// RunWithRuntime executes a Nezha source file in the supplied runtime host
 // world. The caller owns the runtime's lifetime and cleanup.
 func RunWithRuntime(filename string, rt *substrate.GoRuntime, programArgs ...string) error {
 	source, err := os.ReadFile(filename)
@@ -50,7 +50,7 @@ func RunWithRuntime(filename string, rt *substrate.GoRuntime, programArgs ...str
 	return runSourceWithRuntime(filename, string(source), programArgs, rt)
 }
 
-// RunSource executes Aiki source code.
+// RunSource executes Nezha source code.
 func RunSource(filename, source string) error {
 	rt := substrate.NewGoRuntime()
 	defer rt.CloseAllResources()
@@ -61,19 +61,19 @@ func runSourceWithRuntime(filename, source string, programArgs []string, rt *sub
 	return runSourceWithRuntimeProbe(filename, source, programArgs, rt, nil)
 }
 
-// RunSourceWithRuntime executes supplied Aiki source under the given filename in
+// RunSourceWithRuntime executes supplied Nezha source under the given filename in
 // the supplied runtime host world. The caller owns the runtime's lifetime.
 func RunSourceWithRuntime(filename, source string, rt *substrate.GoRuntime, programArgs ...string) error {
 	return runSourceWithRuntimeProbe(filename, source, programArgs, rt, nil)
 }
 
-// RunSourceWithEvalProbeRuntime executes supplied Aiki source while routing AST
+// RunSourceWithEvalProbeRuntime executes supplied Nezha source while routing AST
 // execution-entry observations to the supplied probe.
 func RunSourceWithEvalProbeRuntime(filename, source string, probe engine.EvalProbe, rt *substrate.GoRuntime, programArgs ...string) error {
 	return runSourceWithRuntimeProbe(filename, source, programArgs, rt, probe)
 }
 
-// RunWithEvalProbeRuntime executes an Aiki source file while routing AST
+// RunWithEvalProbeRuntime executes a Nezha source file while routing AST
 // execution-entry observations to the supplied nervous-system endpoint. The
 // probe owns no accounting state; callers typically supply observe.EvalCapture.
 func RunWithEvalProbeRuntime(filename string, probe engine.EvalProbe, rt *substrate.GoRuntime, programArgs ...string) error {
@@ -217,7 +217,7 @@ func RunExpr(expr string) (string, error) {
 	return result.Inspect(), nil
 }
 
-// RunProfile executes an Aiki source file with semantic profiling enabled.
+// RunProfile executes a Nezha source file with semantic profiling enabled.
 func RunProfile(filename string, attributed bool) (engine.SemanticMeasurement, error) {
 	run, err := RunProfileDetailed(filename, ProfileOptions{Attributed: attributed})
 	return run.Semantic, err

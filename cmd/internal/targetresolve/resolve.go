@@ -16,7 +16,7 @@ func Resolve(tool string, targets []string, recursePlainDirs bool) ([]string, er
 }
 
 // ResolveAll is the exhaustive form of Resolve. It preserves target syntax and
-// command directory policy but bypasses .aikiignore selection policy.
+// command directory policy but bypasses .nezhaignore selection policy.
 func ResolveAll(tool string, targets []string, recursePlainDirs bool) ([]string, error) {
 	return resolve(tool, targets, recursePlainDirs, true)
 }
@@ -159,7 +159,7 @@ func loadPolicy(base, tool string) (ignorePolicy, error) {
 func findPolicyFile(base string) string {
 	current := filepath.Clean(base)
 	for {
-		candidate := filepath.Join(current, ".aikiignore")
+		candidate := filepath.Join(current, ".nezhaignore")
 		if _, err := os.Stat(candidate); err == nil {
 			return candidate
 		}

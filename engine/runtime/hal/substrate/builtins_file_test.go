@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 func TestFileOpenReadClose(t *testing.T) {

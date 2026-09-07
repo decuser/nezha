@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"aiki/engine/observe"
+	"nezha/engine/observe"
 )
 
 // LineRecord is one static executable source line and whether execution.eval
@@ -27,7 +27,7 @@ type Report struct {
 }
 
 // Analyze compares static sites with network-backed evaluation hits. Matching
-// is line-based for compatibility with Aiki's existing coverage surface; the
+// is line-based for compatibility with Nezha's existing coverage surface; the
 // dynamic source remains the execution.eval event, not a second hit accountant.
 func Analyze(model Model, hits []observe.EvalSiteCount) Report {
 	hitLines := make(map[string]map[int]int64)

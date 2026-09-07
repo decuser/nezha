@@ -3,12 +3,12 @@ package substrate
 import (
 	"fmt"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
-// bytesFromAiki accepts either Aiki's opaque host-backed bytes value or the
-// pure-Aiki @bytes shaped-list representation and returns host bytes.
-func bytesFromAiki(v value.Value) ([]byte, error) {
+// bytesFromNezha accepts either Nezha's opaque host-backed bytes value or the
+// pure-Nezha @bytes shaped-list representation and returns host bytes.
+func bytesFromNezha(v value.Value) ([]byte, error) {
 	switch b := v.(type) {
 	case *value.Bytes:
 		return b.Val, nil

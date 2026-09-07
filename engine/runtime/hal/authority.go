@@ -6,7 +6,7 @@ import (
 )
 
 // authorityPolicy records the raw runtime bindings explicitly granted to each
-// trusted Aiki source. It is architectural policy; substrate code translates
+// trusted Nezha source. It is architectural policy; substrate code translates
 // host primitives to canonical HAL authority identities at runtime.
 var authorityPolicy = map[string][]string{
 	"engine/runtime/prelude/prelude.ai": {

@@ -4,12 +4,12 @@ import (
 	"regexp"
 	"strings"
 
-	"aiki/engine"
-	"aiki/engine/runtime/modules"
-	"aiki/engine/runtime/prelude"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/runtime/modules"
+	"nezha/engine/runtime/prelude"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // Diagnostic is an editor-independent language finding.
@@ -338,7 +338,7 @@ func (c *checker) bindUseCall(call *syntax.Node) {
 }
 
 // resolveModuleExports obtains module source through the catalog contract and
-// extracts exports using the real Aiki parser. Resolution is an adapter concern;
+// extracts exports using the real Nezha parser. Resolution is an adapter concern;
 // export semantics remain language analysis.
 func (c *checker) resolveModuleExports(moduleName string) []string {
 	if c.catalog == nil {

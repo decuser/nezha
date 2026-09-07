@@ -6,8 +6,8 @@ func testGraphMeasurement(t *testing.T) GraphMeasurement {
 	t.Helper()
 	r := NewNodeRegistry()
 	root := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeRoot, Name: "<main>", File: "main.ai"}, Layer: "semantic", Boundary: "function", Function: "<main>"})
-	f := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "f", File: "/tmp/aiki/lib/foo/foo.ai", Line: 1}, Layer: "semantic", Boundary: "function", Function: "f"})
-	g := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "g", File: "/tmp/aiki/lib/foo/native.ai", Line: 2}, Layer: "semantic", Boundary: "function", Function: "g"})
+	f := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "f", File: "/tmp/nezha/lib/foo/foo.ai", Line: 1}, Layer: "semantic", Boundary: "function", Function: "f"})
+	g := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "g", File: "/tmp/nezha/lib/foo/native.ai", Line: 2}, Layer: "semantic", Boundary: "function", Function: "g"})
 	p := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodePrimitive, Authority: "runtime/primitives", Name: "_equal"}, Layer: "runtime", Boundary: "runtime", Function: "_equal"})
 	return GraphMeasurement{Nodes: r.Nodes(), Edges: []EdgeCount{{Caller: root, Callee: f, Count: 2}, {Caller: f, Callee: g, Count: 3}, {Caller: g, Callee: p, Count: 5}}}
 }

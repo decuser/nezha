@@ -1,12 +1,12 @@
 package evaluator
 
 import (
-	"aiki/engine"
+	"nezha/engine"
 	"reflect"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
 )
 
 type preparedSelectCase struct {
@@ -92,7 +92,7 @@ func (e *Evaluator) chooseSelect(node *syntax.Node, env *value.Env) (*preparedSe
 		return selected, value.EMPTY, nil
 	}
 	if !ok {
-		// Aiki channels are not user-closeable. This protects against an
+		// Nezha channels are not user-closeable. This protects against an
 		// internally closed channel without inventing close semantics.
 		return nil, nil, e.makeFault(node, env, "select: receive from closed channel")
 	}

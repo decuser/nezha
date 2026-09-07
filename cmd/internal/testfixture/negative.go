@@ -1,6 +1,6 @@
 // Package testfixture recognizes declarations carried by intentionally
-// negative Aiki test specimens. Declarations are textual because a parse-
-// negative specimen, by definition, cannot be parsed as an Aiki program.
+// negative Nezha test specimens. Declarations are textual because a parse-
+// negative specimen, by definition, cannot be parsed as a Nezha program.
 package testfixture
 
 import (

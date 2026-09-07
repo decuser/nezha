@@ -1,4 +1,4 @@
-// Package prelude embeds the Aiki prelude source and documentation.
+// Package prelude embeds the Nezha prelude source and documentation.
 package prelude
 
 import (

@@ -4,8 +4,8 @@ import (
 	"math"
 	"time"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 func halCos(args []value.Value, ctx *hal.EvalContext) value.Value {

@@ -3,8 +3,8 @@ package substrate
 import (
 	"testing"
 
-	"aiki/engine/runtime/hostnative"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hostnative"
+	"nezha/engine/semantics/value"
 )
 
 func TestHostNativeBindResolvesOnceToDirectCallable(t *testing.T) {

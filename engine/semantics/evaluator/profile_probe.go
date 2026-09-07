@@ -3,15 +3,15 @@ package evaluator
 import (
 	"runtime"
 
-	"aiki/engine"
-	"aiki/engine/observe"
-	"aiki/engine/runtime/hal"
-	"aiki/engine/runtime/primitives"
-	"aiki/engine/semantics/value"
+	"nezha/engine"
+	"nezha/engine/observe"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/runtime/primitives"
+	"nezha/engine/semantics/value"
 )
 
 // ProfileProbe is the evaluator-facing adapter around the network-owned
-// profiling context. All Aiki profiling facts now terminate in the network;
+// profiling context. All Nezha profiling facts now terminate in the network;
 // this adapter owns no accounting state of its own. Coverage is a separate
 // test-tool concern and does not route through ProfileProbe.
 type ProfileProbe struct {
@@ -140,7 +140,7 @@ func (p *ProfileProbe) rootCursor(file string) observe.Cursor {
 		file = "<main>"
 	}
 	id := p.registry.Register(observe.NodeSpec{
-		Identity: observe.NodeIdentity{Kind: observe.NodeRoot, Authority: "aiki/source", Name: "<main>", File: file},
+		Identity: observe.NodeIdentity{Kind: observe.NodeRoot, Authority: "nezha/source", Name: "<main>", File: file},
 		Layer:    "semantic", Boundary: "function", Function: "<main>", Source: file,
 	})
 	return p.network.Cursor(id)
@@ -158,7 +158,7 @@ func (p *ProfileProbe) userFunctionNode(fn *value.Function) observe.NodeID {
 	if name == "" {
 		name = "<anonymous>"
 	}
-	identity := observe.NodeIdentity{Kind: observe.NodeFunction, Authority: "aiki/source", Name: name, File: fn.ProfileFile, Line: fn.ProfileLine, Col: fn.ProfileCol}
+	identity := observe.NodeIdentity{Kind: observe.NodeFunction, Authority: "nezha/source", Name: name, File: fn.ProfileFile, Line: fn.ProfileLine, Col: fn.ProfileCol}
 	if fn.ProfileFile == "" && fn.ProfileLine == 0 && fn.ProfileCol == 0 {
 		identity.Instance = fn.ProfileInstanceID()
 	}

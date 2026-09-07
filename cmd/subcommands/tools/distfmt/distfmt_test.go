@@ -67,18 +67,18 @@ var policy = map[string][]string{
 	}
 }
 
-func TestFormatAikiExpandsLongListAndPreservesCanonicalStructure(t *testing.T) {
+func TestFormatNezhaExpandsLongListAndPreservesCanonicalStructure(t *testing.T) {
 	src := "let xs = [alpha, beta, gamma, delta, epsilon, zeta, eta, theta, iota, kappa, lambda, mu, nu, xi, omicron]\n"
-	out, err := formatAiki("test.ai", src)
+	out, err := formatNezha("test.ai", src)
 	if err != nil {
-		t.Fatalf("formatAiki: %v", err)
+		t.Fatalf("formatNezha: %v", err)
 	}
 	if !strings.Contains(out, "let xs = [\n\talpha,\n") {
 		t.Fatalf("long list did not expand:\n%s", out)
 	}
-	out2, err := formatAiki("test.ai", out)
+	out2, err := formatNezha("test.ai", out)
 	if err != nil {
-		t.Fatalf("second formatAiki: %v", err)
+		t.Fatalf("second formatNezha: %v", err)
 	}
 	if out2 != out {
 		t.Fatalf("distfmt not stable\n--- first ---\n%s\n--- second ---\n%s", out, out2)

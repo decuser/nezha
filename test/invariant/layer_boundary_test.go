@@ -20,7 +20,7 @@ func TestEngineSubstrateDependencyIsConfinedToCompositionRoot(t *testing.T) {
 
 func TestLayerInvariantRejectsSubstrateImportLeak(t *testing.T) {
 	sources := loadEngineProductionGo(t)
-	sources["engine/language/forbidden.go"] = "package language\nimport _ \"aiki/engine/runtime/hal/substrate\"\n"
+	sources["engine/language/forbidden.go"] = "package language\nimport _ \"nezha/engine/runtime/hal/substrate\"\n"
 	err := validateSubstrateImportBoundary(sources)
 	if err == nil || !strings.Contains(err.Error(), "engine/language/forbidden.go") {
 		t.Fatalf("expected substrate layer-boundary failure, got %v", err)
@@ -57,7 +57,7 @@ func loadEngineProductionGo(t *testing.T) map[string]string {
 }
 
 func validateSubstrateImportBoundary(sources map[string]string) error {
-	const substrateImport = "aiki/engine/runtime/hal/substrate"
+	const substrateImport = "nezha/engine/runtime/hal/substrate"
 	var problems []string
 	for path, source := range sources {
 		f, err := parser.ParseFile(token.NewFileSet(), path, source, parser.ImportsOnly)

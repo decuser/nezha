@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"sort"
 
-	"aiki/engine"
-	languageobserve "aiki/engine/language/observe"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
+	"nezha/engine"
+	languageobserve "nezha/engine/language/observe"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
 )
 
 // CompletionItem is a neutral completion candidate.

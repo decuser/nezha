@@ -3,14 +3,14 @@
 package hal
 
 import (
-	"aiki/engine"
-	"aiki/engine/observe"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/observe"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
-// ContextCallable is a host callable that needs the active Aiki evaluation
+// ContextCallable is a host callable that needs the active Nezha evaluation
 // context. It avoids storing mutable call context in the runtime, which is
 // important when spawned computations execute concurrently.
 type ContextCallable interface {
@@ -86,7 +86,7 @@ type RuntimeContract interface {
 }
 
 // ProfileLabeler is an optional runtime capability used to correlate host CPU
-// samples with the Aiki computation that caused them. Runtimes that do not
+// samples with the Nezha computation that caused them. Runtimes that do not
 // support labeled profiling need not implement it.
 type ProfileLabeler interface {
 	SetProfileLabels(enabled bool)

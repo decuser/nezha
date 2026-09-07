@@ -2,7 +2,7 @@ package value
 
 import "fmt"
 
-// Canvas is an opaque Aiki-visible handle to a runtime-owned canvas resource.
+// Canvas is an opaque Nezha-visible handle to a runtime-owned canvas resource.
 // Concrete drawing/session state belongs to the active runtime substrate.
 type Canvas struct {
 	ID uint64

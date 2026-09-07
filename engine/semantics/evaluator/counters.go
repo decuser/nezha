@@ -3,7 +3,7 @@ package evaluator
 import "sync"
 
 // Counters is the coverage state used by the test command. Profiling accounting
-// no longer lives here; the profiling network is the sole Aiki accounting
+// no longer lives here; the profiling network is the sole Nezha accounting
 // substrate after Cut P3D.
 type Counters struct {
 	mu       sync.Mutex

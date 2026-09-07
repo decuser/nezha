@@ -6,10 +6,10 @@ import (
 	"os"
 	"strings"
 
-	"aiki/engine/language"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/language"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // Run executes lint.
@@ -26,13 +26,13 @@ func Run(args []string) int {
 	showWarnings := fs.Bool("w", true, "include warnings")
 	showShadow := fs.Bool("shadow", false, "include shadowing warnings")
 	includePrelude := fs.Bool("prelude", false, "include prelude in lint walk")
-	allTargets := fs.Bool("all", false, "include targets excluded by .aikiignore")
+	allTargets := fs.Bool("all", false, "include targets excluded by .nezhaignore")
 
 	if err := fs.Parse(args); err != nil {
 		return 2
 	}
 	if fs.NArg() == 0 {
-		fmt.Fprintln(os.Stderr, "usage: aiki lint <file.ai|dir|path/...> [more targets]")
+		fmt.Fprintln(os.Stderr, "usage: nezha lint <file.ai|dir|path/...> [more targets]")
 		return 2
 	}
 

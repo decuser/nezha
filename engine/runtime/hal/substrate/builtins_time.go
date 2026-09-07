@@ -4,8 +4,8 @@ import (
 	"math"
 	"time"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 // halAfter creates a receive-only event channel that produces true once after

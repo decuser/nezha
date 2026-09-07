@@ -1,8 +1,8 @@
 package lint
 
 import (
-	"aiki/cmd/internal/targetresolve"
-	"aiki/cmd/internal/testfixture"
+	"nezha/cmd/internal/targetresolve"
+	"nezha/cmd/internal/testfixture"
 	"strings"
 )
 

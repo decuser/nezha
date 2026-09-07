@@ -1,7 +1,7 @@
 package substrate
 
 import (
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 	"testing"
 )
 

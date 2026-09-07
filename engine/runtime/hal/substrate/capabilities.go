@@ -1,6 +1,6 @@
 package substrate
 
-import "aiki/engine/runtime/hal"
+import "nezha/engine/runtime/hal"
 
 // HasCapability reports whether every HAL operation required by the named
 // capability is bound by this runtime substrate.

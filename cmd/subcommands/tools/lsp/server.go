@@ -8,9 +8,9 @@ import (
 	"unicode/utf16"
 	"unicode/utf8"
 
-	"aiki/engine"
-	"aiki/engine/language"
-	"aiki/engine/semantics/value"
+	"nezha/engine"
+	"nezha/engine/language"
+	"nezha/engine/semantics/value"
 )
 
 type documentState struct {
@@ -60,7 +60,7 @@ func (s *server) handle(msg message) (bool, error) {
 				"completionProvider":         map[string]any{},
 				"hoverProvider":              true,
 			},
-			"serverInfo": map[string]any{"name": "aiki"},
+			"serverInfo": map[string]any{"name": "nezha"},
 		})
 	case "initialized":
 		return false, nil
@@ -117,7 +117,7 @@ func (s *server) handle(msg message) (bool, error) {
 		if !ok {
 			return false, s.reply(msg.ID, nil)
 		}
-		pos := aikiPosition(d.Text, p.Position.Line, p.Position.Character)
+		pos := nezhaPosition(d.Text, p.Position.Line, p.Position.Character)
 		pos.File = d.Path
 		def, err := s.service.Definition(language.Document{ID: d.URI, Path: d.Path, Source: d.Text, Version: d.Version}, pos)
 		if err != nil || !def.Found {
@@ -138,7 +138,7 @@ func (s *server) handle(msg message) (bool, error) {
 		if !ok {
 			return false, s.reply(msg.ID, []any{})
 		}
-		pos := aikiPosition(d.Text, p.Position.Line, p.Position.Character)
+		pos := nezhaPosition(d.Text, p.Position.Line, p.Position.Character)
 		pos.File = d.Path
 		items, err := s.service.Completion(language.Document{ID: d.URI, Path: d.Path, Source: d.Text, Version: d.Version}, pos, scopeForDocument(d))
 		if err != nil {
@@ -167,7 +167,7 @@ func (s *server) handle(msg message) (bool, error) {
 		if !ok {
 			return false, s.reply(msg.ID, nil)
 		}
-		pos := aikiPosition(d.Text, p.Position.Line, p.Position.Character)
+		pos := nezhaPosition(d.Text, p.Position.Line, p.Position.Character)
 		pos.File = d.Path
 		h, err := s.service.Hover(language.Document{ID: d.URI, Path: d.Path, Source: d.Text, Version: d.Version}, pos)
 		if err != nil || !h.Found {
@@ -175,7 +175,7 @@ func (s *server) handle(msg message) (bool, error) {
 		}
 		parts := []string{}
 		if h.Signature != "" {
-			parts = append(parts, "```aiki\n"+h.Signature+"\n```")
+			parts = append(parts, "```nezha\n"+h.Signature+"\n```")
 		}
 		if h.Summary != "" {
 			parts = append(parts, h.Summary)
@@ -283,7 +283,7 @@ func (s *server) publishDiagnostics(d documentState) error {
 		out = append(out, map[string]any{
 			"range":    map[string]any{"start": start, "end": end},
 			"severity": severity,
-			"source":   "aiki-" + diag.Source,
+			"source":   "nezha-" + diag.Source,
 			"message":  diag.Message,
 		})
 	}
@@ -362,7 +362,7 @@ func nextLSPPosition(source string, line, byteCol int) map[string]int {
 	return lspPosition(source, line, byteCol+size)
 }
 
-func aikiPosition(source string, line0, utf16col int) engine.Position {
+func nezhaPosition(source string, line0, utf16col int) engine.Position {
 	lines := strings.Split(source, "\n")
 	if line0 < 0 {
 		line0 = 0

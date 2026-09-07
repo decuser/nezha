@@ -3,8 +3,8 @@ package substrate
 import (
 	"testing"
 
-	"aiki/engine/semantics/evaluator"
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/evaluator"
+	"nezha/engine/semantics/value"
 )
 
 func mustListInts(t *testing.T, v value.Value, want ...int64) *value.List {

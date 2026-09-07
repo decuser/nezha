@@ -4,10 +4,10 @@ import (
 	"sync"
 	"testing"
 
-	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/runtime/hal/substrate"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 func eval(t *testing.T, source string) value.Value {

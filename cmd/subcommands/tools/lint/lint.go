@@ -1,10 +1,10 @@
 package lint
 
 import (
-	"aiki/engine/language"
-	"aiki/engine/language/workspace"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/language"
+	"nezha/engine/language/workspace"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax/grammar"
 )
 
 // Diagnostic is the language-service diagnostic used by the lint CLI.

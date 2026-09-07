@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 // halFileOpen opens a file with the specified mode.
@@ -187,7 +187,7 @@ func halFileWriteBytes(args []value.Value, ctx *hal.EvalContext) value.Value {
 	if file.F == nil {
 		return value.NewShapedError("io", "file is closed")
 	}
-	b, err := bytesFromAiki(args[1])
+	b, err := bytesFromNezha(args[1])
 	if err != nil {
 		return value.NewFault("_file_write_bytes: %v", err)
 	}
@@ -271,7 +271,7 @@ func halFileDelete(args []value.Value, ctx *hal.EvalContext) value.Value {
 }
 
 // halFileEntries returns the immediate entries in a directory, sorted by name,
-// together with the directory bit needed by Aiki-owned recursive traversal.
+// together with the directory bit needed by Nezha-owned recursive traversal.
 // entries(path) -> [[@entry, name, is_dir], ...] | [@error, :io, "message"]
 func halFileEntries(args []value.Value, ctx *hal.EvalContext) value.Value {
 	if len(args) != 1 {
@@ -481,7 +481,7 @@ func halFileTemp(args []value.Value, ctx *hal.EvalContext) value.Value {
 	if len(args) != 0 {
 		return value.NewFault("_file_temp: want 0 arguments, got %d", len(args))
 	}
-	f, err := os.CreateTemp("", "aiki-")
+	f, err := os.CreateTemp("", "nezha-")
 	if err != nil {
 		return value.NewShapedError("io", "%s", err.Error())
 	}
@@ -497,7 +497,7 @@ func halFileTempDir(args []value.Value, ctx *hal.EvalContext) value.Value {
 	if len(args) != 0 {
 		return value.NewFault("_file_temp_dir: want 0 arguments, got %d", len(args))
 	}
-	name, err := os.MkdirTemp("", "aiki-")
+	name, err := os.MkdirTemp("", "nezha-")
 	if err != nil {
 		return value.NewShapedError("io", "%s", err.Error())
 	}

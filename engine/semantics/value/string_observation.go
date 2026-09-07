@@ -34,7 +34,7 @@ func (s *String) FirstRune() (rune, bool) {
 	return s.RuneAt(0)
 }
 
-// CompareRunes preserves Aiki's rune-wise string ordering without allocating
+// CompareRunes preserves Nezha's rune-wise string ordering without allocating
 // temporary rune slices.
 func (s *String) CompareRunes(other *String) int {
 	if s == nil {

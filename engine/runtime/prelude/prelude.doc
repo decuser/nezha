@@ -8,7 +8,7 @@ apply(add, [1, 2])  # 3
 ===
 load
 @unchecked
-Loads and evaluates an aiki source file.
+Loads and evaluates an nezha source file.
 
 load(path)
 

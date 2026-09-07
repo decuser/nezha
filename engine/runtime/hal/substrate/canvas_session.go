@@ -74,9 +74,9 @@ func canvasChildCommand(width, height int) (string, []string, error) {
 		return "", nil, err
 	}
 
-	// Recording deliberately stays in the text-only aiki executable so smoke
+	// Recording deliberately stays in the text-only nezha executable so smoke
 	// tests and headless validation never initialize the graphics library.
-	if strings.EqualFold(os.Getenv("AIKI_CANVAS"), "record") {
+	if strings.EqualFold(os.Getenv("NEZHA_CANVAS"), "record") {
 		return exe, []string{
 			"-canvas",
 			fmt.Sprintf("-canvasw=%d", width),
@@ -88,7 +88,7 @@ func canvasChildCommand(width, height int) (string, []string, error) {
 	if real, err := filepath.EvalSymlinks(exe); err == nil {
 		resolved = real
 	}
-	helper := "aiki-canvas"
+	helper := "nezha-canvas"
 	if runtime.GOOS == "windows" {
 		helper += ".exe"
 	}

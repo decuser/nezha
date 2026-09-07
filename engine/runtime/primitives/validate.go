@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"aiki/engine/runtime/hal"
+	"nezha/engine/runtime/hal"
 )
 
 // ValidateDefinitions verifies the architectural primitive-role catalog against

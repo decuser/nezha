@@ -7,7 +7,7 @@ import (
 )
 
 // atomicWriteFile writes data to a temp file and renames it over path.
-// This mirrors aiki fmt's write discipline and avoids partial writes.
+// This mirrors nezha fmt's write discipline and avoids partial writes.
 func atomicWriteFile(path string, data []byte, perm os.FileMode) error {
 	dir := filepath.Dir(path)
 	base := filepath.Base(path)

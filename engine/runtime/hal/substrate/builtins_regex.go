@@ -4,12 +4,12 @@ import (
 	"regexp"
 	"unicode/utf8"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 // runeIndex converts a byte offset into s to the corresponding rune index.
-// Go's regexp reports byte offsets; Aiki measures string positions in runes
+// Go's regexp reports byte offsets; Nezha measures string positions in runes
 // (see the string module and string indexing), so positions are converted at
 // this boundary rather than exposed in the host's units.
 func runeIndex(s string, byteOffset int) int {

@@ -1,8 +1,8 @@
 package syntax
 
 import (
-	"aiki/engine"
-	"aiki/engine/observe"
+	"nezha/engine"
+	"nezha/engine/observe"
 )
 
 // Node represents an AST node.

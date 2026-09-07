@@ -309,7 +309,7 @@ func sortResolvedEdges(out []ResolvedEdge) {
 	})
 }
 
-// ModuleFromFile derives the canonical library/module coordinate from an Aiki source path.
+// ModuleFromFile derives the canonical library/module coordinate from a Nezha source path.
 // It is shared by dynamic graph rollups and static coverage anatomy.
 func ModuleFromFile(file string) string {
 	if file == "" {

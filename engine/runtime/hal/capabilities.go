@@ -1,6 +1,6 @@
 package hal
 
-// Capability names a host-dependent Aiki facility as a set of HAL operation
+// Capability names a host-dependent Nezha facility as a set of HAL operation
 // identities. Capabilities are metadata; they never participate in dispatch.
 type Capability struct {
 	Name       string

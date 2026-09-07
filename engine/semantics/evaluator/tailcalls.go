@@ -1,8 +1,8 @@
 package evaluator
 
 import (
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
 	"strings"
 )
 

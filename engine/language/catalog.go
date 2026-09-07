@@ -1,6 +1,6 @@
 package language
 
-import "aiki/engine/semantics/value"
+import "nezha/engine/semantics/value"
 
 // HelpEntry is authored help/documentation projected into language services.
 type HelpEntry struct {

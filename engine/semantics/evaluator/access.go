@@ -1,9 +1,9 @@
 package evaluator
 
 import (
-	"aiki/engine"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
+	"nezha/engine"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
 )
 
 func (e *Evaluator) evalIndex(val value.Value, node *syntax.Node, env *value.Env) value.Value {

@@ -5,8 +5,8 @@ import (
 	ossignal "os/signal"
 	"sync"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 type SignalResource struct {

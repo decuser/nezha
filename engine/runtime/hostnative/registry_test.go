@@ -3,7 +3,7 @@ package hostnative
 import (
 	"testing"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 func TestRegisterResolveReturnsBoundOperation(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 func nativeBytes(values ...int64) *value.List {
@@ -18,20 +18,20 @@ func nativeBytes(values ...int64) *value.List {
 	return &value.List{Shape: "bytes", Elements: elems}
 }
 
-func TestBytesFromAikiAcceptsOpaqueAndNative(t *testing.T) {
+func TestBytesFromNezhaAcceptsOpaqueAndNative(t *testing.T) {
 	opaque := &value.Bytes{Val: []byte{65, 66, 67}}
-	got, err := bytesFromAiki(opaque)
+	got, err := bytesFromNezha(opaque)
 	if err != nil || !bytes.Equal(got, []byte("ABC")) {
 		t.Fatalf("opaque bytes: got %v, err %v", got, err)
 	}
 
-	got, err = bytesFromAiki(nativeBytes(65, 66, 67))
+	got, err = bytesFromNezha(nativeBytes(65, 66, 67))
 	if err != nil || !bytes.Equal(got, []byte("ABC")) {
 		t.Fatalf("native bytes: got %v, err %v", got, err)
 	}
 }
 
-func TestBytesFromAikiRejectsMalformedNativeBytes(t *testing.T) {
+func TestBytesFromNezhaRejectsMalformedNativeBytes(t *testing.T) {
 	cases := []struct {
 		name string
 		v    value.Value
@@ -44,7 +44,7 @@ func TestBytesFromAikiRejectsMalformedNativeBytes(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := bytesFromAiki(tc.v)
+			_, err := bytesFromNezha(tc.v)
 			if err == nil || !strings.Contains(err.Error(), tc.want) {
 				t.Fatalf("got err %v, want containing %q", err, tc.want)
 			}

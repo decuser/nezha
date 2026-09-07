@@ -9,10 +9,10 @@ import (
 	"strings"
 	"testing"
 
-	"aiki/engine/runtime/help"
-	"aiki/engine/runtime/modules"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/runtime/help"
+	"nezha/engine/runtime/modules"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // The engine already enforces that prelude.ai and prelude.help agree. That

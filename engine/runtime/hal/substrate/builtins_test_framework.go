@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"strings"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
 )
 
-// runtimeTestState accumulates Aiki test results for one runtime.
+// runtimeTestState accumulates Nezha test results for one runtime.
 type runtimeTestState struct {
 	failures []testFailure
 	passed   int

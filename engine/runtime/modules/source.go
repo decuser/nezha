@@ -3,12 +3,12 @@ package modules
 import (
 	"strings"
 
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // FunctionInfo is the source-declared signature of a named module binding whose
-// value is a function literal. It is derived from the Aiki AST rather than from
+// value is a function literal. It is derived from the Nezha AST rather than from
 // a parallel textual grammar.
 type FunctionInfo struct {
 	Name       string
@@ -17,7 +17,7 @@ type FunctionInfo struct {
 	Calls      []string
 }
 
-// SourceInfo is structural module metadata derived from parsed Aiki source.
+// SourceInfo is structural module metadata derived from parsed Nezha source.
 // Source remains authoritative; this is a reusable engine-owned view.
 type SourceInfo struct {
 	Package   string
@@ -26,7 +26,7 @@ type SourceInfo struct {
 	Functions map[string]FunctionInfo
 }
 
-// AnalyzeSource parses Aiki module source and derives package, export, and named
+// AnalyzeSource parses Nezha module source and derives package, export, and named
 // function facts from the real grammar and AST.
 func AnalyzeSource(g *grammar.Grammar, file, source string) (SourceInfo, error) {
 	lx := syntax.NewLexer(g, file, source, nil)
@@ -55,7 +55,7 @@ func walkSource(node *syntax.Node, info *SourceInfo) {
 	case "package_stmt":
 		if info.Package == "" {
 			if tok := findFirst(node, "STRING"); tok != nil {
-				info.Package = unquoteAikiString(tok.Value)
+				info.Package = unquoteNezhaString(tok.Value)
 			}
 		}
 		return
@@ -92,7 +92,7 @@ func importCalls(root *syntax.Node) []string {
 						continue
 					}
 					if literal := findFirst(child, "STRING"); literal != nil {
-						module := unquoteAikiString(literal.Value)
+						module := unquoteNezhaString(literal.Value)
 						if module != "" && !seen[module] {
 							seen[module] = true
 							out = append(out, module)
@@ -243,7 +243,7 @@ func findAll(node *syntax.Node, typ string) []*syntax.Node {
 	return out
 }
 
-func unquoteAikiString(s string) string {
+func unquoteNezhaString(s string) string {
 	if len(s) >= 2 && s[0] == '"' && s[len(s)-1] == '"' {
 		return s[1 : len(s)-1]
 	}

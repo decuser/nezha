@@ -285,7 +285,7 @@ type NetworkConfig struct {
 
 const defaultEdgeCapacity = 1 << 14
 
-// Network is the sole storage substrate intended for Aiki profiling facts.
+// Network is the sole storage substrate intended for Nezha profiling facts.
 // It has five primitive observation forms: node identity (in Registry), dense
 // node hits, direct edge transitions, irreducible event occurrences, and numeric
 // measures.

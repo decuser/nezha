@@ -3,11 +3,11 @@ package evaluator
 import (
 	"testing"
 
-	"aiki/engine"
-	"aiki/engine/observe"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/observe"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 func makeEvalWithProfile(t *testing.T) (*Evaluator, *grammar.Grammar) {

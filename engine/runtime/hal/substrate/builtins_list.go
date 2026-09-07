@@ -1,9 +1,9 @@
 package substrate
 
 import (
-	"aiki/engine"
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 func halFirst(args []value.Value, ctx *hal.EvalContext) value.Value {

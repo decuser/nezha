@@ -5,9 +5,9 @@ import (
 	"sort"
 	"strings"
 
-	"aiki/engine/runtime/help"
-	"aiki/engine/runtime/modules"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/runtime/help"
+	"nezha/engine/runtime/modules"
+	"nezha/engine/syntax/grammar"
 )
 
 // Catalog is the engine-owned derived view of the authored prelude source,
@@ -18,7 +18,7 @@ type Catalog struct {
 	Names    []string
 }
 
-// LoadCatalog derives and validates the prelude surface from the real Aiki
+// LoadCatalog derives and validates the prelude surface from the real Nezha
 // source plus its authored help and documentation.
 func LoadCatalog(g *grammar.Grammar) (*Catalog, error) {
 	return ValidateSources(g, Source, HelpSource, DocSource)

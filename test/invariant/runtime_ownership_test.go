@@ -17,7 +17,7 @@ var ambientOSNames = map[string]bool{
 	"Getenv": true, "LookupEnv": true, "Environ": true, "Setenv": true, "Unsetenv": true, "Getwd": true, "Chdir": true,
 }
 
-func TestAikiFacingIOAndSystemUseRuntimeOwnedState(t *testing.T) {
+func TestNezhaFacingIOAndSystemUseRuntimeOwnedState(t *testing.T) {
 	if err := validateNoAmbientRuntimeGlobals(loadRuntimeOwnedSurface(t)); err != nil {
 		t.Fatal(err)
 	}

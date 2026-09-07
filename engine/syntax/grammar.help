@@ -21,7 +21,7 @@ let_stmt
 Binds a value to a name, or defines a shape.
 
 let count = 0
-let name = "aiki"
+let name = "nezha"
 let @point [x, y]
 let @person [name, @point]
 ===

@@ -2,7 +2,7 @@ package value
 
 import "fmt"
 
-// TerminalState is an opaque Aiki-visible token for restoring runtime-owned
+// TerminalState is an opaque Nezha-visible token for restoring runtime-owned
 // terminal state after a raw-mode transition.
 type TerminalState struct{ ID uint64 }
 

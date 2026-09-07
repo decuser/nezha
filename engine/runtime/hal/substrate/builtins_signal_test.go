@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 func TestSignalWatchReturnsReceiveOnlyChannelAndStops(t *testing.T) {

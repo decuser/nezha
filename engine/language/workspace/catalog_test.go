@@ -3,9 +3,9 @@ package workspace
 import (
 	"testing"
 
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 func testCatalog(t *testing.T) *Catalog {

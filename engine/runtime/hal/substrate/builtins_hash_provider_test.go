@@ -3,7 +3,7 @@ package substrate
 import (
 	"testing"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 func TestHashProviderImmutableMapOperations(t *testing.T) {

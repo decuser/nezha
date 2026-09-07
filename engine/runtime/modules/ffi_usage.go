@@ -7,10 +7,10 @@ import (
 	"sort"
 	"strings"
 
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/syntax/grammar"
 )
 
-// FFIUsage reports statically reachable FFI module realizations from an Aiki
+// FFIUsage reports statically reachable FFI module realizations from a Nezha
 // source file. It follows literal import()/use() calls through named modules and
 // explicit relative-path imports. Dynamic module names are intentionally not
 // guessed.

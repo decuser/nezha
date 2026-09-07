@@ -1,13 +1,13 @@
-// Package test implements the `aiki test` subcommand.
+// Package test implements the `nezha test` subcommand.
 //
 // Usage:
 //
-//	aiki test ./...
-//	aiki test test/behavior
-//	aiki test path/to/foo_test.ai
-//	aiki test -cover ./...
-//	aiki test -cover -coverview=file ./...
-//	aiki test -coverprofile=coverage.out ./...
+//	nezha test ./...
+//	nezha test test/behavior
+//	nezha test path/to/foo_test.ai
+//	nezha test -cover ./...
+//	nezha test -cover -coverview=file ./...
+//	nezha test -coverprofile=coverage.out ./...
 package test
 
 import (
@@ -18,30 +18,30 @@ import (
 	"sort"
 	"strings"
 
-	"aiki/cmd/internal/aitest"
-	"aiki/cmd/internal/targetresolve"
-	"aiki/engine/coverage"
-	"aiki/engine/observe"
-	"aiki/engine/runner"
-	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/cmd/internal/aitest"
+	"nezha/cmd/internal/targetresolve"
+	"nezha/engine/coverage"
+	"nezha/engine/observe"
+	"nezha/engine/runner"
+	"nezha/engine/runtime/hal/substrate"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
-// Run is the entry point for the `aiki test` subcommand.
+// Run is the entry point for the `nezha test` subcommand.
 func Run(args []string) int {
 	fs := flag.NewFlagSet("test", flag.ExitOnError)
 	cover := fs.Bool("cover", false, "enable coverage analysis")
 	coverprofile := fs.String("coverprofile", "", "write coverage profile to file")
 	coverview := fs.String("coverview", "summary", "coverage view: summary, file, function, module, layer, scope")
-	allTargets := fs.Bool("all", false, "include targets excluded by .aikiignore")
+	allTargets := fs.Bool("all", false, "include targets excluded by .nezhaignore")
 	fs.Parse(args)
 
 	if *coverprofile != "" {
 		*cover = true
 	}
 	if *cover && !validCoverageView(*coverview) {
-		fmt.Fprintf(os.Stderr, "aiki test: invalid -coverview %q (want summary, file, function, module, layer, or scope)\n", *coverview)
+		fmt.Fprintf(os.Stderr, "nezha test: invalid -coverview %q (want summary, file, function, module, layer, or scope)\n", *coverview)
 		return 1
 	}
 
@@ -52,11 +52,11 @@ func Run(args []string) int {
 
 	files, err := discoverTestsWithPolicy(targets, *allTargets)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "aiki test:", err)
+		fmt.Fprintln(os.Stderr, "nezha test:", err)
 		return 1
 	}
 	if len(files) == 0 {
-		fmt.Fprintln(os.Stderr, "aiki test: no *_test.ai files found")
+		fmt.Fprintln(os.Stderr, "nezha test: no *_test.ai files found")
 		return 1
 	}
 
@@ -131,14 +131,14 @@ func Run(args []string) int {
 		hits := coverageHits
 		model, modelErr := buildCoverageModelWithPolicy(targets, hits, *allTargets)
 		if modelErr != nil {
-			fmt.Fprintf(os.Stderr, "aiki test: coverage model: %v\n", modelErr)
+			fmt.Fprintf(os.Stderr, "nezha test: coverage model: %v\n", modelErr)
 			return 1
 		}
 		report := coverage.Analyze(model, hits)
 		printCoverage(report, *coverview)
 		if *coverprofile != "" {
 			if err := writeCoverageProfile(*coverprofile, coverage.HitCounts(hits)); err != nil {
-				fmt.Fprintf(os.Stderr, "aiki test: writing coverage profile: %v\n", err)
+				fmt.Fprintf(os.Stderr, "nezha test: writing coverage profile: %v\n", err)
 			}
 		}
 	}
@@ -164,7 +164,7 @@ func printCoverage(report coverage.Report, view string) {
 		fmt.Fprintln(os.Stdout, "Coverage summary")
 		printRollups("", coverageByScope(report))
 		t := report.Total()
-		printRollup("all executable Aiki", t)
+		printRollup("all executable Nezha", t)
 
 		fmt.Fprintln(os.Stdout, "\nSupported libraries")
 		printRollups("", supportedLibraryCoverage(report))

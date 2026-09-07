@@ -1,13 +1,13 @@
 package evaluator
 
 import (
-	"aiki/engine"
 	"fmt"
+	"nezha/engine"
 	"os"
 	"strings"
 
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
 )
 
 func (e *Evaluator) evalProgram(node *syntax.Node, env *value.Env) value.Value {

@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
 )
 
 func (e *Evaluator) evalNumber(node *syntax.Node, env *value.Env) value.Value {

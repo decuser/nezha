@@ -1,6 +1,6 @@
 package engine
 
-import "aiki/engine/observe"
+import "nezha/engine/observe"
 
 // Profiling/observation types live in the leaf observe package. These aliases
 // retain the existing engine-facing API while callers migrate independently.

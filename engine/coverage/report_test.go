@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"aiki/engine/observe"
+	"nezha/engine/observe"
 )
 
 func TestAnalyzeCombinesStaticLinesWithNetworkEvalHits(t *testing.T) {

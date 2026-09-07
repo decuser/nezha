@@ -10,8 +10,8 @@ import (
 	"strings"
 	"sync"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 type EndpointResource struct {

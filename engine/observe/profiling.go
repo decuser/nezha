@@ -1,4 +1,4 @@
-// Package observe defines neutral observation contracts shared by the Aiki
+// Package observe defines neutral observation contracts shared by the Nezha
 // evaluator, runtime substrate, and semantic values. It intentionally imports
 // no higher-level engine packages so low-level semantic state can participate
 // in observation without depending on the engine facade.
@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-// SemanticKind names an Aiki-level operation. These names describe language
+// SemanticKind names a Nezha-level operation. These names describe language
 // work, not incidental work performed by a particular substrate.
 type SemanticKind string
 
@@ -25,7 +25,7 @@ const (
 	SemanticStoreWrite SemanticKind = "store_write"
 )
 
-// SemanticSite identifies the Aiki source site responsible for semantic work.
+// SemanticSite identifies the Nezha source site responsible for semantic work.
 type SemanticSite struct {
 	File     string
 	Line     int
@@ -35,9 +35,9 @@ type SemanticSite struct {
 	Source   string
 }
 
-// SemanticProbe receives Aiki-level work events at semantic choke points.
+// SemanticProbe receives Nezha-level work events at semantic choke points.
 // Implementations must be safe for concurrent use because spawn can execute
-// Aiki code concurrently.
+// Nezha code concurrently.
 type SemanticProbe interface {
 	Hit(kind SemanticKind, site SemanticSite)
 }
@@ -49,7 +49,7 @@ type AttributionProbe interface {
 	WantsSites() bool
 }
 
-// SemanticCounts is a stable snapshot of Aiki-level work.
+// SemanticCounts is a stable snapshot of Nezha-level work.
 type SemanticCounts struct {
 	Arithmetic int64
 	Comparison int64
@@ -63,8 +63,8 @@ type SemanticCounts struct {
 }
 
 // NumberRealizationCounts describes hidden runtime representations observed
-// while evaluating numeric operations. These are realization facts, not Aiki
-// semantic units; representation remains unobservable to Aiki programs.
+// while evaluating numeric operations. These are realization facts, not Nezha
+// semantic units; representation remains unobservable to Nezha programs.
 type NumberRealizationCounts struct {
 	ResultSmallInteger    int64
 	ResultCompactRational int64
@@ -187,7 +187,7 @@ type CallRealizationCounts struct {
 
 // ListRealizationEventIDs binds persistent-list append realization events to
 // the profiling network. These describe physical representation outcomes, not
-// Aiki semantic operations or user-visible list kinds.
+// Nezha semantic operations or user-visible list kinds.
 type ListRealizationEventIDs struct {
 	FrontierPromoted EventID
 	FrontierExtended EventID
@@ -213,7 +213,7 @@ func RegisterListRealizationEvents(schema *ObservationSchema) (ListRealizationEv
 }
 
 // ListRealizationCounts is a report DTO derived from the profiling network.
-// These are profiling facts, not Aiki semantic units or user-visible kinds.
+// These are profiling facts, not Nezha semantic units or user-visible kinds.
 type ListRealizationCounts struct {
 	FrontierPromoted      int64
 	FrontierExtended      int64
@@ -232,7 +232,7 @@ type ListRealizationProbe interface {
 }
 
 // EnvKind classifies hidden environment realizations for profiling.
-// These are runtime/storage categories, not Aiki scope kinds.
+// These are runtime/storage categories, not Nezha scope kinds.
 type EnvKind uint8
 
 const (
@@ -347,7 +347,7 @@ type SemanticSiteCount struct {
 	Count int64
 }
 
-// SemanticMeasurement is the result of one measured Aiki computation.
+// SemanticMeasurement is the result of one measured Nezha computation.
 type SemanticMeasurement struct {
 	Counts        SemanticCounts
 	Numbers       NumberRealizationCounts
@@ -567,7 +567,7 @@ func BoundaryCrossingTimings(g GraphMeasurement) []BoundaryTiming {
 
 // ProfileLabels are the stable correlation dimensions written into Go CPU
 // profiles. The fixed struct is intentionally comparable so the Go substrate
-// can cache pprof label contexts without allocating on every Aiki call.
+// can cache pprof label contexts without allocating on every Nezha call.
 type ProfileLabels struct {
 	Layer     string
 	Function  string
@@ -859,7 +859,7 @@ func (c *EvalCapture) BindAndHit(node string, site SemanticSite, binding *NodeBi
 	site.Detail = node
 	id := c.network.Registry.Register(NodeSpec{
 		Identity: NodeIdentity{
-			Kind: NodeSite, Authority: "aiki/eval", Name: node,
+			Kind: NodeSite, Authority: "nezha/eval", Name: node,
 			File: site.File, Line: site.Line, Col: site.Col,
 		},
 		Layer: "semantic", Detail: node, Source: site.Source,
@@ -875,7 +875,7 @@ func (c *EvalCapture) Hits() []EvalSiteCount {
 	}
 	out := make([]EvalSiteCount, 0)
 	for _, node := range c.network.Registry.Nodes() {
-		if node.Identity.Kind != NodeSite || node.Identity.Authority != "aiki/eval" {
+		if node.Identity.Kind != NodeSite || node.Identity.Authority != "nezha/eval" {
 			continue
 		}
 		count := c.network.NodeHitCount(node.ID)

@@ -3,7 +3,7 @@ package substrate
 import (
 	"testing"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 func TestStringProviderUsesRunePositions(t *testing.T) {
@@ -32,7 +32,7 @@ func TestStringProviderSplitPreservesUnicode(t *testing.T) {
 	}
 }
 
-func TestStringProviderWhitespaceMatchesAikiContract(t *testing.T) {
+func TestStringProviderWhitespaceMatchesNezhaContract(t *testing.T) {
 	got := halStringTrim([]value.Value{&value.String{Val: " \tfoo\r\n"}}, nil)
 	if got.Inspect() != `"foo"` {
 		t.Fatalf("trim = %s, want %q", got.Inspect(), "foo")
@@ -43,6 +43,6 @@ func TestStringProviderWhitespaceMatchesAikiContract(t *testing.T) {
 		t.Fatalf("trim unicode space returned %T, want *value.String", got)
 	}
 	if trimmed.Val != "\u00a0foo\u00a0" {
-		t.Fatalf("trim unicode space = %q; Aiki trim must remain ASCII-whitespace-only", trimmed.Val)
+		t.Fatalf("trim unicode space = %q; Nezha trim must remain ASCII-whitespace-only", trimmed.Val)
 	}
 }

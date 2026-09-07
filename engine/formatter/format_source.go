@@ -5,12 +5,12 @@ import (
 	"sort"
 	"strings"
 
-	"aiki/engine"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
-// FormatSource formats valid Aiki source to the canonical style.
+// FormatSource formats valid Nezha source to the canonical style.
 //
 // Safety gates:
 //  1. Parse original must succeed.

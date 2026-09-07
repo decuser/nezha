@@ -1,20 +1,20 @@
-.PHONY: build clean baseline run test fmt fmt-all lint lint-all treecheck check check-all bless validate-lang validate-all smoke smoke-all smokegold aikitest aikitest-all enginesmoke enginesmoke-all enginesmokegold enginecoverage enginecoverage-all rigorous fuzz intrinsicgate
+.PHONY: build clean baseline run test fmt fmt-all lint lint-all treecheck check check-all bless validate-lang validate-all smoke smoke-all smokegold nezhatest nezhatest-all enginesmoke enginesmoke-all enginesmokegold enginecoverage enginecoverage-all rigorous fuzz intrinsicgate
 
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
-LDFLAGS := -ldflags "-X aiki/cmd/aikiapp.Version=$(VERSION)"
+LDFLAGS := -ldflags "-X nezha/cmd/cli.Version=$(VERSION)"
 
 DIST_PARENT ?= $(abspath ..)
 
 
 SOURCE_DIR_NAME := $(notdir $(CURDIR))
-BASELINE_NAME := aiki-baseline-$(VERSION)
+BASELINE_NAME := nezha-baseline-$(VERSION)
 BASELINE_ARCHIVE := $(DIST_PARENT)/$(BASELINE_NAME).tar.gz
 
 build:
-	go build $(LDFLAGS) -o aiki ./cmd/aiki
+	go build $(LDFLAGS) -o nezha ./cmd/nezha
 
 clean:
-	rm -f aiki
+	rm -f nezha
 	rm -f "$(BASELINE_ARCHIVE)"
 
 
@@ -26,19 +26,19 @@ baseline:
 	@set -eu; \
 	rm -f "$(BASELINE_ARCHIVE)"; \
 	tar -C "$(DIST_PARENT)" \
-		--exclude="$(SOURCE_DIR_NAME)/aiki" \
-		--exclude="$(SOURCE_DIR_NAME)/aiki.exe" \
+		--exclude="$(SOURCE_DIR_NAME)/nezha" \
+		--exclude="$(SOURCE_DIR_NAME)/nezha.exe" \
 		-czf "$(BASELINE_ARCHIVE)" "$(SOURCE_DIR_NAME)"; \
 	tar -tzf "$(BASELINE_ARCHIVE)" | grep -q "^$(SOURCE_DIR_NAME)/\.git/" || { \
 		echo "baseline: archive is missing .git" >&2; exit 1; \
 	}; \
-	if tar -tzf "$(BASELINE_ARCHIVE)" | grep -Eq "^$(SOURCE_DIR_NAME)/aiki(\.exe)?$$"; then \
+	if tar -tzf "$(BASELINE_ARCHIVE)" | grep -Eq "^$(SOURCE_DIR_NAME)/nezha(\.exe)?$$"; then \
 		echo "baseline: archive unexpectedly contains built executable" >&2; exit 1; \
 	fi; \
 	echo "$(BASELINE_ARCHIVE)"
 
 run: build
-	./aiki
+	./nezha
 
 # Behavioral and implementation tests. Architectural invariants are run
 # separately by `make invariant` and composed back into `make check`.
@@ -54,92 +54,92 @@ invariant:
 
 fmt:
 	go fmt ./...
-	./aiki fmt ./...
-	./aiki distfmt ./...
+	./nezha fmt ./...
+	./nezha distfmt ./...
 
 fmt-all:
 	go fmt ./...
-	./aiki fmt --all ./...
-	./aiki distfmt --all ./...
+	./nezha fmt --all ./...
+	./nezha distfmt --all ./...
 
 lint:
-	./aiki lint ./...
+	./nezha lint ./...
 
 lint-all:
-	./aiki lint --all ./...
+	./nezha lint --all ./...
 
 treecheck: build
-	./aiki treecheck
+	./nezha treecheck
 
 
 smoke:
-	./aiki smoke test/behavior/
+	./nezha smoke test/behavior/
 
 smoke-all:
-	./aiki smoke --all test/behavior/
+	./nezha smoke --all test/behavior/
 
 smokegold: build
-	./aiki smoke --gold test/behavior/
+	./nezha smoke --gold test/behavior/
 
 
-aikitest:
+nezhatest:
 	@if find . -name '*_test.ai' -print -quit | grep -q .; then \
-		./aiki test ./...; \
+		./nezha test ./...; \
 	else \
-		echo "aikitest: no *_test.ai files found; skipping"; \
+		echo "nezhatest: no *_test.ai files found; skipping"; \
 	fi
 
-aikitest-all:
+nezhatest-all:
 	@if find . -name '*_test.ai' -print -quit | grep -q .; then \
-		./aiki test --all ./...; \
+		./nezha test --all ./...; \
 	else \
-		echo "aikitest-all: no *_test.ai files found; skipping"; \
+		echo "nezhatest-all: no *_test.ai files found; skipping"; \
 	fi
 
 enginecoverage: build fmt
-	./aiki enginesmoke --stage all --coverage test/structure/engine
+	./nezha enginesmoke --stage all --coverage test/structure/engine
 
 enginecoverage-all: build fmt-all
-	./aiki enginesmoke --all --stage all --coverage test/structure/engine
+	./nezha enginesmoke --all --stage all --coverage test/structure/engine
 
 enginesmoke: build fmt
-	./aiki enginesmoke --stage all --check test/structure/engine
+	./nezha enginesmoke --stage all --check test/structure/engine
 
 enginesmoke-all: build fmt-all
-	./aiki enginesmoke --all --stage all --check test/structure/engine
+	./nezha enginesmoke --all --stage all --check test/structure/engine
 
 enginesmokegold: build fmt
-	./aiki enginesmoke --stage all --gold test/structure/engine
+	./nezha enginesmoke --stage all --gold test/structure/engine
 
 # Snapshot-independent language/runtime correctness checks. This target never
 # writes gold files and uses ordinary CLI target policy.
-check: build fmt lint treecheck test invariant aikitest enginecoverage
+check: build fmt lint treecheck test invariant nezhatest enginecoverage
 
 # Exhaustive snapshot-independent repository checks. Repository selection remains
-# owned by the CLI: --all bypasses .aikiignore without teaching Make which trees
+# owned by the CLI: --all bypasses .nezhaignore without teaching Make which trees
 # are normally excluded. go test ./... supplies the exhaustive ordinary Go suite.
 check-all: build fmt-all lint-all treecheck
 	go test ./...
-	$(MAKE) aikitest-all
-	./aiki enginesmoke --all --stage all --coverage test/structure/engine
+	$(MAKE) nezhatest-all
+	./nezha enginesmoke --all --stage all --coverage test/structure/engine
 
 # Bless the current, independently checked behavior and engine structure.
 # Blessing records a reference state; it is not validation.
 bless: check
-	./aiki smoke --gold test/behavior/
-	./aiki enginesmoke --stage all --gold test/structure/engine
+	./nezha smoke --gold test/behavior/
+	./nezha enginesmoke --stage all --gold test/structure/engine
 
 # Routine language/runtime repository gate. Ordinary CLI policy applies, so
 # repository test exclusions are honored without Make knowing their paths.
 validate-lang: check
-	./aiki smoke test/behavior/
-	./aiki enginesmoke --stage all --check test/structure/engine
+	./nezha smoke test/behavior/
+	./nezha enginesmoke --stage all --check test/structure/engine
 
 # Exhaustive applicable repository gate. --all changes target-policy selection
 # only; each CLI command retains its own source/fixture semantics.
 validate-all: check-all
-	./aiki smoke --all test/behavior/
-	./aiki enginesmoke --all --stage all --check test/structure/engine
+	./nezha smoke --all test/behavior/
+	./nezha enginesmoke --all --stage all --check test/structure/engine
 
 
 fuzz:

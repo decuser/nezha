@@ -1,6 +1,6 @@
 package substrate
 
-import "aiki/engine/runtime/primitives"
+import "nezha/engine/runtime/primitives"
 
 func (g *GoRuntime) registryFor(role primitives.Role) map[string]*Builtin {
 	switch role {

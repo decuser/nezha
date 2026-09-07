@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"sort"
 
-	"aiki/engine"
-	languageobserve "aiki/engine/language/observe"
-	"aiki/engine/syntax"
+	"nezha/engine"
+	languageobserve "nezha/engine/language/observe"
+	"nezha/engine/syntax"
 )
 
 // Symbol is a source-defined binding known to the language service.
@@ -140,7 +140,7 @@ func (s *Service) buildSymbolIndex(doc Document) (*symbolIndex, error) {
 	}
 	idx := &symbolIndex{refs: map[string]Symbol{}, visible: map[string][]Symbol{}}
 	global := newSymbolScope(nil)
-	// Aiki top-level lets are mutually visible to structural analysis.
+	// Nezha top-level lets are mutually visible to structural analysis.
 	if root != nil && root.Type == "program" {
 		for _, st := range root.Children {
 			n := unwrapStatement(st)

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"aiki/cmd/internal/testfixture"
+	"nezha/cmd/internal/testfixture"
 )
 
 func withDistributionRoot(t *testing.T) {

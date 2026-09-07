@@ -10,11 +10,11 @@ import (
 	"testing"
 	"time"
 
-	"aiki/test/support/docexamples"
+	"nezha/test/support/docexamples"
 )
 
 func TestDocExamplesExecutable(t *testing.T) {
-	exe := buildAiki(t)
+	exe := buildNezha(t)
 	examples, err := docexamples.Load(distributionRoot(t))
 	if err != nil {
 		t.Fatal(err)
@@ -42,7 +42,7 @@ func TestDocExamplesExecutable(t *testing.T) {
 		}
 
 		absRoot, _ := filepath.Abs(distributionRoot(t))
-		stdout, stderr, exitCode, err := runAikiSource(exe, program.String(), absRoot)
+		stdout, stderr, exitCode, err := runNezhaSource(exe, program.String(), absRoot)
 		if err != nil {
 			t.Errorf("%s.%s: run error: %v", ex.Module, ex.Name, err)
 			continue
@@ -78,7 +78,7 @@ func TestDocExamplesExecutable(t *testing.T) {
 	t.Logf("doc examples: %d checked, %d unchecked, %d skipped (no code/expects)", checked, uncheckedCount, skipped)
 }
 
-func buildAiki(t *testing.T) string {
+func buildNezha(t *testing.T) string {
 	t.Helper()
 	absRoot, err := filepath.Abs(distributionRoot(t))
 	if err != nil {
@@ -86,17 +86,17 @@ func buildAiki(t *testing.T) string {
 	}
 
 	distDir := t.TempDir()
-	exe := filepath.Join(distDir, "aiki-test-bin")
-	cmd := exec.Command("go", "build", "-buildvcs=false", "-o", exe, "./cmd/aiki")
+	exe := filepath.Join(distDir, "nezha-test-bin")
+	cmd := exec.Command("go", "build", "-buildvcs=false", "-o", exe, "./cmd/nezha")
 	cmd.Dir = absRoot
 	if out, err := cmd.CombinedOutput(); err != nil {
-		t.Fatalf("building aiki: %v\n%s", err, out)
+		t.Fatalf("building nezha: %v\n%s", err, out)
 	}
 	return exe
 }
 
-func runAikiSource(exe, source, workDir string) (stdout, stderr string, exitCode int, err error) {
-	tmp, err := os.CreateTemp("", "aiki-doc-*.ai")
+func runNezhaSource(exe, source, workDir string) (stdout, stderr string, exitCode int, err error) {
+	tmp, err := os.CreateTemp("", "nezha-doc-*.ai")
 	if err != nil {
 		return "", "", 1, err
 	}

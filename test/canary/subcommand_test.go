@@ -10,7 +10,7 @@ import (
 // TestSubcommandDebugExists verifies the debug subcommand runs and produces output.
 func TestSubcommandDebugExists(t *testing.T) {
 	// Running without args should print usage to stderr
-	cmd := exec.Command("go", "run", "../../cmd/aiki", "debug")
+	cmd := exec.Command("go", "run", "../../cmd/nezha", "debug")
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	cmd.Run() // ignore exit code, we just want to see it ran
@@ -23,7 +23,7 @@ func TestSubcommandDebugExists(t *testing.T) {
 
 // TestSubcommandFmtExists verifies the fmt subcommand runs.
 func TestSubcommandFmtExists(t *testing.T) {
-	cmd := exec.Command("go", "run", "../../cmd/aiki", "fmt")
+	cmd := exec.Command("go", "run", "../../cmd/nezha", "fmt")
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	cmd.Run()
@@ -36,7 +36,7 @@ func TestSubcommandFmtExists(t *testing.T) {
 
 // TestSubcommandDistfmtExists verifies the distfmt subcommand runs.
 func TestSubcommandDistfmtExists(t *testing.T) {
-	cmd := exec.Command("go", "run", "../../cmd/aiki", "distfmt")
+	cmd := exec.Command("go", "run", "../../cmd/nezha", "distfmt")
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	cmd.Run()
@@ -49,7 +49,7 @@ func TestSubcommandDistfmtExists(t *testing.T) {
 
 // TestSubcommandLintExists verifies the lint subcommand runs.
 func TestSubcommandLintExists(t *testing.T) {
-	cmd := exec.Command("go", "run", "../../cmd/aiki", "lint")
+	cmd := exec.Command("go", "run", "../../cmd/nezha", "lint")
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	cmd.Run()
@@ -62,7 +62,7 @@ func TestSubcommandLintExists(t *testing.T) {
 
 // TestSubcommandTreecheckExists verifies the treecheck subcommand runs.
 func TestSubcommandTreecheckExists(t *testing.T) {
-	cmd := exec.Command("go", "run", "../../cmd/aiki", "treecheck", "-root", "../..")
+	cmd := exec.Command("go", "run", "../../cmd/nezha", "treecheck", "-root", "../..")
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
@@ -77,7 +77,7 @@ func TestSubcommandTreecheckExists(t *testing.T) {
 
 // TestSubcommandVersionExists verifies the version subcommand runs.
 func TestSubcommandVersionExists(t *testing.T) {
-	cmd := exec.Command("go", "run", "../../cmd/aiki", "version")
+	cmd := exec.Command("go", "run", "../../cmd/nezha", "version")
 	var stdout bytes.Buffer
 	cmd.Stdout = &stdout
 	err := cmd.Run()

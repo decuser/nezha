@@ -1,13 +1,13 @@
 // Package hostnative contains generic mechanics for host-native implementations
-// of Aiki semantic contracts. It deliberately operates below the ordinary Aiki
+// of Nezha semantic contracts. It deliberately operates below the ordinary Nezha
 // callable/value ABI: hot interactions use fixed-width host values and pre-resolved
-// bindings, crossing back into interpreted Aiki only when explicitly required.
+// bindings, crossing back into interpreted Nezha only when explicitly required.
 package hostnative
 
 import "fmt"
 
 // Word is the fixed-width carrier used between admitted host-native implementations.
-// Its representation is implementation-private; ordinary Aiki numeric semantics do
+// Its representation is implementation-private; ordinary Nezha numeric semantics do
 // not constrain or reinterpret these bits.
 type Word uint64
 
@@ -28,7 +28,7 @@ type endpointBinding struct {
 // Outcome is the result of one transport operation. Direct endpoints return a
 // response packet immediately. Interpreted endpoints set Yield and preserve the
 // same packed packet plus the already-resolved endpoint id and local offset for
-// the wrapper that must cross into Aiki.
+// the wrapper that must cross into Nezha.
 type Outcome struct {
 	Packet   Word
 	Endpoint EndpointID
@@ -129,7 +129,7 @@ func (t *Transport) ReplaceDirect(start, end uint32, endpoint DirectEndpoint) (E
 }
 
 // RegisterInterpreted admits an endpoint whose semantic transition is still
-// implemented in Aiki. Runtime transport resolves it identically to a direct
+// implemented in Nezha. Runtime transport resolves it identically to a direct
 // endpoint, but returns an explicit yield rather than entering the evaluator
 // through the hot transport call.
 func (t *Transport) RegisterInterpreted(start, end uint32) (EndpointID, error) {

@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"aiki/engine/runtime/prelude"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/runtime/prelude"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 func invariantGrammar(t *testing.T) *grammar.Grammar {

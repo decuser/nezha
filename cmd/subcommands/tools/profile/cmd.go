@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"aiki/engine"
-	"aiki/engine/observe"
-	"aiki/engine/runner"
+	"nezha/engine"
+	"nezha/engine/observe"
+	"nezha/engine/runner"
 )
 
 func Run(args []string) int {
@@ -31,7 +31,7 @@ func Run(args []string) int {
 		return 2
 	}
 	if fs.NArg() != 1 {
-		fmt.Fprintln(os.Stderr, "usage: aiki profile [-counts] [-time] [-depth 0|N|full] [-callers name] [-from name] [-hops N] [-alloc-target primitive] [-cpu file] [-allocs file] [-trace file] file.ai")
+		fmt.Fprintln(os.Stderr, "usage: nezha profile [-counts] [-time] [-depth 0|N|full] [-callers name] [-from name] [-hops N] [-alloc-target primitive] [-cpu file] [-allocs file] [-trace file] file.ai")
 		return 2
 	}
 	depth, full, err := parseDepth(*depthText)
@@ -94,10 +94,10 @@ func Run(args []string) int {
 		}
 	}
 	if *cpuPath != "" {
-		fmt.Printf("  cpu profile  %s (labels: aiki_layer, aiki_function, aiki_file, aiki_line, aiki_primitive)\n", *cpuPath)
+		fmt.Printf("  cpu profile  %s (labels: nezha_layer, nezha_function, nezha_file, nezha_line, nezha_primitive)\n", *cpuPath)
 	}
 	if *allocsPath != "" {
-		fmt.Printf("  alloc profile %s (Go allocation sites; not Aiki-label correlated)\n", *allocsPath)
+		fmt.Printf("  alloc profile %s (Go allocation sites; not Nezha-label correlated)\n", *allocsPath)
 	}
 	if *tracePath != "" {
 		fmt.Printf("  runtime trace %s\n", *tracePath)
@@ -107,7 +107,7 @@ func Run(args []string) int {
 
 func printMeasurement(m engine.SemanticMeasurement, showSites bool) {
 	c := m.Counts
-	fmt.Println("Aiki semantic work")
+	fmt.Println("Nezha semantic work")
 	rows := []struct {
 		name string
 		n    int64
@@ -128,7 +128,7 @@ func printMeasurement(m engine.SemanticMeasurement, showSites bool) {
 	if !showSites || len(m.Sites) == 0 {
 		return
 	}
-	fmt.Println("\nAiki source attribution")
+	fmt.Println("\nNezha source attribution")
 	for _, sc := range m.Sites {
 		where := fmt.Sprintf("%s:%d:%d", sc.Site.File, sc.Site.Line, sc.Site.Col)
 		context := ""

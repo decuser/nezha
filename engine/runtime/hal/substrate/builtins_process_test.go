@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 func TestProcessHelper(t *testing.T) {
@@ -27,7 +27,7 @@ func TestProcessHelper(t *testing.T) {
 	case "block":
 		select {}
 	case "env":
-		fmt.Fprint(os.Stdout, os.Getenv("AIKI_CHILD_ENV_TEST"))
+		fmt.Fprint(os.Stdout, os.Getenv("NEZHA_CHILD_ENV_TEST"))
 		os.Exit(0)
 	default:
 		return

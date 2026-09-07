@@ -4,11 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/semantics/evaluator"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/runtime/hal/substrate"
+	"nezha/engine/semantics/evaluator"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // eval helper for canary tests - uses prelude scope for HAL access.

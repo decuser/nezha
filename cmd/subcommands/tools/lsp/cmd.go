@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"os"
 
-	"aiki/engine/language"
-	"aiki/engine/language/workspace"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/language"
+	"nezha/engine/language/workspace"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 func Run(args []string) int {
 	if len(args) != 0 {
-		fmt.Fprintln(os.Stderr, "usage: aiki lsp")
+		fmt.Fprintln(os.Stderr, "usage: nezha lsp")
 		return 2
 	}
 	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)

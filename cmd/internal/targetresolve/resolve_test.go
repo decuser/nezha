@@ -16,7 +16,7 @@ func makeTree(t *testing.T) string {
 	mustWrite(t, filepath.Join(root, "src", "a.ai"), "let a = 1\n")
 	mustWrite(t, filepath.Join(root, "src", "sub", "b.ai"), "let b = 2\n")
 	mustWrite(t, filepath.Join(root, "experiments", "demo", "e_test.ai"), "let e = 3\n")
-	mustWrite(t, filepath.Join(root, ".aikiignore"), "[test]\nexperiments/**\n")
+	mustWrite(t, filepath.Join(root, ".nezhaignore"), "[test]\nexperiments/**\n")
 	return root
 }
 
@@ -36,7 +36,7 @@ func TestPolicyPrunesExperimentsFromBroadRecursion(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveFrom returned error: %v", err)
 	}
-	want := []string{".aikiignore", "src/a.ai", "src/sub/b.ai"}
+	want := []string{".nezhaignore", "src/a.ai", "src/sub/b.ai"}
 	assertStrings(t, got, want)
 }
 
@@ -71,7 +71,7 @@ func TestExhaustiveResolutionBypassesRepositoryPolicy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveAllFrom returned error: %v", err)
 	}
-	want := []string{".aikiignore", "experiments/demo/e_test.ai", "src/a.ai", "src/sub/b.ai"}
+	want := []string{".nezhaignore", "experiments/demo/e_test.ai", "src/a.ai", "src/sub/b.ai"}
 	assertStrings(t, got, want)
 }
 

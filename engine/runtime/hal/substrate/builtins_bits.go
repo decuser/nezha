@@ -3,8 +3,8 @@ package substrate
 import (
 	"math/big"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 func bitsNonNegativeInteger(v value.Value, what string) (*big.Int, *value.Fault) {

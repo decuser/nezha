@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 func testRegistryGrammar(t *testing.T) *grammar.Grammar {
@@ -119,7 +119,7 @@ func TestRegistryCanonicalListExcludesAliases(t *testing.T) {
 }
 
 func TestModuleRootsAreEmptyByDefault(t *testing.T) {
-	got := ModuleRoots("home/user", "opt/aiki", "forge/dev/aiki")
+	got := ModuleRoots("home/user", "opt/nezha", "forge/dev/nezha")
 	if len(got) != 0 {
 		t.Fatalf("module roots: got %v, want none", got)
 	}

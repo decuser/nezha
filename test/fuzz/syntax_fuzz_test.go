@@ -3,8 +3,8 @@ package fuzz
 import (
 	"testing"
 
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 var testGrammar *grammar.Grammar

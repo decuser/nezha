@@ -15,12 +15,12 @@ import (
 	"sync/atomic"
 	"time"
 
-	"aiki/engine"
-	"aiki/engine/runtime/hal"
-	"aiki/engine/runtime/help"
-	"aiki/engine/runtime/modules"
-	"aiki/engine/runtime/primitives"
-	"aiki/engine/semantics/value"
+	"nezha/engine"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/runtime/help"
+	"nezha/engine/runtime/modules"
+	"nezha/engine/runtime/primitives"
+	"nezha/engine/semantics/value"
 )
 
 // BuiltinFunc is a HAL-level function that may use evaluation context.
@@ -68,7 +68,7 @@ var _ hal.RealizationProbeRequired = (*Builtin)(nil)
 
 // GoRuntime implements hal.RuntimeContract using Go substrate bindings. Native
 // machinery is separated by architectural role, and only canonical host
-// operations populate hostBindings. User-visible names are defined in Aiki.
+// operations populate hostBindings. User-visible names are defined in Nezha.
 type GoRuntime struct {
 	intrinsics        map[string]*Builtin
 	runtimePrimitives map[string]*Builtin
@@ -364,7 +364,7 @@ func (g *GoRuntime) ProfileLabelsEnabled() bool {
 }
 
 // WithProfileLabels executes fn under a cached pprof label context. It uses
-// SetGoroutineLabels rather than pprof.Do so repeated Aiki calls do not rebuild
+// SetGoroutineLabels rather than pprof.Do so repeated Nezha calls do not rebuild
 // context label maps on every invocation.
 func (g *GoRuntime) WithProfileLabels(labels engine.ProfileLabels, restore engine.ProfileLabels, fn func()) {
 	if !g.profileLabels.Load() {
@@ -381,11 +381,11 @@ func (g *GoRuntime) profileContext(labels engine.ProfileLabels) context.Context 
 		return cached.(context.Context)
 	}
 	pairs := []string{
-		"aiki_layer", labels.Layer,
-		"aiki_function", labels.Function,
-		"aiki_file", labels.File,
-		"aiki_line", labels.Line,
-		"aiki_primitive", labels.Primitive,
+		"nezha_layer", labels.Layer,
+		"nezha_function", labels.Function,
+		"nezha_file", labels.File,
+		"nezha_line", labels.Line,
+		"nezha_primitive", labels.Primitive,
 	}
 	ctx := pprof.WithLabels(context.Background(), pprof.Labels(pairs...))
 	actual, _ := g.labelContexts.LoadOrStore(labels, ctx)

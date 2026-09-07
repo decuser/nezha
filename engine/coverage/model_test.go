@@ -3,9 +3,9 @@ package coverage
 import (
 	"testing"
 
-	"aiki/engine"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 func TestFromASTDefinesStaticSitesWithoutPunctuationLines(t *testing.T) {

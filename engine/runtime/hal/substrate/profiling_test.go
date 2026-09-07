@@ -5,9 +5,9 @@ import (
 	"sync"
 	"testing"
 
-	"aiki/engine"
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 type recordingProbe struct {
@@ -56,7 +56,7 @@ func TestFailedStoreAccessDoesNotCountSemanticWork(t *testing.T) {
 	}
 }
 
-func TestProfileContextCarriesAikiCorrelationLabels(t *testing.T) {
+func TestProfileContextCarriesNezhaCorrelationLabels(t *testing.T) {
 	rt := NewGoRuntime()
 	labels := engine.ProfileLabels{
 		Layer:     "substrate",
@@ -67,11 +67,11 @@ func TestProfileContextCarriesAikiCorrelationLabels(t *testing.T) {
 	}
 	ctx := rt.profileContext(labels)
 	for key, want := range map[string]string{
-		"aiki_layer":     labels.Layer,
-		"aiki_function":  labels.Function,
-		"aiki_file":      labels.File,
-		"aiki_line":      labels.Line,
-		"aiki_primitive": labels.Primitive,
+		"nezha_layer":     labels.Layer,
+		"nezha_function":  labels.Function,
+		"nezha_file":      labels.File,
+		"nezha_line":      labels.Line,
+		"nezha_primitive": labels.Primitive,
 	} {
 		got, ok := pprof.Label(ctx, key)
 		if !ok || got != want {

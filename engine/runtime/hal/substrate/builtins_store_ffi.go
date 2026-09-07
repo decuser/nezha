@@ -1,9 +1,9 @@
 package substrate
 
 import (
-	"aiki/engine/runtime/hal"
-	"aiki/engine/runtime/machinevalue"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/runtime/machinevalue"
+	"nezha/engine/semantics/value"
 )
 
 func fixedStoreNew(args []value.Value, kind, name string) value.Value {
@@ -115,7 +115,7 @@ func halFixedStoreCounterGet(args []value.Value, ctx *hal.EvalContext) value.Val
 	}
 	v := s.CounterGet(i)
 	if v > uint64(^uint64(0)>>1) {
-		return value.NewFault("store/ffi.counter_get: value exceeds Aiki integer boundary")
+		return value.NewFault("store/ffi.counter_get: value exceeds Nezha integer boundary")
 	}
 	return value.NewNumber(int64(v), 1)
 }
@@ -183,7 +183,7 @@ func halFixedStoreSnapshot(args []value.Value, ctx *hal.EvalContext) value.Value
 		for i := 0; i < count; i++ {
 			v := s.CounterGet(i)
 			if v > uint64(^uint64(0)>>1) {
-				return value.NewFault("store/ffi.snapshot: counter exceeds Aiki integer boundary")
+				return value.NewFault("store/ffi.snapshot: counter exceeds Nezha integer boundary")
 			}
 			out[i] = value.NewNumber(int64(v), 1)
 		}
@@ -197,7 +197,7 @@ func halFixedStoreSnapshot(args []value.Value, ctx *hal.EvalContext) value.Value
 }
 
 // Direct physical-memory helpers keep byte/word values inside the fixed-width
-// provider domain and avoid converting an 18-bit bus address to an Aiki index.
+// provider domain and avoid converting an 18-bit bus address to a Nezha index.
 func halFixedStoreWordReadAddr(args []value.Value, ctx *hal.EvalContext) value.Value {
 	if len(args) != 2 {
 		return value.NewFault("store/ffi.word_read_addr: want 2 arguments")

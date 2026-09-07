@@ -13,14 +13,14 @@ import (
 	"strconv"
 	"strings"
 
-	"aiki/cmd/internal/targetresolve"
-	"aiki/engine"
-	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/runtime/prelude"
-	"aiki/engine/semantics/evaluator"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/cmd/internal/targetresolve"
+	"nezha/engine"
+	"nezha/engine/runtime/hal/substrate"
+	"nezha/engine/runtime/prelude"
+	"nezha/engine/semantics/evaluator"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 type stage string
@@ -48,7 +48,7 @@ func Run(args []string) int {
 	fs.BoolVar(&check, "check", false, "compare to blessed .gold outputs")
 	fs.BoolVar(&coverage, "coverage", false, "require every grammar production to be exercised")
 	fs.StringVar(&grammarPath, "grammar", "", "override grammar path")
-	allTargets := fs.Bool("all", false, "include targets excluded by .aikiignore")
+	allTargets := fs.Bool("all", false, "include targets excluded by .nezhaignore")
 
 	if err := fs.Parse(args); err != nil {
 		return 2

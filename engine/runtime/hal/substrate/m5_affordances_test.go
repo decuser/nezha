@@ -5,13 +5,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 func TestM5FileMetadataDirectoryAndCopyAffordances(t *testing.T) {
 	dir := t.TempDir()
 	src := filepath.Join(dir, "source.txt")
-	if err := os.WriteFile(src, []byte("aiki"), 0644); err != nil {
+	if err := os.WriteFile(src, []byte("data"), 0644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -37,7 +37,7 @@ func TestM5FileMetadataDirectoryAndCopyAffordances(t *testing.T) {
 		t.Fatalf("copy = %s", got.Inspect())
 	}
 	data, err := os.ReadFile(dst)
-	if err != nil || string(data) != "aiki" {
+	if err != nil || string(data) != "data" {
 		t.Fatalf("copied data = %q, %v", data, err)
 	}
 

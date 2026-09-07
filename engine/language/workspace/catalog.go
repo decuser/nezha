@@ -8,12 +8,12 @@ import (
 	"sort"
 	"strings"
 
-	"aiki/engine/language"
-	"aiki/engine/runtime/modules"
-	"aiki/engine/runtime/prelude"
-	"aiki/engine/runtime/primitives"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/language"
+	"nezha/engine/runtime/modules"
+	"nezha/engine/runtime/prelude"
+	"nezha/engine/runtime/primitives"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax/grammar"
 )
 
 var _ language.Catalog = (*Catalog)(nil)

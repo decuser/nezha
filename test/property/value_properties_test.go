@@ -4,7 +4,7 @@ import (
 	"testing"
 	"testing/quick"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 // TestNumberArithmeticPreservesSemanticType verifies arithmetic stays in the Number boundary.

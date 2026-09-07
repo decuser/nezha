@@ -1,11 +1,11 @@
 package evaluator
 
 import (
-	"aiki/engine"
 	"fmt"
+	"nezha/engine"
 
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
 )
 
 type binaryOperatorKind int

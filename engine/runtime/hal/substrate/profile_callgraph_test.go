@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"aiki/engine/observe"
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/observe"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 type profileContextTarget struct{ seen observe.NodeID }

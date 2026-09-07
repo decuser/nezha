@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"testing"
 
-	"aiki/engine/semantics/value"
+	"nezha/engine/semantics/value"
 )
 
 func bitsN(n int64) *value.Number { return value.NewNumber(n, 1) }

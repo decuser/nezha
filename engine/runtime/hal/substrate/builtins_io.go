@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"io"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 func (g *GoRuntime) halPrint(args []value.Value, ctx *hal.EvalContext) value.Value {
@@ -99,7 +99,7 @@ func (g *GoRuntime) halIOWrite(args []value.Value, ctx *hal.EvalContext) value.V
 		data = []byte(v.Val)
 	default:
 		var err error
-		data, err = bytesFromAiki(args[1])
+		data, err = bytesFromNezha(args[1])
 		if err != nil {
 			return value.NewFault("io.write: %v", err)
 		}

@@ -4,8 +4,8 @@ import (
 	"math"
 	"math/big"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 func halFloor(args []value.Value, ctx *hal.EvalContext) value.Value {
@@ -71,7 +71,7 @@ func halModulo(args []value.Value, ctx *hal.EvalContext) value.Value {
 		return value.NewFault("modulo: expected numbers")
 	}
 	if right.Sign() == 0 {
-		// math/native deliberately reaches ordinary Aiki division here so the
+		// math/native deliberately reaches ordinary Nezha division here so the
 		// public fault remains the language-level division-by-zero fault.
 		return value.NewFault("division by zero")
 	}

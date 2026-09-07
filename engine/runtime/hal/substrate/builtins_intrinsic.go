@@ -3,11 +3,11 @@ package substrate
 import (
 	"os"
 
-	"aiki/engine"
-	"aiki/engine/observe"
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
+	"nezha/engine"
+	"nezha/engine/observe"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
 )
 
 // halApply implements apply(fn, list) - spreads list as args.

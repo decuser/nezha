@@ -1,11 +1,11 @@
 package evaluator
 
 import (
-	"aiki/engine"
-	"aiki/engine/observe"
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
+	"nezha/engine"
+	"nezha/engine/observe"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
 	"strconv"
 )
 
@@ -30,7 +30,7 @@ func (e *Evaluator) applyFunction(fn value.Value, args []value.Value, node *synt
 	return e.applyFunctionOwned(fn, args, nil, node, env)
 }
 
-// CallValue invokes an already-resolved Aiki value through the ordinary call
+// CallValue invokes an already-resolved Nezha value through the ordinary call
 // semantics. It exists for typed host adapters; it does not create a second
 // calling convention.
 func (e *Evaluator) CallValue(fn value.Value, args []value.Value, env *value.Env) value.Value {

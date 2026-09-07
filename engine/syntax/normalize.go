@@ -1,6 +1,6 @@
 package syntax
 
-import "aiki/engine/syntax/grammar"
+import "nezha/engine/syntax/grammar"
 
 // NormalizeTokens applies grammar-declared skip and physical-newline policy to
 // a raw lexer stream. It is the observable normalized token surface used by

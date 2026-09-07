@@ -4,8 +4,8 @@ import (
 	"image/color"
 	"math"
 
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 )
 
 var (
@@ -130,8 +130,8 @@ func (g *GoRuntime) halCanvas(args []value.Value, ctx *hal.EvalContext) value.Va
 	return cvs
 }
 
-// halCanvasCommand realizes the Aiki-defined Canvas protocol through one host
-// crossing. The operation symbol and argument list are constructed in Aiki;
+// halCanvasCommand realizes the Nezha-defined Canvas protocol through one host
+// crossing. The operation symbol and argument list are constructed in Nezha;
 // this adapter maps that protocol onto the existing substrate implementation.
 func (g *GoRuntime) halCanvasCommand(args []value.Value, ctx *hal.EvalContext) value.Value {
 	if len(args) != 3 {

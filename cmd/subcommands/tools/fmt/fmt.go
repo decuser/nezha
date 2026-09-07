@@ -8,10 +8,10 @@ import (
 	"os"
 	"strings"
 
-	"aiki/cmd/internal/targetresolve"
-	"aiki/cmd/internal/testfixture"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/cmd/internal/targetresolve"
+	"nezha/cmd/internal/testfixture"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // Config controls formatting behavior.

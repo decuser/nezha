@@ -17,7 +17,7 @@ const (
 )
 
 // NumberRepresentation is a Go-side observation category for profiling and
-// tests. It is not an Aiki type and is never exposed through language
+// tests. It is not a Nezha type and is never exposed through language
 // semantics.
 type NumberRepresentation uint8
 
@@ -47,7 +47,7 @@ func (n *Number) ProfileRepresentation() NumberRepresentation {
 	}
 }
 
-// Number is Aiki's exact numeric value. Representation is private and may vary;
+// Number is Nezha's exact numeric value. Representation is private and may vary;
 // all observable behavior is defined by exact rational semantics.
 type Number struct {
 	kind numberKind
@@ -111,7 +111,7 @@ func NewNumberFromBigInt(i *big.Int) *Number {
 }
 
 // NewNumberFromFloat64 retains a finite host binary64 result as an exact dyadic
-// rational carrier. This does not admit rounded binary arithmetic into Aiki; it
+// rational carrier. This does not admit rounded binary arithmetic into Nezha; it
 // only preserves the exact finite bit pattern already returned by the host.
 func NewNumberFromFloat64(f float64) (*Number, bool) {
 	if math.IsNaN(f) || math.IsInf(f, 0) {
@@ -321,7 +321,7 @@ func (n *Number) Uint64() (uint64, bool) {
 }
 
 // Float64 is an explicit host-numeric boundary. exact reports whether the
-// returned binary64 value exactly denotes the Aiki number.
+// returned binary64 value exactly denotes the Nezha number.
 func (n *Number) Float64() (float64, bool) {
 	if n != nil && n.kind == numberBinary64 {
 		return math.Float64frombits(uint64(n.num)), true

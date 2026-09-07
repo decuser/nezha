@@ -7,7 +7,7 @@
 
 @func load
 @template "load(path)"
-@help "Loads and evaluates an aiki file."
+@help "Loads and evaluates an nezha file."
 
 @func stack_limit
 @template "stack_limit(n)"

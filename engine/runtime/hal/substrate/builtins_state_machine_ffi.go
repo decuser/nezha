@@ -1,8 +1,8 @@
 package substrate
 
 import (
-	"aiki/engine/runtime/hal"
-	"aiki/engine/semantics/value"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/semantics/value"
 	"sync"
 )
 
@@ -675,7 +675,7 @@ func halStateMachineRun(args []value.Value, ctx *hal.EvalContext) value.Value {
 	}
 	m.mu.Unlock()
 	if done > uint64(^uint64(0)>>1) {
-		return value.NewFault("%s: count exceeds Aiki integer boundary", name)
+		return value.NewFault("%s: count exceeds Nezha integer boundary", name)
 	}
 	return value.NewNumber(int64(done), 1)
 }
@@ -720,7 +720,7 @@ func halStateMachineRunUntil(args []value.Value, ctx *hal.EvalContext) value.Val
 	}
 	m.mu.Unlock()
 	if done > uint64(^uint64(0)>>1) {
-		return value.NewFault("%s: count exceeds Aiki integer boundary", name)
+		return value.NewFault("%s: count exceeds Nezha integer boundary", name)
 	}
 	return value.NewNumber(int64(done), 1)
 }
@@ -791,7 +791,7 @@ func halStateMachineDropped(args []value.Value, ctx *hal.EvalContext) value.Valu
 	d := m.dropped
 	m.mu.Unlock()
 	if d > uint64(^uint64(0)>>1) {
-		return value.NewFault("%s: value exceeds Aiki integer boundary", name)
+		return value.NewFault("%s: value exceeds Nezha integer boundary", name)
 	}
 	return value.NewNumber(int64(d), 1)
 }

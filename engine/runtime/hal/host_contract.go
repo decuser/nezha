@@ -1,7 +1,7 @@
 package hal
 
-// HostOperation describes one canonical irreducible crossing from Aiki into
-// the host. It is architectural metadata: the Aiki-facing meaning, HAL
+// HostOperation describes one canonical irreducible crossing from Nezha into
+// the host. It is architectural metadata: the Nezha-facing meaning, HAL
 // contract identity, and substrate realization remain distinct names.
 type HostOperation struct {
 	Identity            string
@@ -15,12 +15,12 @@ type HostOperation struct {
 	ErrorContract       string
 	SemanticObservation string
 	SubstrateProvenance string
-	AikiBindings        []AikiBinding
+	NezhaBindings       []NezhaBinding
 }
 
-// AikiBinding records one programmer-facing Aiki name implemented through a
+// NezhaBinding records one programmer-facing Nezha name implemented through a
 // host operation and the source file that owns that meaning.
-type AikiBinding struct {
+type NezhaBinding struct {
 	Name   string
 	Source string
 }

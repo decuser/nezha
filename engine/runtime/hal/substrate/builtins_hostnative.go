@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"aiki/engine/observe"
-	"aiki/engine/runtime/hal"
-	"aiki/engine/runtime/hostnative"
-	"aiki/engine/semantics/value"
+	"nezha/engine/observe"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/runtime/hostnative"
+	"nezha/engine/semantics/value"
 )
 
-// hostNativeOperation is resolved once when an Aiki module binds a host-native
+// hostNativeOperation is resolved once when a Nezha module binds a host-native
 // implementation operation. The returned callable retains this exact function
 // pointer; steady-state calls perform no implementation/name lookup or switch.
 type hostNativeOperation struct {

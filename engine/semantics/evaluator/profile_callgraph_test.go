@@ -3,11 +3,11 @@ package evaluator
 import (
 	"testing"
 
-	"aiki/engine"
-	"aiki/engine/observe"
-	"aiki/engine/runtime/hal"
-	"aiki/engine/runtime/primitives"
-	"aiki/engine/semantics/value"
+	"nezha/engine"
+	"nezha/engine/observe"
+	"nezha/engine/runtime/hal"
+	"nezha/engine/runtime/primitives"
+	"nezha/engine/semantics/value"
 )
 
 type profileTestPrimitive struct{ ordinal uint32 }

@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"aiki/engine"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/syntax/grammar"
 )
 
 // testGrammar creates a grammar that covers what these lexer unit tests feed it.

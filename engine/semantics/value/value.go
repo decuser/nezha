@@ -1,4 +1,4 @@
-// Package value defines the core value types for Aiki.
+// Package value defines the core value types for Nezha.
 package value
 
 import (
@@ -37,7 +37,7 @@ const (
 	TerminalStateType Type = "terminal_state"
 )
 
-// Value is the interface all Aiki values implement.
+// Value is the interface all Nezha values implement.
 type Value interface {
 	Type() Type
 	Inspect() string
@@ -91,8 +91,8 @@ func (b *Bytes) Inspect() string {
 }
 
 // Opaque is a provider-owned value whose representation and operations are not
-// part of Aiki's language semantics. Providers may distinguish private kinds,
-// but ordinary Aiki code sees only an opaque capability value.
+// part of Nezha's language semantics. Providers may distinguish private kinds,
+// but ordinary Nezha code sees only an opaque capability value.
 type Opaque struct {
 	Provider string
 	Kind     string
@@ -103,7 +103,7 @@ func (o *Opaque) Type() Type      { return OpaqueType }
 func (o *Opaque) Inspect() string { return "<opaque>" }
 
 // FixedStore is provider-backed mutable fixed-width storage. Unlike Store,
-// cells are not arbitrary Aiki values. Width is provider policy, not an Aiki
+// cells are not arbitrary Nezha values. Width is provider policy, not a Nezha
 // numeric type.
 type FixedStore struct {
 	mu       sync.RWMutex
@@ -227,7 +227,7 @@ type listBacking struct {
 }
 
 // ListAppendRealization describes one physical append realization. It is an
-// internal profiling fact, not an Aiki semantic kind.
+// internal profiling fact, not a Nezha semantic kind.
 type ListAppendRealization struct {
 	Promoted       bool
 	Extended       bool
@@ -430,7 +430,7 @@ func (f *File) Type() Type      { return FileType }
 func (f *File) Inspect() string { return fmt.Sprintf("<file %s %s>", f.Mode, f.Path) }
 
 // Store is explicit mutable indexed storage for systems work.
-// It is an opaque capability: ordinary Aiki lists remain immutable.
+// It is an opaque capability: ordinary Nezha lists remain immutable.
 // A store may be shared explicitly across spawned evaluations; the mutex
 // protects concurrent access inside the Go implementation.
 type Store struct {
@@ -496,7 +496,7 @@ func NewChannel() *Channel {
 
 // NewEventChannel creates an internal one-event receive-only channel.
 // The capacity prevents an abandoned event source from stranding its producer.
-// General buffered channels are not part of Aiki's language semantics.
+// General buffered channels are not part of Nezha's language semantics.
 func NewEventChannel() *Channel {
 	return &Channel{C: make(chan Value, 1), sendable: false}
 }
@@ -529,9 +529,9 @@ func (e *ExitSignal) Inspect() string { return "" }
 
 var EXIT = &ExitSignal{}
 
-// ProgramExitSignal requests immediate termination of the current Aiki program
+// ProgramExitSignal requests immediate termination of the current Nezha program
 // with a portable process exit status. It is evaluator control flow, not an
-// ordinary Aiki value.
+// ordinary Nezha value.
 type ProgramExitSignal struct {
 	Code int
 }
@@ -571,7 +571,7 @@ func IsTruthy(v Value) bool {
 }
 
 // Fault represents an internal evaluation failure that halts execution.
-// Fault is not an ordinary Aiki value - evaluation halts immediately when one occurs.
+// Fault is not an ordinary Nezha value - evaluation halts immediately when one occurs.
 // For recoverable errors, use shaped lists: [@error, :kind, "message"]
 type Fault struct {
 	Message string

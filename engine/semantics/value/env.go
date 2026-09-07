@@ -1,6 +1,6 @@
 package value
 
-import "aiki/engine/observe"
+import "nezha/engine/observe"
 
 // Scope represents lexical/tooling role. It does not confer raw runtime authority.
 type Scope int
@@ -517,7 +517,7 @@ func (e *Env) PopFrame() {
 	}
 }
 
-// CurrentFrame returns the active Aiki call frame without copying the stack.
+// CurrentFrame returns the active Nezha call frame without copying the stack.
 func (e *Env) CurrentFrame() (StackFrame, bool) {
 	if e == nil || e.stack == nil || len(*e.stack) == 0 {
 		return StackFrame{}, false

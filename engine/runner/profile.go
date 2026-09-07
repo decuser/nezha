@@ -8,13 +8,13 @@ import (
 	"runtime/trace"
 	"time"
 
-	"aiki/engine"
-	"aiki/engine/observe"
-	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/semantics/evaluator"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/observe"
+	"nezha/engine/runtime/hal/substrate"
+	"nezha/engine/semantics/evaluator"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // ProfileOptions controls one correlated semantic/substrate measurement.
@@ -31,7 +31,7 @@ type ProfileOptions struct {
 
 // SubstrateStats describes host work observed during the same evaluation
 // interval as the semantic measurement. These are realization measurements,
-// not Aiki semantic units.
+// not Nezha semantic units.
 type SubstrateStats struct {
 	Elapsed    time.Duration
 	AllocBytes uint64

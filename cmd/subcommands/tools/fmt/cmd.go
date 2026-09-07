@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// Run formats Aiki source files in place.
+// Run formats Nezha source files in place.
 //
 // Default behavior mirrors the user's preferred workflow:
 // rewrite files in place and print filenames that changed.
@@ -23,13 +23,13 @@ func Run(args []string) int {
 	noWrite := fs.Bool("n", false, "do not write; list files that would change")
 	printOut := fs.Bool("p", false, "print formatted output to stdout (single file)")
 	backup := fs.Bool("b", false, "create .bak before overwriting")
-	allTargets := fs.Bool("all", false, "include targets excluded by .aikiignore")
+	allTargets := fs.Bool("all", false, "include targets excluded by .nezhaignore")
 
 	if err := fs.Parse(args); err != nil {
 		return 2
 	}
 	if fs.NArg() == 0 {
-		fmt.Fprintln(os.Stderr, "usage: aiki fmt <file.ai|path/...> [more targets]")
+		fmt.Fprintln(os.Stderr, "usage: nezha fmt <file.ai|path/...> [more targets]")
 		return 2
 	}
 	if *printOut && fs.NArg() != 1 {

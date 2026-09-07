@@ -6,9 +6,9 @@ import (
 	"os"
 )
 
-// Run applies Aiki's distribution/source presentation style.
+// Run applies Nezha's distribution/source presentation style.
 //
-// It intentionally mirrors `aiki fmt` command behavior:
+// It intentionally mirrors `nezha fmt` command behavior:
 //
 //	-n     do not write; just list files that would change
 //	-p     print restyled source to stdout (single file only; no write)
@@ -20,13 +20,13 @@ func Run(args []string) int {
 	noWrite := fs.Bool("n", false, "do not write; list files that would change")
 	printOut := fs.Bool("p", false, "print restyled output to stdout (single file)")
 	backup := fs.Bool("b", false, "create .bak before overwriting")
-	allTargets := fs.Bool("all", false, "include targets excluded by .aikiignore")
+	allTargets := fs.Bool("all", false, "include targets excluded by .nezhaignore")
 
 	if err := fs.Parse(args); err != nil {
 		return 2
 	}
 	if fs.NArg() == 0 {
-		fmt.Fprintln(os.Stderr, "usage: aiki distfmt <file.ai|file.go|path/...> [more targets]")
+		fmt.Fprintln(os.Stderr, "usage: nezha distfmt <file.ai|file.go|path/...> [more targets]")
 		return 2
 	}
 	if *printOut && fs.NArg() != 1 {

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"aiki/engine/semantics/evaluator"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine/semantics/evaluator"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 )
 
 // TestHandlerValidationPanicsOnMissingHandler verifies that missing production handlers panic at startup.

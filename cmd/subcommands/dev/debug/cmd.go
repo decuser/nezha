@@ -6,15 +6,15 @@ import (
 	"io"
 	"os"
 
-	"aiki/engine"
-	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/runtime/prelude"
-	"aiki/engine/semantics/evaluator"
-	"aiki/engine/semantics/value"
-	"aiki/engine/syntax"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/runtime/hal/substrate"
+	"nezha/engine/runtime/prelude"
+	"nezha/engine/semantics/evaluator"
+	"nezha/engine/semantics/value"
+	"nezha/engine/syntax"
+	"nezha/engine/syntax/grammar"
 
-	aikifmt "aiki/engine/formatter"
+	nezhafmt "nezha/engine/formatter"
 )
 
 // Run executes the debug subcommand with the given arguments.
@@ -30,7 +30,7 @@ func Run(args []string) int {
 	}
 
 	if fs.NArg() < 1 {
-		fmt.Fprintln(os.Stderr, "usage: aiki debug [-stage lex|parse|eval|fmt|all] [-trace] [-prelude] <filename>")
+		fmt.Fprintln(os.Stderr, "usage: nezha debug [-stage lex|parse|eval|fmt|all] [-trace] [-prelude] <filename>")
 		return 1
 	}
 
@@ -64,7 +64,7 @@ func run(path, stage string, trace, tracePrelude bool, stdout, stderr io.Writer)
 	// Fmt stage - run formatter with observer
 	if stage == "fmt" {
 		fmt.Fprintln(stdout, "==== Format ====")
-		formatted, err := aikifmt.FormatSourceWithObserver(g, path, source, obs)
+		formatted, err := nezhafmt.FormatSourceWithObserver(g, path, source, obs)
 		if err != nil {
 			fmt.Fprintf(stderr, "format error: %v\n", err)
 			return 1

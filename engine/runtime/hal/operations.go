@@ -11,16 +11,16 @@ var operationDefinitions = map[string]HostOperation{
 	)),
 }
 
-func binding(name, source string) AikiBinding {
-	return AikiBinding{Name: name, Source: source}
+func binding(name, source string) NezhaBinding {
+	return NezhaBinding{Name: name, Source: source}
 }
 
-func bindings(bs ...AikiBinding) []AikiBinding { return bs }
+func bindings(bs ...NezhaBinding) []NezhaBinding { return bs }
 
-func hostOperation(identity, primitive, context, blocking, errors string, aiki []AikiBinding) HostOperation {
+func hostOperation(identity, primitive, context, blocking, errors string, nezha []NezhaBinding) HostOperation {
 	observation := ""
-	if len(aiki) > 0 {
-		observation = aiki[0].Name
+	if len(nezha) > 0 {
+		observation = nezha[0].Name
 	}
 	return HostOperation{
 		Identity:            identity,
@@ -33,34 +33,34 @@ func hostOperation(identity, primitive, context, blocking, errors string, aiki [
 		Optionality:         "constitutive",
 		ErrorContract:       errors,
 		SemanticObservation: observation,
-		AikiBindings:        aiki,
+		NezhaBindings:       nezha,
 	}
 }
 
-func fileOperation(identity, primitive, observation string, b AikiBinding) HostOperation {
+func fileOperation(identity, primitive, observation string, b NezhaBinding) HostOperation {
 	op := hostOperation(identity, primitive, "runtime.filesystem", "may block", "fault or shaped :io result", bindings(b))
 	op.SemanticObservation = observation
 	return op
 }
 
-func pathOperation(identity, primitive, observation string, b AikiBinding) HostOperation {
+func pathOperation(identity, primitive, observation string, b NezhaBinding) HostOperation {
 	return fileOperation(identity, primitive, observation, b)
 }
 
-func optionalPathOperation(identity, primitive, observation string, b AikiBinding) HostOperation {
+func optionalPathOperation(identity, primitive, observation string, b NezhaBinding) HostOperation {
 	op := fileOperation(identity, primitive, observation, b)
 	op.Optionality = "optional"
 	return op
 }
 
-func resourceAcquisition(identity, primitive, observation string, b AikiBinding) HostOperation {
+func resourceAcquisition(identity, primitive, observation string, b NezhaBinding) HostOperation {
 	op := fileOperation(identity, primitive, observation, b)
 	op.Effect = "resource acquisition"
 	op.Lifetime = "returns resource"
 	return op
 }
 
-func resourceOperation(identity, primitive, observation string, b AikiBinding) HostOperation {
+func resourceOperation(identity, primitive, observation string, b NezhaBinding) HostOperation {
 	op := fileOperation(identity, primitive, observation, b)
 	op.Lifetime = "operates on resource"
 	return op
@@ -74,7 +74,7 @@ func OperationDefinition(primitive string) (HostOperation, bool) {
 		return HostOperation{}, false
 	}
 	op.Context = append([]string(nil), op.Context...)
-	op.AikiBindings = append([]AikiBinding(nil), op.AikiBindings...)
+	op.NezhaBindings = append([]NezhaBinding(nil), op.NezhaBindings...)
 	return op, true
 }
 

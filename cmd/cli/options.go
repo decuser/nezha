@@ -1,4 +1,4 @@
-package aikiapp
+package cli
 
 import (
 	"flag"
@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-const appName = "aiki"
+const appName = "nezha"
 
 type Options struct {
 	Version    bool
@@ -24,8 +24,8 @@ func parseOptions() Options {
 	tracefile := flag.String("trace", "", "write runtime trace to file")
 
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: aiki [options] <file.ai [args...]>")
-		fmt.Fprintln(os.Stderr, "       aiki <command> [command options] [args...]")
+		fmt.Fprintln(os.Stderr, "usage: nezha [options] <file.ai [args...]>")
+		fmt.Fprintln(os.Stderr, "       nezha <command> [command options] [args...]")
 		fmt.Fprintln(os.Stderr, "")
 		fmt.Fprintln(os.Stderr, "commands:")
 		for _, cmd := range commands {

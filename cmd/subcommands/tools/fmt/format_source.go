@@ -1,12 +1,12 @@
 package fmt
 
 import (
-	"aiki/engine"
-	"aiki/engine/formatter"
-	"aiki/engine/syntax/grammar"
+	"nezha/engine"
+	"nezha/engine/formatter"
+	"nezha/engine/syntax/grammar"
 )
 
-// FormatSource formats valid Aiki source to the canonical style.
+// FormatSource formats valid Nezha source to the canonical style.
 // The implementation lives in engine/formatter so command and language-service
 // adapters share one formatting authority.
 func FormatSource(g *grammar.Grammar, file, source string) (string, error) {

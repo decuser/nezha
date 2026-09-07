@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"aiki/test/support/docexamples"
+	"nezha/test/support/docexamples"
 )
 
 func TestLibModulesHaveDoc(t *testing.T) {

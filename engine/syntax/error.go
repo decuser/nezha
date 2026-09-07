@@ -1,6 +1,6 @@
 package syntax
 
-import "aiki/engine"
+import "nezha/engine"
 
 // SourceError is a structured lexical or parse error. Error preserves the
 // existing user-facing rendering while Pos/Kind/Message let services project
