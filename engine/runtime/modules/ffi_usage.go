@@ -65,8 +65,7 @@ func FFIUsage(g *grammar.Grammar, entry string, roots []string) ([]string, error
 			if !ok {
 				return fmt.Errorf("%s imports unknown package %q", path, name)
 			}
-			policy, declared := StdlibModulePolicyFor(canonical)
-			if (declared && policy.Realization == RealizationFFI) || strings.HasSuffix(canonical, "/ffi") {
+			if strings.HasSuffix(canonical, "/ffi") {
 				found[canonical] = true
 			}
 			if err := visitFile(modulePath); err != nil {
