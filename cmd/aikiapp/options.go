@@ -30,7 +30,7 @@ func parseOptions() Options {
 	tracefile := flag.String("trace", "", "write runtime trace to file")
 
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: aiki [options] [file.ai [args...]]")
+		fmt.Fprintln(os.Stderr, "usage: aiki [options] <file.ai [args...]>")
 		fmt.Fprintln(os.Stderr, "       aiki <command> [command options] [args...]")
 		fmt.Fprintln(os.Stderr, "")
 		fmt.Fprintln(os.Stderr, "commands:")

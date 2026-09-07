@@ -5,18 +5,14 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"os/user"
 	"runtime/pprof"
 	"runtime/trace"
 
-	"aiki/cmd/subcommands/ux/repl"
 	"aiki/engine/runner"
 	"aiki/engine/semantics/value"
 )
 
 func Main() {
-	repl.AppVersion = Version
-
 	// Check for subcommands before flag parsing. The command registry is also
 	// the authority used by top-level help, so dispatch and discovery cannot drift.
 	if len(os.Args) > 1 {
@@ -44,10 +40,10 @@ func Main() {
 	}
 
 	if flag.NArg() == 0 {
-		startREPL(opts)
-	} else {
-		runFile(flag.Arg(0), opts)
+		flag.Usage()
+		os.Exit(2)
 	}
+	runFile(flag.Arg(0), opts)
 }
 
 func startProfiling(opts Options) func() {
@@ -88,26 +84,6 @@ func startProfiling(opts Options) func() {
 		for i := len(stops) - 1; i >= 0; i-- {
 			stops[i]()
 		}
-	}
-}
-
-func startREPL(opts Options) {
-	u, err := user.Current()
-	if err != nil {
-		u = &user.User{Username: "user"}
-	}
-
-	fmt.Printf("%s %s\n", appName, Version)
-	fmt.Printf("Hello %s! The system is live.\n", u.Username)
-	fmt.Printf("Type help() for help.\n\n")
-
-	sess, err := repl.NewSession(os.Stdout, opts.Debug)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v\n", err)
-		os.Exit(1)
-	}
-	if code := sess.Run(); code != 0 {
-		os.Exit(code)
 	}
 }
 
