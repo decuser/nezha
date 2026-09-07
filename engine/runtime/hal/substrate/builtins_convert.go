@@ -3,7 +3,6 @@ package substrate
 import (
 	"math/big"
 	"strings"
-	"unicode"
 
 	"nezha/engine/runtime/hal"
 	"nezha/engine/semantics/value"
@@ -145,70 +144,4 @@ func halChr(args []value.Value, ctx *hal.EvalContext) value.Value {
 		return value.NewShapedError("range", "chr: code point out of range: %d", code)
 	}
 	return &value.Rune{Val: rune(code)}
-}
-
-// halChars decomposes a string into its Unicode rune values in one pass.
-// The public surface remains lib/string.chars; this is its substrate primitive.
-func halChars(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("chars: want 1 argument, got %d", len(args))
-	}
-	s, ok := args[0].(*value.String)
-	if !ok {
-		return value.NewFault("chars: expected string")
-	}
-	runes := []rune(s.Val)
-	elems := make([]value.Value, len(runes))
-	for i, r := range runes {
-		elems[i] = &value.Rune{Val: r}
-	}
-	return &value.List{Elements: elems}
-}
-
-// halUpper converts a string to uppercase using Unicode rules.
-func halUpper(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("upper: want 1 argument, got %d", len(args))
-	}
-	s, ok := args[0].(*value.String)
-	if !ok {
-		return value.NewFault("upper: expected string")
-	}
-	return &value.String{Val: strings.ToUpper(s.Val)}
-}
-
-// halLower converts a string to lowercase using Unicode rules.
-func halLower(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("lower: want 1 argument, got %d", len(args))
-	}
-	s, ok := args[0].(*value.String)
-	if !ok {
-		return value.NewFault("lower: expected string")
-	}
-	return &value.String{Val: strings.ToLower(s.Val)}
-}
-
-// halUpperRune converts a rune to uppercase using Unicode rules.
-func halUpperRune(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("upper_rune: want 1 argument, got %d", len(args))
-	}
-	r, ok := args[0].(*value.Rune)
-	if !ok {
-		return value.NewFault("upper_rune: expected rune")
-	}
-	return &value.Rune{Val: unicode.ToUpper(r.Val)}
-}
-
-// halLowerRune converts a rune to lowercase using Unicode rules.
-func halLowerRune(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("lower_rune: want 1 argument, got %d", len(args))
-	}
-	r, ok := args[0].(*value.Rune)
-	if !ok {
-		return value.NewFault("lower_rune: expected rune")
-	}
-	return &value.Rune{Val: unicode.ToLower(r.Val)}
 }

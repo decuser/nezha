@@ -1,4 +1,4 @@
-.PHONY: build clean baseline run test fmt fmt-all lint lint-all treecheck check check-all bless validate-lang validate-all smoke smoke-all smokegold enginesmoke enginesmoke-all enginesmokegold enginecoverage enginecoverage-all rigorous fuzz intrinsicgate
+.PHONY: build clean baseline run test fmt fmt-all lint lint-all treecheck check check-all bless validate-lang validate-all smoke smoke-all smokegold enginesmoke enginesmoke-all enginesmokegold enginecoverage enginecoverage-all rigorous fuzz
 
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 LDFLAGS := -ldflags "-X nezha/cmd/cli.Version=$(VERSION)"
@@ -135,7 +135,3 @@ fuzz:
 rigorous: validate-all fuzz
 
 
-
-# Reproducible semantic/substrate profiling sweep. Not part of validation.
-intrinsicgate: build
-	./engineering/profiling/state-machine-intrinsic-gate.sh
