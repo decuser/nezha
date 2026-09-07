@@ -16,13 +16,12 @@ import (
 	"nezha/engine"
 	"nezha/engine/runtime/hal"
 	"nezha/engine/runtime/help"
-	"nezha/engine/runtime/modules"
 	"nezha/engine/runtime/primitives"
 	"nezha/engine/semantics/value"
 )
 
 // BuiltinFunc is a HAL-level function that may use evaluation context.
-// Simple builtins ignore ctx; intrinsics (import, export, apply, etc.) use it.
+// Simple builtins ignore ctx; intrinsics such as apply and load use it.
 type BuiltinFunc func(args []value.Value, ctx *hal.EvalContext) value.Value
 type ProbeBuiltinFunc func(args []value.Value, probe engine.SemanticProbe) value.Value
 
@@ -80,7 +79,6 @@ type GoRuntime struct {
 	stderr            io.Writer
 	pageOutput        func(string) bool
 	userEnv           *value.Env
-	moduleRegistry    *modules.ModuleRegistry
 	helpRegistry      *help.Registry
 	mu                sync.RWMutex
 	profileLabels     atomic.Bool
@@ -156,13 +154,6 @@ func (g *GoRuntime) SetUserEnv(env *value.Env) {
 	g.mu.Unlock()
 }
 
-// SetModuleRegistry installs the runtime-owned module registry/cache.
-func (g *GoRuntime) SetModuleRegistry(registry *modules.ModuleRegistry) {
-	g.mu.Lock()
-	g.moduleRegistry = registry
-	g.mu.Unlock()
-}
-
 // SetHelpRegistry installs the runtime-owned prelude help/documentation registry.
 func (g *GoRuntime) SetHelpRegistry(registry *help.Registry) {
 	g.mu.Lock()
@@ -217,15 +208,8 @@ func (g *GoRuntime) authorityKey(name string) string {
 }
 
 // HasBuiltin checks whether a runtime binding is executable under the supplied
-// lexical authority. Language intrinsics import/use/export remain constitutive
-// and do not consume a grant. Scope is intentionally not consulted.
+// lexical authority. Scope is intentionally not consulted.
 func (g *GoRuntime) HasBuiltin(name string, authority value.Authority) bool {
-	if name == "export" || name == "import" || name == "use" {
-		g.mu.RLock()
-		_, ok := g.intrinsics["_"+name]
-		g.mu.RUnlock()
-		return ok
-	}
 	if !authority.Allows(g.authorityKey(name)) {
 		return false
 	}
@@ -239,12 +223,6 @@ func (g *GoRuntime) HasBuiltin(name string, authority value.Authority) bool {
 // architectural key. Host operations use canonical HAL identities; other
 // primitives use their implementation primitive names.
 func (g *GoRuntime) GetBuiltin(name string, authority value.Authority) (value.Callable, bool) {
-	if name == "export" || name == "import" || name == "use" {
-		g.mu.RLock()
-		b, ok := g.intrinsics["_"+name]
-		g.mu.RUnlock()
-		return b, ok
-	}
 	if !authority.Allows(g.authorityKey(name)) {
 		return nil, false
 	}

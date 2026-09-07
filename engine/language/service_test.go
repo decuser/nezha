@@ -147,10 +147,6 @@ func (completionCatalog) Help(name string) (HelpEntry, bool) {
 	}
 	return HelpEntry{}, false
 }
-func (completionCatalog) ModuleSource(currentFile, moduleName string) (string, string, bool) {
-	return "", "", false
-}
-
 func TestCompletionUsesLexicalScopeAndCatalog(t *testing.T) {
 	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
 	if err != nil {

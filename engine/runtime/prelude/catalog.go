@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"nezha/engine/runtime/help"
-	"nezha/engine/runtime/modules"
+	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
 )
 
@@ -29,7 +29,7 @@ func LoadCatalog(g *grammar.Grammar) (*Catalog, error) {
 // invariant tests can deliberately mutate one authority without duplicating the
 // join logic.
 func ValidateSources(g *grammar.Grammar, source, helpSource, docSource string) (*Catalog, error) {
-	info, err := modules.AnalyzeSource(g, "engine/runtime/prelude/prelude.nez", source)
+	declared, err := declaredPreludeFunctions(g, "engine/runtime/prelude/prelude.nez", source)
 	if err != nil {
 		return nil, fmt.Errorf("analyzing prelude source: %w", err)
 	}
@@ -43,13 +43,11 @@ func ValidateSources(g *grammar.Grammar, source, helpSource, docSource string) (
 		return nil, err
 	}
 
-	names := make([]string, 0, len(info.Functions))
-	declared := make(map[string]bool, len(info.Functions))
-	for name := range info.Functions {
+	names := make([]string, 0, len(declared))
+	for name := range declared {
 		if strings.HasPrefix(name, "_") {
 			continue
 		}
-		declared[name] = true
 		names = append(names, name)
 	}
 	if err := validateHelpCoverage(declared, funcs); err != nil {
@@ -63,6 +61,69 @@ func ValidateSources(g *grammar.Grammar, source, helpSource, docSource string) (
 	registry := help.NewRegistry()
 	registry.Merge(funcs, docs)
 	return &Catalog{Registry: registry, Names: names}, nil
+}
+
+func declaredPreludeFunctions(g *grammar.Grammar, file, source string) (map[string]bool, error) {
+	lx := syntax.NewLexer(g, file, source, nil)
+	tokens, err := lx.Tokenize()
+	if err != nil {
+		return nil, err
+	}
+	p := syntax.NewParser(g, tokens, source, nil)
+	root, err := p.Parse()
+	if err != nil {
+		return nil, err
+	}
+	declared := map[string]bool{}
+	var walk func(*syntax.Node)
+	walk = func(node *syntax.Node) {
+		if node == nil || node.Type == "block" {
+			return
+		}
+		if node.Type == "let_stmt" {
+			if name, ok := functionBindingName(node); ok {
+				declared[name] = true
+			}
+			return
+		}
+		for _, child := range node.Children {
+			walk(child)
+		}
+	}
+	walk(root)
+	return declared, nil
+}
+
+func functionBindingName(node *syntax.Node) (string, bool) {
+	var name string
+	var valueNode *syntax.Node
+	for i, child := range node.Children {
+		if child.Type == "NAME" && name == "" {
+			name = child.Value
+		}
+		if child.Type == "TERMINAL" && child.Value == "=" && i+1 < len(node.Children) {
+			valueNode = node.Children[i+1]
+		}
+	}
+	if name == "" || valueNode == nil || findFirst(valueNode, "func_literal") == nil {
+		return "", false
+	}
+	return name, true
+}
+
+func findFirst(node *syntax.Node, typ string) *syntax.Node {
+	if node == nil {
+		return nil
+	}
+	if node.Type == typ {
+		return node
+	}
+	for _, child := range node.Children {
+		if found := findFirst(child, typ); found != nil {
+			return found
+		}
+	}
+	return nil
 }
 
 func validateHelpCoverage(declared map[string]bool, entries map[string]help.FuncEntry) error {

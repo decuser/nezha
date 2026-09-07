@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"nezha/engine"
-	"nezha/engine/runtime/modules"
 	"nezha/engine/runtime/prelude"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
@@ -206,10 +205,6 @@ func (c *checker) check(node *syntax.Node) {
 		c.checkMatch(node)
 		return
 
-	case "select_stmt":
-		c.checkSelect(node)
-		return
-
 	case "return_stmt":
 		for _, ch := range node.Children {
 			if ch.Type != "TERMINAL" {
@@ -253,131 +248,9 @@ func (c *checker) check(node *syntax.Node) {
 
 func (c *checker) checkPostfix(node *syntax.Node) {
 	// postfix_expr = primary { call | index | access }
-	// Handle import(...) as a special form that introduces bindings.
-	// Example: import("math/exact", :sin, :cos)
-	if node == nil || len(node.Children) == 0 {
-		return
-	}
-
-	prim := node.Children[0]
-	nameTok := prim.ChildByType("NAME")
-	if nameTok != nil && nameTok.Value == "import" {
-		for _, ch := range node.Children[1:] {
-			if ch.Type != "call" {
-				continue
-			}
-			c.bindImportCall(ch)
-			break
-		}
-	}
-
-	// Handle use("module") - bind all exports from module
-	if nameTok != nil && nameTok.Value == "use" {
-		for _, ch := range node.Children[1:] {
-			if ch.Type != "call" {
-				continue
-			}
-			c.bindUseCall(ch)
-			break
-		}
-	}
-
 	for _, ch := range node.Children {
 		c.check(ch)
 	}
-}
-
-func (c *checker) bindImportCall(call *syntax.Node) {
-	if call == nil {
-		return
-	}
-	// call = "(" [ expr { "," expr } ] ")"
-	// Import list items are SYMBOL tokens like :sin, :cos. Note: SYMBOL is not
-	// necessarily a direct child of expr, so we must search recursively.
-	for _, ch := range call.Children {
-		if ch.Type != "expr" {
-			continue
-		}
-		for _, sym := range findAllByType(ch, "SYMBOL") {
-			name := strings.TrimPrefix(sym.Value, ":")
-			if name != "" && isNameToken(name) {
-				c.define(name)
-			}
-		}
-	}
-}
-
-// bindUseCall handles use("module") by loading module exports into scope.
-func (c *checker) bindUseCall(call *syntax.Node) {
-	if call == nil {
-		return
-	}
-	// call = "(" [ expr { "," expr } ] ")"
-	// First argument should be a string literal with the module path.
-	for _, ch := range call.Children {
-		if ch.Type != "expr" {
-			continue
-		}
-		// Find the STRING token
-		strTok := findFirstByType(ch, "STRING")
-		if strTok == nil {
-			continue
-		}
-		// Extract module path from string literal (remove quotes)
-		modulePath := strings.Trim(strTok.Value, "\"")
-		if modulePath == "" {
-			continue
-		}
-		// Resolve and load module exports
-		exports := c.resolveModuleExports(modulePath)
-		for _, name := range exports {
-			c.define(name)
-		}
-		return // use() takes only one argument
-	}
-}
-
-// resolveModuleExports obtains module source through the catalog contract and
-// extracts exports using the real Nezha parser. Resolution is an adapter concern;
-// export semantics remain language analysis.
-func (c *checker) resolveModuleExports(moduleName string) []string {
-	if c.catalog == nil {
-		return nil
-	}
-	_, source, ok := c.catalog.ModuleSource(c.currentFile, moduleName)
-	if !ok {
-		return nil
-	}
-	return modules.ExportNames(c.grammar, "<module>", source)
-}
-
-func findAllByType(n *syntax.Node, typ string) []*syntax.Node {
-	if n == nil {
-		return nil
-	}
-	var out []*syntax.Node
-	if n.Type == typ {
-		out = append(out, n)
-	}
-	for _, ch := range n.Children {
-		out = append(out, findAllByType(ch, typ)...)
-	}
-	return out
-}
-
-func findFirstByType(n *syntax.Node, typ string) *syntax.Node {
-	if n == nil {
-		return nil
-	}
-	if n.Type == typ {
-		return n
-	}
-	for _, ch := range n.Children {
-		if found := findFirstByType(ch, typ); found != nil {
-			return found
-		}
-	}
-	return nil
 }
 
 func (c *checker) checkLet(node *syntax.Node) {
@@ -469,49 +342,6 @@ func (c *checker) checkWhile(node *syntax.Node) {
 		}
 		if ch.Type == "block" {
 			c.check(ch)
-		}
-	}
-}
-
-func (c *checker) checkSelect(node *syntax.Node) {
-	for _, child := range node.Children {
-		switch child.Type {
-		case "select_case":
-			var bind string
-			var expr *syntax.Node
-			var block *syntax.Node
-			for _, part := range child.Children {
-				switch part.Type {
-				case "NAME":
-					if bind == "" {
-						bind = part.Value
-					}
-				case "expr":
-					expr = part
-				case "block":
-					block = part
-				}
-			}
-			// Channel expressions are evaluated in the surrounding scope.
-			if expr != nil {
-				c.check(expr)
-			}
-			// Each arm has its own scope, as in match. The receive binding
-			// and any bindings made by the arm do not leak out.
-			c.pushScope()
-			if bind != "" {
-				c.define(bind)
-			}
-			if block != nil {
-				c.check(block)
-			}
-			c.popScope()
-		case "select_default":
-			c.pushScope()
-			if block := child.ChildByType("block"); block != nil {
-				c.check(block)
-			}
-			c.popScope()
 		}
 	}
 }

@@ -89,7 +89,7 @@ func ParseFile(moduleName, path string) ([]Example, error) {
 					continue
 				}
 			}
-			if strings.HasPrefix(trimmed, "let ") || strings.HasPrefix(trimmed, "use(") || strings.HasPrefix(trimmed, "import(") {
+			if strings.HasPrefix(trimmed, "let ") {
 				ex.Code = append(ex.Code, line)
 			}
 		}

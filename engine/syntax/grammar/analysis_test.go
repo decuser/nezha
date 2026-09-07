@@ -19,8 +19,8 @@ func TestAnalysisCurrentGrammar(t *testing.T) {
 	if a == nil {
 		t.Fatal("analysis is nil")
 	}
-	if got := len(a.ProductionNames()); got != 32 {
-		t.Fatalf("productions = %d, want 32", got)
+	if got := len(a.ProductionNames()); got != 28 {
+		t.Fatalf("productions = %d, want 28", got)
 	}
 
 	wantRefs := map[string]struct{}{

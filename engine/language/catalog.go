@@ -15,5 +15,4 @@ type HelpEntry struct {
 type Catalog interface {
 	VisibleNames(scope value.Scope) []string
 	Help(name string) (HelpEntry, bool)
-	ModuleSource(currentFile, moduleName string) (path string, source string, ok bool)
 }

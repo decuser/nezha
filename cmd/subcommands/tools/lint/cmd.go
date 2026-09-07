@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"nezha/engine/language"
 	"nezha/engine/semantics/value"
 	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
@@ -85,10 +84,6 @@ func Run(args []string) int {
 			if !*includePrelude {
 				continue
 			}
-		} else if language.HasPackageDeclaration(string(src)) {
-			// Package modules are evaluated in an env enclosed by the prelude env,
-			// inheriting ScopePrelude (see substrate import implementation).
-			scope = value.ScopePrelude
 		}
 		diags, err := LintSource(g, path, string(src), scope)
 		if err != nil {

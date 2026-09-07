@@ -3,13 +3,9 @@
 package workspace
 
 import (
-	"os"
-	"path/filepath"
 	"sort"
-	"strings"
 
 	"nezha/engine/language"
-	"nezha/engine/runtime/modules"
 	"nezha/engine/runtime/prelude"
 	"nezha/engine/runtime/primitives"
 	"nezha/engine/semantics/value"
@@ -20,7 +16,6 @@ var _ language.Catalog = (*Catalog)(nil)
 
 type Catalog struct {
 	grammar        *grammar.Grammar
-	registry       *modules.ModuleRegistry
 	preludeCatalog *prelude.Catalog
 }
 
@@ -74,48 +69,4 @@ func (c *Catalog) Help(name string) (language.HelpEntry, bool) {
 		doc = d.Doc
 	}
 	return language.HelpEntry{Name: name, Template: entry.Template, Summary: entry.Help, Doc: doc}, true
-}
-
-func (c *Catalog) ModuleSource(currentFile, name string) (string, string, bool) {
-	path := c.resolveModulePath(currentFile, name)
-	if path == "" {
-		return "", "", false
-	}
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return "", "", false
-	}
-	return path, string(data), true
-}
-
-func (c *Catalog) resolveModulePath(currentFile, name string) string {
-	if modules.IsPathImport(name) {
-		path := name
-		if !strings.HasSuffix(path, ".nez") {
-			path += ".nez"
-		}
-		if currentFile != "" && currentFile != "<unknown>" {
-			candidate := filepath.Join(filepath.Dir(currentFile), path)
-			if _, err := os.Stat(candidate); err == nil {
-				return candidate
-			}
-		}
-		if _, err := os.Stat(path); err == nil {
-			return path
-		}
-		return ""
-	}
-	if c.registry == nil {
-		homeDir, _ := os.UserHomeDir()
-		r := modules.NewModuleRegistry(modules.DefaultModuleRoots(homeDir))
-		if err := r.Scan(c.grammar); err != nil {
-			return ""
-		}
-		c.registry = r
-	}
-	path, _, ok := c.registry.Resolve(name)
-	if !ok {
-		return ""
-	}
-	return path
 }

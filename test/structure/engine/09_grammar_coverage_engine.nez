@@ -1,6 +1,4 @@
 # Covers grammar productions not otherwise exercised structurally.
-package "engine/coverage"
-
 let @pair [left, right]
 let pair = [@pair, 10, 20]
 println(pair.left)

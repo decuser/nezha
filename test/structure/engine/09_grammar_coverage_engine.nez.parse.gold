@@ -1,281 +1,276 @@
 program 2:1
   statement 2:1
-    package_stmt 2:1
-      TERMINAL 2:1 "package"
-      STRING 2:9 "\"engine/coverage\""
-  TERMINAL 2:26 ";"
+    let_stmt 2:1
+      TERMINAL 2:1 "let"
+      SHAPE 2:5 "@pair"
+      TERMINAL 2:11 "["
+      field 2:12
+        NAME 2:12 "left"
+      TERMINAL 2:16 ","
+      field 2:18
+        NAME 2:18 "right"
+      TERMINAL 2:23 "]"
+  TERMINAL 2:24 ";"
+  statement 3:1
+    let_stmt 3:1
+      TERMINAL 3:1 "let"
+      NAME 3:5 "pair"
+      TERMINAL 3:10 "="
+      expr 3:12
+        pipe_expr 3:12
+          infix_expr 3:12
+            unary_expr 3:12
+              postfix_expr 3:12
+                primary 3:12
+                  list_literal 3:12
+                    TERMINAL 3:12 "["
+                    SHAPE 3:13 "@pair"
+                    TERMINAL 3:18 ","
+                    expr 3:20
+                      pipe_expr 3:20
+                        infix_expr 3:20
+                          unary_expr 3:20
+                            postfix_expr 3:20
+                              primary 3:20
+                                NUMBER 3:20 "10"
+                    TERMINAL 3:22 ","
+                    expr 3:24
+                      pipe_expr 3:24
+                        infix_expr 3:24
+                          unary_expr 3:24
+                            postfix_expr 3:24
+                              primary 3:24
+                                NUMBER 3:24 "20"
+                    TERMINAL 3:26 "]"
+  TERMINAL 3:27 ";"
   statement 4:1
-    let_stmt 4:1
-      TERMINAL 4:1 "let"
-      SHAPE 4:5 "@pair"
-      TERMINAL 4:11 "["
-      field 4:12
-        NAME 4:12 "left"
-      TERMINAL 4:16 ","
-      field 4:18
-        NAME 4:18 "right"
-      TERMINAL 4:23 "]"
-  TERMINAL 4:24 ";"
+    expr_stmt 4:1
+      expr 4:1
+        pipe_expr 4:1
+          infix_expr 4:1
+            unary_expr 4:1
+              postfix_expr 4:1
+                primary 4:1
+                  NAME 4:1 "println"
+                call 4:8
+                  TERMINAL 4:8 "("
+                  expr 4:9
+                    pipe_expr 4:9
+                      infix_expr 4:9
+                        unary_expr 4:9
+                          postfix_expr 4:9
+                            primary 4:9
+                              NAME 4:9 "pair"
+                            access 4:13
+                              TERMINAL 4:13 "."
+                              NAME 4:14 "left"
+                  TERMINAL 4:18 ")"
+  TERMINAL 4:19 ";"
   statement 5:1
-    let_stmt 5:1
-      TERMINAL 5:1 "let"
-      NAME 5:5 "pair"
-      TERMINAL 5:10 "="
-      expr 5:12
-        pipe_expr 5:12
-          infix_expr 5:12
-            unary_expr 5:12
-              postfix_expr 5:12
-                primary 5:12
-                  list_literal 5:12
-                    TERMINAL 5:12 "["
-                    SHAPE 5:13 "@pair"
-                    TERMINAL 5:18 ","
-                    expr 5:20
-                      pipe_expr 5:20
-                        infix_expr 5:20
-                          unary_expr 5:20
-                            postfix_expr 5:20
-                              primary 5:20
-                                NUMBER 5:20 "10"
-                    TERMINAL 5:22 ","
-                    expr 5:24
-                      pipe_expr 5:24
-                        infix_expr 5:24
-                          unary_expr 5:24
-                            postfix_expr 5:24
-                              primary 5:24
-                                NUMBER 5:24 "20"
-                    TERMINAL 5:26 "]"
-  TERMINAL 5:27 ";"
-  statement 6:1
-    expr_stmt 6:1
-      expr 6:1
-        pipe_expr 6:1
-          infix_expr 6:1
-            unary_expr 6:1
-              postfix_expr 6:1
-                primary 6:1
-                  NAME 6:1 "println"
-                call 6:8
-                  TERMINAL 6:8 "("
-                  expr 6:9
-                    pipe_expr 6:9
-                      infix_expr 6:9
-                        unary_expr 6:9
-                          postfix_expr 6:9
-                            primary 6:9
-                              NAME 6:9 "pair"
-                            access 6:13
-                              TERMINAL 6:13 "."
-                              NAME 6:14 "left"
-                  TERMINAL 6:18 ")"
-  TERMINAL 6:19 ";"
+    expr_stmt 5:1
+      expr 5:1
+        pipe_expr 5:1
+          infix_expr 5:1
+            unary_expr 5:1
+              postfix_expr 5:1
+                primary 5:1
+                  NAME 5:1 "println"
+                call 5:8
+                  TERMINAL 5:8 "("
+                  expr 5:9
+                    pipe_expr 5:9
+                      infix_expr 5:9
+                        unary_expr 5:9
+                          postfix_expr 5:9
+                            primary 5:9
+                              list_literal 5:9
+                                TERMINAL 5:9 "["
+                                expr 5:10
+                                  pipe_expr 5:10
+                                    infix_expr 5:10
+                                      unary_expr 5:10
+                                        postfix_expr 5:10
+                                          primary 5:10
+                                            NUMBER 5:10 "1"
+                                TERMINAL 5:11 ","
+                                expr 5:13
+                                  pipe_expr 5:13
+                                    infix_expr 5:13
+                                      unary_expr 5:13
+                                        postfix_expr 5:13
+                                          primary 5:13
+                                            NUMBER 5:13 "2"
+                                TERMINAL 5:14 ","
+                                expr 5:16
+                                  pipe_expr 5:16
+                                    infix_expr 5:16
+                                      unary_expr 5:16
+                                        postfix_expr 5:16
+                                          primary 5:16
+                                            NUMBER 5:16 "3"
+                                TERMINAL 5:17 "]"
+                            index 5:18
+                              TERMINAL 5:18 "["
+                              expr 5:19
+                                pipe_expr 5:19
+                                  infix_expr 5:19
+                                    unary_expr 5:19
+                                      postfix_expr 5:19
+                                        primary 5:19
+                                          NUMBER 5:19 "1"
+                              TERMINAL 5:20 "]"
+                  TERMINAL 5:21 ")"
+  TERMINAL 5:22 ";"
   statement 7:1
-    expr_stmt 7:1
-      expr 7:1
-        pipe_expr 7:1
-          infix_expr 7:1
-            unary_expr 7:1
-              postfix_expr 7:1
-                primary 7:1
-                  NAME 7:1 "println"
-                call 7:8
-                  TERMINAL 7:8 "("
-                  expr 7:9
-                    pipe_expr 7:9
-                      infix_expr 7:9
-                        unary_expr 7:9
-                          postfix_expr 7:9
-                            primary 7:9
-                              list_literal 7:9
-                                TERMINAL 7:9 "["
-                                expr 7:10
-                                  pipe_expr 7:10
-                                    infix_expr 7:10
-                                      unary_expr 7:10
-                                        postfix_expr 7:10
-                                          primary 7:10
-                                            NUMBER 7:10 "1"
-                                TERMINAL 7:11 ","
-                                expr 7:13
-                                  pipe_expr 7:13
-                                    infix_expr 7:13
-                                      unary_expr 7:13
-                                        postfix_expr 7:13
-                                          primary 7:13
-                                            NUMBER 7:13 "2"
-                                TERMINAL 7:14 ","
-                                expr 7:16
-                                  pipe_expr 7:16
-                                    infix_expr 7:16
-                                      unary_expr 7:16
-                                        postfix_expr 7:16
-                                          primary 7:16
-                                            NUMBER 7:16 "3"
-                                TERMINAL 7:17 "]"
-                            index 7:18
-                              TERMINAL 7:18 "["
-                              expr 7:19
-                                pipe_expr 7:19
-                                  infix_expr 7:19
-                                    unary_expr 7:19
-                                      postfix_expr 7:19
-                                        primary 7:19
-                                          NUMBER 7:19 "1"
-                              TERMINAL 7:20 "]"
-                  TERMINAL 7:21 ")"
-  TERMINAL 7:22 ";"
-  statement 9:1
-    let_stmt 9:1
-      TERMINAL 9:1 "let"
-      NAME 9:5 "count_rest"
-      TERMINAL 9:16 "="
-      expr 9:18
-        pipe_expr 9:18
-          infix_expr 9:18
-            unary_expr 9:18
-              postfix_expr 9:18
-                primary 9:18
-                  func_literal 9:18
-                    TERMINAL 9:18 "("
-                    params 9:19
-                      param_list 9:19
-                        NAME 9:19 "first"
-                      TERMINAL 9:24 ","
-                      rest_param 9:26
-                        TERMINAL 9:26 "..."
-                        NAME 9:29 "rest"
-                    TERMINAL 9:33 ")"
-                    block 9:35
-                      TERMINAL 9:35 "{"
-                      statement 10:2
-                        expr_stmt 10:2
-                          expr 10:2
-                            pipe_expr 10:2
-                              infix_expr 10:2
-                                unary_expr 10:2
-                                  postfix_expr 10:2
-                                    primary 10:2
-                                      NAME 10:2 "length"
-                                    call 10:8
-                                      TERMINAL 10:8 "("
-                                      expr 10:9
-                                        pipe_expr 10:9
-                                          infix_expr 10:9
-                                            unary_expr 10:9
-                                              postfix_expr 10:9
-                                                primary 10:9
-                                                  NAME 10:9 "rest"
-                                      TERMINAL 10:13 ")"
-                      TERMINAL 10:14 ";"
-                      TERMINAL 11:1 "}"
+    let_stmt 7:1
+      TERMINAL 7:1 "let"
+      NAME 7:5 "count_rest"
+      TERMINAL 7:16 "="
+      expr 7:18
+        pipe_expr 7:18
+          infix_expr 7:18
+            unary_expr 7:18
+              postfix_expr 7:18
+                primary 7:18
+                  func_literal 7:18
+                    TERMINAL 7:18 "("
+                    params 7:19
+                      param_list 7:19
+                        NAME 7:19 "first"
+                      TERMINAL 7:24 ","
+                      rest_param 7:26
+                        TERMINAL 7:26 "..."
+                        NAME 7:29 "rest"
+                    TERMINAL 7:33 ")"
+                    block 7:35
+                      TERMINAL 7:35 "{"
+                      statement 8:2
+                        expr_stmt 8:2
+                          expr 8:2
+                            pipe_expr 8:2
+                              infix_expr 8:2
+                                unary_expr 8:2
+                                  postfix_expr 8:2
+                                    primary 8:2
+                                      NAME 8:2 "length"
+                                    call 8:8
+                                      TERMINAL 8:8 "("
+                                      expr 8:9
+                                        pipe_expr 8:9
+                                          infix_expr 8:9
+                                            unary_expr 8:9
+                                              postfix_expr 8:9
+                                                primary 8:9
+                                                  NAME 8:9 "rest"
+                                      TERMINAL 8:13 ")"
+                      TERMINAL 8:14 ";"
+                      TERMINAL 9:1 "}"
+  statement 11:1
+    expr_stmt 11:1
+      expr 11:1
+        pipe_expr 11:1
+          infix_expr 11:1
+            unary_expr 11:1
+              postfix_expr 11:1
+                primary 11:1
+                  NAME 11:1 "println"
+                call 11:8
+                  TERMINAL 11:8 "("
+                  expr 11:9
+                    pipe_expr 11:9
+                      infix_expr 11:9
+                        unary_expr 11:9
+                          postfix_expr 11:9
+                            primary 11:9
+                              NAME 11:9 "count_rest"
+                            call 11:19
+                              TERMINAL 11:19 "("
+                              expr 11:20
+                                pipe_expr 11:20
+                                  infix_expr 11:20
+                                    unary_expr 11:20
+                                      postfix_expr 11:20
+                                        primary 11:20
+                                          NUMBER 11:20 "1"
+                              TERMINAL 11:21 ","
+                              expr 11:23
+                                pipe_expr 11:23
+                                  infix_expr 11:23
+                                    unary_expr 11:23
+                                      postfix_expr 11:23
+                                        primary 11:23
+                                          NUMBER 11:23 "2"
+                              TERMINAL 11:24 ","
+                              expr 11:26
+                                pipe_expr 11:26
+                                  infix_expr 11:26
+                                    unary_expr 11:26
+                                      postfix_expr 11:26
+                                        primary 11:26
+                                          NUMBER 11:26 "3"
+                              TERMINAL 11:27 ")"
+                  TERMINAL 11:28 ")"
+  TERMINAL 11:29 ";"
   statement 13:1
-    expr_stmt 13:1
-      expr 13:1
-        pipe_expr 13:1
-          infix_expr 13:1
-            unary_expr 13:1
-              postfix_expr 13:1
-                primary 13:1
-                  NAME 13:1 "println"
-                call 13:8
-                  TERMINAL 13:8 "("
-                  expr 13:9
-                    pipe_expr 13:9
-                      infix_expr 13:9
-                        unary_expr 13:9
-                          postfix_expr 13:9
-                            primary 13:9
-                              NAME 13:9 "count_rest"
-                            call 13:19
-                              TERMINAL 13:19 "("
-                              expr 13:20
-                                pipe_expr 13:20
-                                  infix_expr 13:20
-                                    unary_expr 13:20
-                                      postfix_expr 13:20
-                                        primary 13:20
-                                          NUMBER 13:20 "1"
-                              TERMINAL 13:21 ","
-                              expr 13:23
-                                pipe_expr 13:23
-                                  infix_expr 13:23
-                                    unary_expr 13:23
-                                      postfix_expr 13:23
-                                        primary 13:23
-                                          NUMBER 13:23 "2"
-                              TERMINAL 13:24 ","
-                              expr 13:26
-                                pipe_expr 13:26
-                                  infix_expr 13:26
-                                    unary_expr 13:26
-                                      postfix_expr 13:26
-                                        primary 13:26
-                                          NUMBER 13:26 "3"
-                              TERMINAL 13:27 ")"
-                  TERMINAL 13:28 ")"
-  TERMINAL 13:29 ";"
-  statement 15:1
-    match_stmt 15:1
-      TERMINAL 15:1 "match"
-      expr 15:7
-        pipe_expr 15:7
-          infix_expr 15:7
-            unary_expr 15:7
-              postfix_expr 15:7
-                primary 15:7
-                  SYMBOL 15:7 ":ok"
-      TERMINAL 15:11 "{"
-      pattern 16:2
-        literal 16:2
-          SYMBOL 16:2 ":ok"
-      block 16:6
-        TERMINAL 16:6 "{"
-        statement 17:3
-          expr_stmt 17:3
-            expr 17:3
-              pipe_expr 17:3
-                infix_expr 17:3
-                  unary_expr 17:3
-                    postfix_expr 17:3
-                      primary 17:3
-                        NAME 17:3 "println"
-                      call 17:10
-                        TERMINAL 17:10 "("
-                        expr 17:11
-                          pipe_expr 17:11
-                            infix_expr 17:11
-                              unary_expr 17:11
-                                postfix_expr 17:11
-                                  primary 17:11
-                                    STRING 17:11 "\"matched\""
-                        TERMINAL 17:20 ")"
-        TERMINAL 17:21 ";"
-        TERMINAL 18:2 "}"
-      pattern 19:2
-        TERMINAL 19:2 "_"
-      block 19:4
-        TERMINAL 19:4 "{"
-        statement 20:3
-          expr_stmt 20:3
-            expr 20:3
-              pipe_expr 20:3
-                infix_expr 20:3
-                  unary_expr 20:3
-                    postfix_expr 20:3
-                      primary 20:3
-                        NAME 20:3 "println"
-                      call 20:10
-                        TERMINAL 20:10 "("
-                        expr 20:11
-                          pipe_expr 20:11
-                            infix_expr 20:11
-                              unary_expr 20:11
-                                postfix_expr 20:11
-                                  primary 20:11
-                                    STRING 20:11 "\"missed\""
-                        TERMINAL 20:19 ")"
-        TERMINAL 20:20 ";"
-        TERMINAL 21:2 "}"
-      TERMINAL 22:1 "}"
+    match_stmt 13:1
+      TERMINAL 13:1 "match"
+      expr 13:7
+        pipe_expr 13:7
+          infix_expr 13:7
+            unary_expr 13:7
+              postfix_expr 13:7
+                primary 13:7
+                  SYMBOL 13:7 ":ok"
+      TERMINAL 13:11 "{"
+      pattern 14:2
+        literal 14:2
+          SYMBOL 14:2 ":ok"
+      block 14:6
+        TERMINAL 14:6 "{"
+        statement 15:3
+          expr_stmt 15:3
+            expr 15:3
+              pipe_expr 15:3
+                infix_expr 15:3
+                  unary_expr 15:3
+                    postfix_expr 15:3
+                      primary 15:3
+                        NAME 15:3 "println"
+                      call 15:10
+                        TERMINAL 15:10 "("
+                        expr 15:11
+                          pipe_expr 15:11
+                            infix_expr 15:11
+                              unary_expr 15:11
+                                postfix_expr 15:11
+                                  primary 15:11
+                                    STRING 15:11 "\"matched\""
+                        TERMINAL 15:20 ")"
+        TERMINAL 15:21 ";"
+        TERMINAL 16:2 "}"
+      pattern 17:2
+        TERMINAL 17:2 "_"
+      block 17:4
+        TERMINAL 17:4 "{"
+        statement 18:3
+          expr_stmt 18:3
+            expr 18:3
+              pipe_expr 18:3
+                infix_expr 18:3
+                  unary_expr 18:3
+                    postfix_expr 18:3
+                      primary 18:3
+                        NAME 18:3 "println"
+                      call 18:10
+                        TERMINAL 18:10 "("
+                        expr 18:11
+                          pipe_expr 18:11
+                            infix_expr 18:11
+                              unary_expr 18:11
+                                postfix_expr 18:11
+                                  primary 18:11
+                                    STRING 18:11 "\"missed\""
+                        TERMINAL 18:19 ")"
+        TERMINAL 18:20 ";"
+        TERMINAL 19:2 "}"
+      TERMINAL 20:1 "}"

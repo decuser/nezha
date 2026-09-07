@@ -250,31 +250,7 @@ func (idx *symbolIndex) walk(n *syntax.Node, scope *symbolScope, top bool) {
 				}
 			}
 		}
-	case "select_stmt":
-		for _, ch := range n.Children {
-			if ch.Type == "select_case" {
-				arm := newSymbolScope(scope)
-				var bind *syntax.Node
-				for _, p := range ch.Children {
-					if p.Type == "NAME" && bind == nil {
-						bind = p
-					}
-					if p.Type == "expr" {
-						idx.walk(p, scope, false)
-					}
-				}
-				if bind != nil {
-					idx.addDef(arm, bind, "binding", false)
-				}
-				if b := ch.ChildByType("block"); b != nil {
-					idx.walk(b, arm, false)
-				}
-			} else if ch.Type == "select_default" {
-				if b := ch.ChildByType("block"); b != nil {
-					idx.walk(b, newSymbolScope(scope), false)
-				}
-			}
-		}
+
 	case "postfix_expr":
 		for _, ch := range n.Children {
 			idx.walk(ch, scope, false)

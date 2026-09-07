@@ -23,7 +23,7 @@ func TestVisibleNamesIncludesAuthoredPreludeSurface(t *testing.T) {
 	for _, name := range c.VisibleNames(value.ScopeUser) {
 		seen[name] = true
 	}
-	for _, want := range []string{"print", "length", "inspect", "import", "use", "export"} {
+	for _, want := range []string{"print", "length", "inspect"} {
 		if !seen[want] {
 			t.Fatalf("visible names missing %q", want)
 		}

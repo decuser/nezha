@@ -6,7 +6,6 @@ import (
 	nezhadebug "nezha/cmd/subcommands/dev/debug"
 	nezhaenginesmoke "nezha/cmd/subcommands/dev/enginesmoke"
 	nezhasmoke "nezha/cmd/subcommands/dev/smoke"
-	nezhacheck "nezha/cmd/subcommands/tools/check"
 	nezhadistfmt "nezha/cmd/subcommands/tools/distfmt"
 	nezhafmt "nezha/cmd/subcommands/tools/fmt"
 	nezhalint "nezha/cmd/subcommands/tools/lint"
@@ -23,7 +22,6 @@ type command struct {
 }
 
 var commands = []command{
-	{Name: "check", Description: "static source diagnostics", Run: nezhacheck.Run},
 	{Name: "debug", Description: "inspect lexer/parser/evaluator stages", Run: nezhadebug.Run},
 	{Name: "distfmt", Description: "apply distribution/source presentation style", Run: nezhadistfmt.Run},
 	{Name: "enginesmoke", Description: "run structural engine specimens", Run: nezhaenginesmoke.Run},

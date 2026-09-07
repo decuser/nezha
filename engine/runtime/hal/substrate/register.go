@@ -10,9 +10,6 @@ func (g *GoRuntime) registerHAL() {
 
 	// Evaluator/language intrinsics.
 	g.registerPrimitive("_apply", halApply)
-	g.registerPrimitive("_import", g.halImport)
-	g.registerPrimitive("_use", g.halUse)
-	g.registerPrimitive("_export", halExport)
 	g.registerPrimitive("_load", halLoad)
 
 	// Language/value primitives implemented natively. Append remains context-free

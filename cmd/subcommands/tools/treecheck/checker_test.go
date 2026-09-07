@@ -126,39 +126,6 @@ func TestAllowPrefixSuppressesIntentionalStandaloneTree(t *testing.T) {
 	}
 }
 
-func TestBareImportDoesNotJustifyLocalPackageSource(t *testing.T) {
-	root := minimalTree(t)
-	writeTestFile(t, root, "test/behavior/import_smoke.nez", "import(\"target\", :x)\n")
-	writeTestFile(t, root, "test/behavior/import_smoke.gold", "EXIT:0\n")
-
-	local := "test/behavior/target.nez"
-	writeTestFile(t, root, local, "package \"target\"\nexport(:x)\nlet x = 1\n")
-
-	result, err := Check(root, "treecheck.allow")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !hasFinding(result.Orphans, local) {
-		t.Fatalf("bare import must not justify arbitrary local package: %#v", result.Orphans)
-	}
-}
-
-func TestRelativeImportedHelperIsJustified(t *testing.T) {
-	root := minimalTree(t)
-	writeTestFile(t, root, "test/behavior/import_smoke.nez", "import(\"./import_target\", :x)\n")
-	writeTestFile(t, root, "test/behavior/import_smoke.gold", "EXIT:0\n")
-	path := "test/behavior/import_target.nez"
-	writeTestFile(t, root, path, "package \"import_target\"\nexport(:x)\nlet x = 1\n")
-
-	result, err := Check(root, "treecheck.allow")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if hasFinding(result.Orphans, path) {
-		t.Fatalf("relative imported helper reported as orphan: %#v", result.Orphans)
-	}
-}
-
 func TestDeletedTrackedPathIsNotTreatedAsPresent(t *testing.T) {
 	if _, err := exec.LookPath("git"); err != nil {
 		t.Skip("git unavailable")

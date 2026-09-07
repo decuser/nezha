@@ -50,8 +50,8 @@ type AsyncFaultSource interface {
 }
 
 // EvalContext provides evaluation context to builtins that need it.
-// Most builtins ignore this; intrinsics (import, export, apply, load, spawn)
-// use it to access the evaluator, grammar, and environment.
+// Most builtins ignore this; intrinsics such as apply and load use it to
+// access the evaluator, grammar, and environment.
 type EvalContext struct {
 	Env                   *value.Env
 	Node                  *syntax.Node

@@ -23,7 +23,7 @@ func TestAnalyzeNewlineRuleCurrentGrammar(t *testing.T) {
 	assertSymbols(t, "ExpressionEnd", got.ExpressionEnd,
 		"NAME", "NUMBER", "RUNE", "STRING", "SYMBOL", ")", "]", "false", "true", "}")
 	assertSymbols(t, "StatementFirst", got.StatementFirst,
-		"NAME", "NUMBER", "RUNE", "STRING", "SYMBOL", "(", "-", "[", "false", "if", "let", "match", "not", "package", "return", "select", "true", "while")
+		"NAME", "NUMBER", "RUNE", "STRING", "SYMBOL", "(", "-", "[", "false", "if", "let", "match", "not", "return", "true", "while")
 	assertSymbols(t, "Continuation", got.Continuation,
 		"(", "*", "+", "-", ".", "/", "<", "<=", ">", ">=", "[", "and", "or", "|>")
 	assertSymbols(t, "Ambiguous", got.Ambiguous, "(", "-", "[")

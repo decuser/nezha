@@ -292,9 +292,6 @@ func (s *server) publishDiagnostics(d documentState) error {
 }
 
 func scopeForDocument(d documentState) value.Scope {
-	if language.HasPackageDeclaration(d.Text) {
-		return value.ScopePrelude
-	}
 	return value.ScopeUser
 }
 

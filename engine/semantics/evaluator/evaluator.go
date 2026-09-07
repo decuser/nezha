@@ -24,18 +24,16 @@ var handlers map[string]handlerFunc
 func init() {
 	handlers = map[string]handlerFunc{
 		// Statements
-		"program":      (*Evaluator).evalProgram,
-		"statement":    (*Evaluator).evalStatement,
-		"package_stmt": (*Evaluator).evalPackage,
-		"let_stmt":     (*Evaluator).evalLet,
-		"assign_stmt":  (*Evaluator).evalAssign,
-		"return_stmt":  (*Evaluator).evalReturn,
-		"expr_stmt":    (*Evaluator).evalExprStmt,
-		"if_stmt":      (*Evaluator).evalIf,
-		"while_stmt":   (*Evaluator).evalWhile,
-		"match_stmt":   (*Evaluator).evalMatch,
-		"select_stmt":  (*Evaluator).evalSelect,
-		"block":        (*Evaluator).evalBlock,
+		"program":     (*Evaluator).evalProgram,
+		"statement":   (*Evaluator).evalStatement,
+		"let_stmt":    (*Evaluator).evalLet,
+		"assign_stmt": (*Evaluator).evalAssign,
+		"return_stmt": (*Evaluator).evalReturn,
+		"expr_stmt":   (*Evaluator).evalExprStmt,
+		"if_stmt":     (*Evaluator).evalIf,
+		"while_stmt":  (*Evaluator).evalWhile,
+		"match_stmt":  (*Evaluator).evalMatch,
+		"block":       (*Evaluator).evalBlock,
 
 		// Expressions
 		"expr":         (*Evaluator).evalExpr,
@@ -60,17 +58,15 @@ func init() {
 		"BINOP":    (*Evaluator).evalTerminal,
 
 		// Structural (nil = delegate to single child)
-		"call":           nil,
-		"index":          nil,
-		"access":         nil,
-		"params":         nil,
-		"param_list":     nil,
-		"rest_param":     nil,
-		"pattern":        nil,
-		"select_case":    nil,
-		"select_default": nil,
-		"literal":        nil,
-		"field":          nil,
+		"call":       nil,
+		"index":      nil,
+		"access":     nil,
+		"params":     nil,
+		"param_list": nil,
+		"rest_param": nil,
+		"pattern":    nil,
+		"literal":    nil,
+		"field":      nil,
 	}
 }
 

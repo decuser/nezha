@@ -51,19 +51,6 @@ func contains(s, sub string) bool {
 	return false
 }
 
-func TestFormatSourceSelect(t *testing.T) {
-	g := testGrammar(t)
-	src := "select{let x=recv(a){println(x)}recv(b){println(:b)}default{println(:idle)}}\n"
-	out, err := FormatSource(g, "test.nez", src)
-	if err != nil {
-		t.Fatalf("format: %v", err)
-	}
-	want := "select {\n\tlet x = recv(a) {\n\t\tprintln(x)\n\t}\n\trecv(b) {\n\t\tprintln(:b)\n\t}\n\tdefault {\n\t\tprintln(:idle)\n\t}\n}\n"
-	if out != want {
-		t.Fatalf("unexpected select format\n--- got ---\n%s\n--- want ---\n%s", out, want)
-	}
-}
-
 func TestFormatterProductionCoverageMatchesGrammar(t *testing.T) {
 	g := testGrammar(t)
 	for _, name := range g.Analysis().ProductionNames() {

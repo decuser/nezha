@@ -27,7 +27,6 @@ const (
 	FileType          Type = "file"
 	FileLockType      Type = "file_lock"
 	ChannelType       Type = "channel"
-	ModuleType        Type = "module"
 	StoreType         Type = "store"
 	ProcessType       Type = "process"
 	EndpointType      Type = "endpoint"
@@ -498,26 +497,6 @@ func NewChannel() *Channel {
 // General buffered channels are not part of Nezha's language semantics.
 func NewEventChannel() *Channel {
 	return &Channel{C: make(chan Value, 1), sendable: false}
-}
-
-// Module holds a loaded package's exports.
-type Module struct {
-	Name    string           // package name
-	Exports map[string]Value // exported bindings
-}
-
-func (m *Module) Type() Type      { return ModuleType }
-func (m *Module) Inspect() string { return "<module " + m.Name + ">" }
-
-// Get retrieves an exported value by name.
-func (m *Module) Get(name string) (Value, bool) {
-	v, ok := m.Exports[name]
-	return v, ok
-}
-
-// NewModule creates a module with the given name and exports.
-func NewModule(name string, exports map[string]Value) *Module {
-	return &Module{Name: name, Exports: exports}
 }
 
 // ExitSignal signals REPL to exit.

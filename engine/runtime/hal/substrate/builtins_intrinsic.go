@@ -134,59 +134,6 @@ func applyUserFunction(fn *value.Function, args []value.Value, ctx *hal.EvalCont
 	return result
 }
 
-// halExport implements export(:name1, :name2, ...).
-// Records exported names on the environment.
-func halExport(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) == 0 {
-		return value.NewFault("export: want at least 1 argument")
-	}
-
-	if ctx == nil || ctx.Env == nil {
-		return value.NewFault("export: environment not available")
-	}
-
-	var names []string
-	for _, arg := range args {
-		sym, ok := arg.(*value.Symbol)
-		if !ok {
-			return value.NewFault("export: expected symbol, got %s", arg.Type())
-		}
-		names = append(names, sym.Val)
-	}
-
-	ctx.Env.SetExports(names)
-	return value.EMPTY
-}
-
-// halImport validates the call shape for the historical import primitive, but
-// Nezha no longer has a module loader behind it.
-func (g *GoRuntime) halImport(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) < 1 {
-		return value.NewFault("import: want at least module name")
-	}
-	if _, ok := args[0].(*value.String); !ok {
-		return value.NewFault("import: expected string module name, got %s", args[0].Type())
-	}
-	for _, arg := range args[1:] {
-		if _, ok := arg.(*value.Symbol); !ok {
-			return value.NewFault("import: expected symbol, got %s", arg.Type())
-		}
-	}
-	return value.NewShapedError("import", "import: modules are not available")
-}
-
-// halUse validates the call shape for the historical use primitive, but Nezha
-// no longer has a module loader behind it.
-func (g *GoRuntime) halUse(args []value.Value, ctx *hal.EvalContext) value.Value {
-	if len(args) != 1 {
-		return value.NewFault("use: want 1 argument, got %d", len(args))
-	}
-	if _, ok := args[0].(*value.String); !ok {
-		return value.NewFault("use: expected string module name, got %s", args[0].Type())
-	}
-	return value.NewShapedError("use", "use: modules are not available")
-}
-
 func halLoad(args []value.Value, ctx *hal.EvalContext) value.Value {
 	if len(args) != 1 {
 		return value.NewFault("load: want 1 argument, got %d", len(args))

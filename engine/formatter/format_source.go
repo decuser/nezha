@@ -371,8 +371,6 @@ func (p *printer) printStatement(node *syntax.Node) {
 		p.printWhile(child)
 	case "match_stmt":
 		p.printMatch(child)
-	case "select_stmt":
-		p.printSelect(child)
 	default:
 		p.printNode(child)
 		p.emitEOLComment(line)
@@ -387,13 +385,11 @@ type printKind uint8
 const (
 	printProgramKind printKind = iota + 1
 	printStatementKind
-	printPackageKind
 	printLetKind
 	printAssignKind
 	printIfKind
 	printWhileKind
 	printMatchKind
-	printSelectKind
 	printReturnKind
 	printExprStmtKind
 	printBlockKind
@@ -419,13 +415,11 @@ const (
 var productionPrinters = map[string]printKind{
 	"program":      printProgramKind,
 	"statement":    printStatementKind,
-	"package_stmt": printPackageKind,
 	"let_stmt":     printLetKind,
 	"assign_stmt":  printAssignKind,
 	"if_stmt":      printIfKind,
 	"while_stmt":   printWhileKind,
 	"match_stmt":   printMatchKind,
-	"select_stmt":  printSelectKind,
 	"return_stmt":  printReturnKind,
 	"expr_stmt":    printExprStmtKind,
 	"block":        printBlockKind,
@@ -450,12 +444,10 @@ var productionPrinters = map[string]printKind{
 // dispatch. Keeping the exception set explicit makes production coverage
 // mechanically checkable.
 var handledByParent = map[string]struct{}{
-	"field":          {},
-	"select_case":    {},
-	"select_default": {},
-	"param_list":     {},
-	"rest_param":     {},
-	"literal":        {},
+	"field":      {},
+	"param_list": {},
+	"rest_param": {},
+	"literal":    {},
 }
 
 var printableLeafTypes = map[string]struct{}{
@@ -484,8 +476,6 @@ func (p *printer) printNode(node *syntax.Node) {
 			p.printProgram(node)
 		case printStatementKind:
 			p.printStatement(node)
-		case printPackageKind:
-			p.printPackage(node)
 		case printLetKind:
 			p.printLet(node)
 		case printAssignKind:
@@ -496,8 +486,6 @@ func (p *printer) printNode(node *syntax.Node) {
 			p.printWhile(node)
 		case printMatchKind:
 			p.printMatch(node)
-		case printSelectKind:
-			p.printSelect(node)
 		case printReturnKind:
 			p.printReturn(node)
 		case printExprStmtKind:

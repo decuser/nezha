@@ -308,26 +308,6 @@ func (o *testParserObserver) OnDiagnostic(kind, message string, pos engine.Posit
 	}
 }
 
-func TestParserSelect(t *testing.T) {
-	ast := parseSource(t, `select {
-		let msg = recv(commands) { println(msg) }
-		recv(interrupts) { println(:interrupt) }
-		default { println(:idle) }
-	}`)
-
-	found := findNode(ast, "select_stmt")
-	if found == nil {
-		t.Fatal("expected select_stmt node")
-	}
-	cases := findAllNodes(found, "select_case")
-	if len(cases) != 2 {
-		t.Fatalf("expected 2 select cases, got %d", len(cases))
-	}
-	if findNode(found, "select_default") == nil {
-		t.Fatal("expected select_default node")
-	}
-}
-
 func TestParserConsumesGrammarNewlineCompletionRule(t *testing.T) {
 	g := loadTestGrammar(t)
 	source := "let x = 1\n\t+ 2\n"

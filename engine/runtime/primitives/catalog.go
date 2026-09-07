@@ -24,11 +24,8 @@ const (
 
 var nonHALRoles = map[string]Role{
 	// Evaluator/language intrinsics.
-	"_apply":  RoleIntrinsic,
-	"_import": RoleIntrinsic,
-	"_use":    RoleIntrinsic,
-	"_export": RoleIntrinsic,
-	"_load":   RoleIntrinsic,
+	"_apply": RoleIntrinsic,
+	"_load":  RoleIntrinsic,
 
 	// Constitutive language/value/runtime primitives.
 	"_first":            RoleRuntime,
@@ -133,11 +130,7 @@ func ProfileOrdinal(name string) (uint32, bool) {
 // a lexical scope. User code sees only the language intrinsics directly;
 // trusted/prelude scopes also see the primitive namespace.
 func NamesForScope(scope value.Scope) []string {
-	set := map[string]bool{
-		"import": true,
-		"use":    true,
-		"export": true,
-	}
+	set := map[string]bool{}
 	if scope != value.ScopeUser {
 		for name := range Definitions() {
 			set[name] = true

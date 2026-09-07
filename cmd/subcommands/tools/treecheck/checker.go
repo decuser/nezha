@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 )
@@ -41,9 +40,6 @@ type allowRule struct {
 	glob   string
 }
 
-var packageRE = regexp.MustCompile(`(?m)^\s*package\s+"([^"]+)"`)
-var importRE = regexp.MustCompile(`\b(?:import|use)\("([^"]+)"`)
-
 func Check(root, allowFile string) (Result, error) {
 	abs, err := filepath.Abs(root)
 	if err != nil {
@@ -64,7 +60,6 @@ func Check(root, allowFile string) (Result, error) {
 	c.applyAllow()
 	c.seedBuiltins()
 	c.checkStructuralPairs()
-	c.resolveNezhaPackageReferences()
 	c.resolveTextReferences()
 	c.resolveDirectoryReadmes()
 
@@ -285,8 +280,6 @@ func hasProposalFiles(files map[string]bool) bool {
 
 func (c *Checker) structuralErrors() []Finding {
 	var out []Finding
-	packages := make(map[string][]string)
-
 	proposalDispositions := map[string]bool{
 		"active":     true,
 		"completed":  true,
@@ -349,78 +342,8 @@ func (c *Checker) structuralErrors() []Finding {
 				out = append(out, Finding{Path: p, Reason: "syntax conformance projection has no .input specimen"})
 			}
 		}
-		if isNamedPackageSource(p) {
-			data, err := os.ReadFile(filepath.Join(c.Root, filepath.FromSlash(p)))
-			if err == nil {
-				if m := packageRE.FindSubmatch(data); m != nil {
-					packages[string(m[1])] = append(packages[string(m[1])], p)
-				}
-			}
-		}
-	}
-	for name, paths := range packages {
-		if len(paths) < 2 {
-			continue
-		}
-		sort.Strings(paths)
-		for _, p := range paths {
-			out = append(out, Finding{Path: p, Reason: fmt.Sprintf("duplicate Nezha package %q (%s)", name, strings.Join(paths, ", "))})
-		}
 	}
 	return out
-}
-
-func (c *Checker) resolveNezhaPackageReferences() {
-	packageFiles := make(map[string][]string)
-	for p := range c.files {
-		if !isNamedPackageSource(p) {
-			continue
-		}
-		data, err := os.ReadFile(filepath.Join(c.Root, filepath.FromSlash(p)))
-		if err != nil {
-			continue
-		}
-		if m := packageRE.FindSubmatch(data); m != nil {
-			packageFiles[string(m[1])] = append(packageFiles[string(m[1])], p)
-		}
-	}
-
-	changed := true
-	for changed {
-		changed = false
-		for p := range c.justified {
-			if !strings.HasSuffix(p, ".nez") {
-				continue
-			}
-			data, err := os.ReadFile(filepath.Join(c.Root, filepath.FromSlash(p)))
-			if err != nil {
-				continue
-			}
-			for _, m := range importRE.FindAllSubmatch(data, -1) {
-				name := string(m[1])
-				if strings.HasPrefix(name, "./") || strings.HasPrefix(name, "../") {
-					target := filepath.ToSlash(filepath.Clean(filepath.Join(filepath.Dir(p), name)))
-					if filepath.Ext(target) == "" {
-						target += ".nez"
-					}
-					if c.files[target] {
-						if _, ok := c.justified[target]; !ok {
-							c.mark(target, "imported by "+p)
-							changed = true
-						}
-					}
-					continue
-				}
-				for _, target := range packageFiles[name] {
-					if _, ok := c.justified[target]; ok {
-						continue
-					}
-					c.mark(target, "imported by "+p)
-					changed = true
-				}
-			}
-		}
-	}
 }
 
 func (c *Checker) resolveTextReferences() {
