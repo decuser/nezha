@@ -11,7 +11,6 @@ import (
 	"aiki/engine"
 	"aiki/engine/observe"
 	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/runtime/libpath"
 	"aiki/engine/semantics/evaluator"
 	"aiki/engine/semantics/value"
 	"aiki/engine/syntax"
@@ -61,20 +60,13 @@ func RunProfileDetailed(filename string, opts ProfileOptions) (ProfileRun, error
 	}
 	rt := substrate.NewGoRuntime()
 	defer rt.CloseAllResources()
-	if err := initModuleRegistry(g, rt); err != nil {
-		return out, fmt.Errorf("initializing registry: %w", err)
-	}
 
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
 	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.ai"))
 	if err := loadPrelude(g, rt, preludeEnv); err != nil {
 		return out, fmt.Errorf("loading prelude: %w", err)
 	}
-	userScope := value.ScopeUser
-	if libpath.IsBlessedLibPath(filename) {
-		userScope = value.ScopePrelude
-	}
-	userEnv := value.NewEnclosedEnvWithScope(preludeEnv, userScope)
+	userEnv := value.NewEnclosedEnvWithScope(preludeEnv, value.ScopeUser)
 	userEnv.SetAuthority(rt.AuthorityForSource(filename))
 	userEnv.SetFile(filename)
 	userEnv.SetSource(string(source))

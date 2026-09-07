@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime/pprof"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -326,44 +327,30 @@ func (g *GoRuntime) registerHost(op hal.HostOperation, fn BuiltinFunc) {
 	g.hostBindings[op.Primitive] = op
 }
 
-// resolveModulePath finds the .ai file for a module name.
+// resolveModulePath finds an explicit source file for load(). It does not
+// consult library or distribution module roots.
 func resolveModulePath(name string, env *value.Env) string {
-	// Try relative to current file
+	candidates := []string{name}
+	if !strings.HasSuffix(name, ".ai") {
+		candidates = append([]string{name + ".ai"}, candidates...)
+	}
+
 	currentFile := env.GetFile()
 	if currentFile != "" && currentFile != "<unknown>" {
 		dir := filepath.Dir(currentFile)
-		candidate := filepath.Join(dir, name+".ai")
+		for _, candidate := range candidates {
+			path := filepath.Join(dir, candidate)
+			if _, err := os.Stat(path); err == nil {
+				return path
+			}
+		}
+	}
+
+	for _, candidate := range candidates {
 		if _, err := os.Stat(candidate); err == nil {
 			return candidate
 		}
 	}
-
-	// Try as-is with .ai extension
-	candidate := name + ".ai"
-	if _, err := os.Stat(candidate); err == nil {
-		return candidate
-	}
-
-	// Try lib/ directory relative to cwd
-	libCandidate := filepath.Join("lib", name+".ai")
-	if _, err := os.Stat(libCandidate); err == nil {
-		return libCandidate
-	}
-
-	// Try lib/ directory relative to executable
-	if exePath, err := os.Executable(); err == nil {
-		exeDir := filepath.Dir(exePath)
-		libCandidate := filepath.Join(exeDir, "lib", name+".ai")
-		if _, err := os.Stat(libCandidate); err == nil {
-			return libCandidate
-		}
-	}
-
-	// Try without extension
-	if _, err := os.Stat(name); err == nil {
-		return name
-	}
-
 	return ""
 }
 

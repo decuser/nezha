@@ -118,25 +118,10 @@ func TestRegistryCanonicalListExcludesAliases(t *testing.T) {
 	}
 }
 
-func TestModuleRootsUseExplicitDistributionAndDevelopmentRoots(t *testing.T) {
-	home := filepath.Join("home", "user")
-	exe := filepath.Join("opt", "aiki")
-	work := filepath.Join("forge", "dev", "aiki")
-	got := ModuleRoots(home, exe, work)
-	want := []string{
-		filepath.Join(exe, "lib"),
-		filepath.Join(exe, "vendor"),
-		filepath.Join(work, "lib"),
-		filepath.Join(work, "vendor"),
-		filepath.Join(home, ".aiki", "lib"),
-	}
-	if len(got) != len(want) {
-		t.Fatalf("module roots: got %v, want %v", got, want)
-	}
-	for i := range want {
-		if got[i] != want[i] {
-			t.Fatalf("module root %d: got %q, want %q", i, got[i], want[i])
-		}
+func TestModuleRootsAreEmptyByDefault(t *testing.T) {
+	got := ModuleRoots("home/user", "opt/aiki", "forge/dev/aiki")
+	if len(got) != 0 {
+		t.Fatalf("module roots: got %v, want none", got)
 	}
 }
 
@@ -151,7 +136,7 @@ func TestModuleRootsDoNotScanWorkingDirectoryItself(t *testing.T) {
 }
 
 func TestModuleRegistryRootsReturnsCopyInLookupOrder(t *testing.T) {
-	want := []string{"/dist/lib", "/dist/vendor", "/work/lib", "/home/user/.aiki/lib"}
+	want := []string{"/explicit/a", "/explicit/b"}
 	r := NewModuleRegistry(want)
 	got := r.Roots()
 	if len(got) != len(want) {

@@ -2,14 +2,10 @@ package substrate
 
 import (
 	"os"
-	"path/filepath"
-	"strings"
 
 	"aiki/engine"
 	"aiki/engine/observe"
 	"aiki/engine/runtime/hal"
-	"aiki/engine/runtime/libpath"
-	"aiki/engine/runtime/modules"
 	"aiki/engine/semantics/value"
 	"aiki/engine/syntax"
 )
@@ -162,244 +158,33 @@ func halExport(args []value.Value, ctx *hal.EvalContext) value.Value {
 	return value.EMPTY
 }
 
-// halImport implements import("module", :name1, :name2, ...).
-// Parses and evaluates the module, then copies exported names into the current environment.
+// halImport validates the call shape for the historical import primitive, but
+// Nezha no longer has a module loader behind it.
 func (g *GoRuntime) halImport(args []value.Value, ctx *hal.EvalContext) value.Value {
 	if len(args) < 1 {
 		return value.NewFault("import: want at least module name")
 	}
-
-	if ctx == nil || ctx.Env == nil || ctx.Grammar == nil || ctx.Eval == nil {
-		return value.NewFault("import: evaluation context not available")
-	}
-
-	// First arg: module name or path (string)
-	moduleStr, ok := args[0].(*value.String)
-	if !ok {
+	if _, ok := args[0].(*value.String); !ok {
 		return value.NewFault("import: expected string module name, got %s", args[0].Type())
 	}
-	moduleName := moduleStr.Val
-
-	// Remaining args: names to import (symbols)
-	var importNames []string
 	for _, arg := range args[1:] {
-		sym, ok := arg.(*value.Symbol)
-		if !ok {
+		if _, ok := arg.(*value.Symbol); !ok {
 			return value.NewFault("import: expected symbol, got %s", arg.Type())
 		}
-		importNames = append(importNames, sym.Val)
 	}
-
-	// Load the module
-	mod, errVal := g.loadModule(moduleName, ctx)
-	if errVal != nil {
-		return errVal
-	}
-
-	// If no names specified, return the Module value
-	if len(importNames) == 0 {
-		return mod
-	}
-
-	// Bind requested names into calling environment
-	for _, name := range importNames {
-		val, ok := mod.Get(name)
-		if !ok {
-			return value.NewShapedError("import", "import: '%s' is not exported by '%s'", name, mod.Name)
-		}
-		ctx.Env.Set(name, val)
-	}
-
-	return value.EMPTY
+	return value.NewShapedError("import", "import: modules are not available")
 }
 
-// loadModule loads a module by name or path, using cache if available.
-// LoadModuleForHost exposes the normal module loader to narrow Go-side adapters
-// that need to invoke Aiki library semantics with typed values. It does not add
-// alternate import or package-resolution semantics.
-func (g *GoRuntime) LoadModuleForHost(name string, ctx *hal.EvalContext) (*value.Module, value.Value) {
-	return g.loadModule(name, ctx)
-}
-
-func (g *GoRuntime) loadModule(name string, ctx *hal.EvalContext) (*value.Module, value.Value) {
-	var modulePath string
-	var pkgName string
-	var requestedName string
-
-	if modules.IsPathImport(name) {
-		// Path-based import: resolve relative to current file
-		modulePath = resolveRelativePath(name, ctx.Env)
-		if modulePath == "" {
-			return nil, value.NewShapedError("import", "import: cannot find '%s'", name)
-		}
-		// Package name will be determined from file
-		pkgName = ""
-	} else {
-		// Registry-based import
-		if g.moduleRegistry == nil {
-			return nil, value.NewFault("import: module registry not initialized")
-		}
-
-		requestedName = name
-
-		// Resolve public name to its physical module and declared package name.
-		// Bare defaults such as "math" may resolve to "math/native".
-		var ok bool
-		modulePath, pkgName, ok = g.moduleRegistry.Resolve(name)
-		if !ok {
-			return nil, value.NewShapedError("import", "import: unknown package '%s'", name)
-		}
-
-		// Check cache after resolution so aliases share the canonical module.
-		if mod, ok := g.moduleRegistry.GetCached(name); ok {
-			if requestedName != pkgName {
-				return value.NewModule(requestedName, mod.Exports), nil
-			}
-			return mod, nil
-		}
-	}
-
-	// Read module source
-	data, err := os.ReadFile(modulePath)
-	if err != nil {
-		return nil, value.NewShapedError("import", "import: cannot read '%s': %s", modulePath, err)
-	}
-
-	// Parse module
-	lexer := syntax.NewLexer(ctx.Grammar, modulePath, string(data), nil)
-	tokens, err := lexer.Tokenize()
-	if err != nil {
-		return nil, value.NewShapedError("import", "import: lex error in '%s': %s", modulePath, err)
-	}
-
-	parser := syntax.NewParser(ctx.Grammar, tokens, string(data), nil)
-	ast, err := parser.Parse()
-	if err != nil {
-		return nil, value.NewShapedError("import", "import: parse error in '%s': %s", modulePath, err)
-	}
-
-	// Create module environment enclosed by prelude env (not caller's env)
-	preludeEnv := ctx.Env.GetPreludeEnv()
-	if preludeEnv == nil {
-		return nil, value.NewFault("import: prelude environment not available")
-	}
-
-	// Determine scope based on module path
-	// Modules in /lib/ or /contrib/lib/ retain ScopePrelude as a lexical/tooling role.
-	// Raw runtime authority is assigned independently by AuthorityForSource.
-	modScope := value.ScopeUser
-	if libpath.IsBlessedLibPath(modulePath) {
-		modScope = value.ScopePrelude
-	}
-	modEnv := value.NewEnclosedEnvWithScope(preludeEnv, modScope)
-	modEnv.SetAuthority(g.AuthorityForSource(modulePath))
-	modEnv.SetFile(modulePath)
-	modEnv.SetSource(string(data))
-
-	// Evaluate module
-	result := ctx.Eval(ast, modEnv)
-	if value.IsFault(result) {
-		return nil, result
-	}
-
-	// Get package name from evaluated module
-	declaredPkg := modEnv.GetPackageName()
-	if pkgName == "" {
-		pkgName = declaredPkg
-	} else if declaredPkg != "" && declaredPkg != pkgName {
-		return nil, value.NewFault("import: package declares '%s' but expected '%s'", declaredPkg, pkgName)
-	}
-
-	if pkgName == "" {
-		// Use filename as fallback
-		pkgName = filepath.Base(modulePath)
-		pkgName = strings.TrimSuffix(pkgName, ".ai")
-	}
-
-	// Build exports map
-	exports := make(map[string]value.Value)
-	exportNames := modEnv.GetExports()
-
-	if len(exportNames) == 0 {
-		return nil, value.NewFault("import: module '%s' has no exports", pkgName)
-	}
-
-	for _, expName := range exportNames {
-		val, ok := modEnv.Get(expName)
-		if !ok {
-			return nil, value.NewFault("import: exported name '%s' not defined in '%s'", expName, pkgName)
-		}
-		exports[expName] = val
-	}
-
-	mod := value.NewModule(pkgName, exports)
-
-	// Cache the canonical module for registry-based imports. Aliases resolve to
-	// this cache entry but receive a module value bearing the public name used
-	// by the caller.
-	if g.moduleRegistry != nil && !modules.IsPathImport(name) {
-		g.moduleRegistry.Cache(pkgName, mod)
-		if requestedName != "" && requestedName != pkgName {
-			return value.NewModule(requestedName, exports), nil
-		}
-	}
-
-	return mod, nil
-}
-
-// resolveRelativePath resolves a path relative to the current file.
-
-func resolveRelativePath(name string, env *value.Env) string {
-	currentFile := env.GetFile()
-
-	// Add .ai extension if not present
-	if !strings.HasSuffix(name, ".ai") {
-		name = name + ".ai"
-	}
-
-	if currentFile != "" {
-		dir := filepath.Dir(currentFile)
-		candidate := filepath.Join(dir, name)
-		if _, err := os.Stat(candidate); err == nil {
-			return candidate
-		}
-	}
-
-	// Try from current directory
-	if _, err := os.Stat(name); err == nil {
-		return name
-	}
-
-	return ""
-}
-
-// halUse implements use("module").
-// Loads module and binds all exports into current scope.
+// halUse validates the call shape for the historical use primitive, but Nezha
+// no longer has a module loader behind it.
 func (g *GoRuntime) halUse(args []value.Value, ctx *hal.EvalContext) value.Value {
 	if len(args) != 1 {
 		return value.NewFault("use: want 1 argument, got %d", len(args))
 	}
-
-	if ctx == nil || ctx.Env == nil || ctx.Grammar == nil || ctx.Eval == nil {
-		return value.NewFault("use: evaluation context not available")
-	}
-
-	moduleStr, ok := args[0].(*value.String)
-	if !ok {
+	if _, ok := args[0].(*value.String); !ok {
 		return value.NewFault("use: expected string module name, got %s", args[0].Type())
 	}
-
-	mod, errVal := g.loadModule(moduleStr.Val, ctx)
-	if errVal != nil {
-		return errVal
-	}
-
-	// Bind all exports into calling environment
-	for name, val := range mod.Exports {
-		ctx.Env.Set(name, val)
-	}
-
-	return value.EMPTY
+	return value.NewShapedError("use", "use: modules are not available")
 }
 
 func halLoad(args []value.Value, ctx *hal.EvalContext) value.Value {

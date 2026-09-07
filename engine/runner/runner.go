@@ -7,8 +7,6 @@ import (
 
 	"aiki/engine"
 	"aiki/engine/runtime/hal/substrate"
-	"aiki/engine/runtime/libpath"
-	"aiki/engine/runtime/modules"
 	"aiki/engine/runtime/prelude"
 	"aiki/engine/semantics/evaluator"
 	"aiki/engine/semantics/value"
@@ -93,11 +91,6 @@ func runSourceWithRuntimeProbe(filename, source string, programArgs []string, rt
 		return fmt.Errorf("loading grammar: %w", err)
 	}
 
-	// Initialize the supplied runtime module registry.
-	if err := initModuleRegistry(g, rt); err != nil {
-		return fmt.Errorf("initializing registry: %w", err)
-	}
-
 	rt.SetProgramArgs(programArgs)
 
 	// Create prelude environment with ScopePrelude
@@ -109,14 +102,8 @@ func runSourceWithRuntimeProbe(filename, source string, programArgs []string, rt
 		return fmt.Errorf("loading prelude: %w", err)
 	}
 
-	// Create user environment enclosed by prelude
-	// Files in /lib/ or /contrib/lib/ retain ScopePrelude as a lexical/tooling role.
-	// Raw runtime authority is assigned independently by AuthorityForSource.
-	userScope := value.ScopeUser
-	if libpath.IsBlessedLibPath(filename) {
-		userScope = value.ScopePrelude
-	}
-	userEnv := value.NewEnclosedEnvWithScope(preludeEnv, userScope)
+	// Create user environment enclosed by prelude.
+	userEnv := value.NewEnclosedEnvWithScope(preludeEnv, value.ScopeUser)
 	userEnv.SetAuthority(rt.AuthorityForSource(filename))
 
 	// Lex user code
@@ -175,16 +162,6 @@ func loadPrelude(g *grammar.Grammar, rt *substrate.GoRuntime, env *value.Env) er
 }
 
 // initHelpRegistry loads prelude help and doc files with validation.
-// initModuleRegistry creates and scans the module registry.
-func initModuleRegistry(g *grammar.Grammar, rt *substrate.GoRuntime) error {
-	homeDir, _ := os.UserHomeDir()
-	registry := modules.NewModuleRegistry(modules.DefaultModuleRoots(homeDir))
-	if err := registry.Scan(g); err != nil {
-		return err
-	}
-	rt.SetModuleRegistry(registry)
-	return nil
-}
 
 func initHelpRegistry(g *grammar.Grammar, rt *substrate.GoRuntime) error {
 	catalog, err := prelude.LoadCatalog(g)
@@ -204,9 +181,6 @@ func RunExpr(expr string) (string, error) {
 
 	rt := substrate.NewGoRuntime()
 	defer rt.CloseAllResources()
-	if err := initModuleRegistry(g, rt); err != nil {
-		return "", fmt.Errorf("initializing registry: %w", err)
-	}
 
 	// Create prelude environment with ScopePrelude
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)

@@ -2,13 +2,10 @@ package substrate
 
 import (
 	"bytes"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
 	"aiki/engine/runtime/hal"
-	"aiki/engine/runtime/modules"
 	"aiki/engine/syntax"
 	"aiki/engine/syntax/grammar"
 )
@@ -26,13 +23,6 @@ func TestStripDocMarkersLeavesOrdinaryAtLines(t *testing.T) {
 	want := in
 	if got := stripDocMarkers(in); got != want {
 		t.Fatalf("stripDocMarkers() = %q, want %q", got, want)
-	}
-}
-
-func TestModuleHelpCarriesPreamble(t *testing.T) {
-	mh := &modules.ModuleHelp{Preamble: `use("math/native")`}
-	if got, want := mh.Preamble, `use("math/native")`; got != want {
-		t.Fatalf("ModuleHelp.Preamble = %q, want %q", got, want)
 	}
 }
 
@@ -101,126 +91,5 @@ func TestGrammarNewlineHelpUsesDeclaredMetadata(t *testing.T) {
 	want := "newline\n  " + g.Newline.Meta.Help + "\n"
 	if got := out.String(); got != want {
 		t.Fatalf("newline help = %q, want %q", got, want)
-	}
-}
-
-func TestModuleHelpShowsCanonicalTargetForBareNativeAlias(t *testing.T) {
-	root := t.TempDir()
-	moduleDir := filepath.Join(root, "math")
-	if err := os.MkdirAll(moduleDir, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(moduleDir, "native.ai"), []byte("package \"math/native\"\n\nlet floor = (x) {\n\treturn x\n}\nexport(:floor)\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(moduleDir, "native.help"), []byte("@summary \"math/native test summary\"\n\n@func floor\n@template \"floor(x)\"\n@help \"test floor\"\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(moduleDir, "native.doc"), []byte("floor\nTest floor documentation.\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
-	if err != nil {
-		t.Fatal(err)
-	}
-	registry := modules.NewModuleRegistry([]string{root})
-	if err := registry.Scan(g); err != nil {
-		t.Fatal(err)
-	}
-
-	var out bytes.Buffer
-	rt := NewGoRuntime()
-	rt.SetIO(nil, &out)
-	rt.SetPageOutput(func(string) bool { return false })
-	rt.SetModuleRegistry(registry)
-
-	rt.showModuleHelp("math")
-	got := out.String()
-	if !strings.Contains(got, "Module: math\nResolves to: math/native\n") {
-		t.Fatalf("bare module help did not expose canonical resolution:\n%s", got)
-	}
-
-	out.Reset()
-	rt.showModuleHelp("math/native")
-	got = out.String()
-	if strings.Contains(got, "Resolves to:") {
-		t.Fatalf("canonical module help unexpectedly reported alias resolution:\n%s", got)
-	}
-
-	out.Reset()
-	rt.showModuleFuncHelp("math.floor")
-	got = out.String()
-	if !strings.Contains(got, "math.floor\nResolves to: math/native.floor\n") {
-		t.Fatalf("bare module function help did not expose canonical resolution:\n%s", got)
-	}
-
-	out.Reset()
-	rt.showModuleFuncHelp("math/native.floor")
-	got = out.String()
-	if strings.Contains(got, "Resolves to:") {
-		t.Fatalf("canonical module function help unexpectedly reported alias resolution:\n%s", got)
-	}
-}
-
-func TestModuleDocShowsCanonicalTargetForBareNativeAlias(t *testing.T) {
-	root := t.TempDir()
-	moduleDir := filepath.Join(root, "math")
-	if err := os.MkdirAll(moduleDir, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(moduleDir, "native.ai"), []byte("package \"math/native\"\n\nlet floor = (x) {\n\treturn x\n}\nexport(:floor)\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(moduleDir, "native.help"), []byte("@summary \"math/native test summary\"\n\n@func floor\n@template \"floor(x)\"\n@help \"test floor\"\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(moduleDir, "native.doc"), []byte("floor\nTest floor documentation.\n"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
-	if err != nil {
-		t.Fatal(err)
-	}
-	registry := modules.NewModuleRegistry([]string{root})
-	if err := registry.Scan(g); err != nil {
-		t.Fatal(err)
-	}
-
-	var out bytes.Buffer
-	rt := NewGoRuntime()
-	rt.SetIO(nil, &out)
-	rt.SetPageOutput(func(string) bool { return false })
-	rt.SetModuleRegistry(registry)
-
-	rt.showModuleDoc("math")
-	got := out.String()
-	if !strings.Contains(got, "Module: math\nResolves to: math/native\n") {
-		t.Fatalf("bare module doc did not expose canonical resolution:\n%s", got)
-	}
-	if !strings.Contains(got, "math/native test summary\n") {
-		t.Fatalf("bare module doc did not expose module summary:\n%s", got)
-	}
-
-	out.Reset()
-	rt.showModuleDoc("math/native")
-	got = out.String()
-	if !strings.Contains(got, "Module: math/native\n\nmath/native test summary\n") {
-		t.Fatalf("canonical module doc did not expose module summary:\n%s", got)
-	}
-
-	out.Reset()
-	rt.showModuleFuncDoc("math.floor")
-	got = out.String()
-	if !strings.Contains(got, "math.floor\nResolves to: math/native.floor\n") {
-		t.Fatalf("bare module function doc did not expose canonical resolution:\n%s", got)
-	}
-
-	out.Reset()
-	rt.showModuleFuncDoc("math/native.floor")
-	got = out.String()
-	if strings.Contains(got, "Resolves to:") {
-		t.Fatalf("canonical module function doc unexpectedly reported alias resolution:\n%s", got)
 	}
 }

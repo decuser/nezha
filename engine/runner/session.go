@@ -24,9 +24,6 @@ func NewSession() (*Session, error) {
 	}
 
 	rt := substrate.NewGoRuntime()
-	if err := initModuleRegistry(g, rt); err != nil {
-		return nil, err
-	}
 
 	// Create prelude environment with ScopePrelude
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
@@ -74,9 +71,6 @@ func (s *Session) Eval(source string) value.Value {
 
 // Reset creates a fresh environment with prelude reloaded.
 func (s *Session) Reset() error {
-	if err := initModuleRegistry(s.Grammar, s.Runtime); err != nil {
-		return err
-	}
 
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
 	preludeEnv.SetAuthority(s.Runtime.AuthorityForSource("engine/runtime/prelude/prelude.ai"))

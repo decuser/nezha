@@ -68,55 +68,6 @@ func lintSource(t *testing.T, src string) []Diagnostic {
 	return diags
 }
 
-func TestLintUseResolvesRegistryPackage(t *testing.T) {
-	dir := t.TempDir()
-	moduleDir := filepath.Join(dir, "lib", "fixture")
-	if err := os.MkdirAll(moduleDir, 0755); err != nil {
-		t.Fatal(err)
-	}
-	moduleSource := `package "fixture"
-let identity = (x) { return x }
-export(:identity)
-`
-	if err := os.WriteFile(filepath.Join(moduleDir, "fixture.ai"), []byte(moduleSource), 0644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(moduleDir, "fixture.help"), []byte(`@summary "test fixture module"
-`), 0644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(moduleDir, "fixture.doc"), nil, 0644); err != nil {
-		t.Fatal(err)
-	}
-
-	oldwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Chdir(dir); err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { _ = os.Chdir(oldwd) })
-
-	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
-	if err != nil {
-		t.Fatal(err)
-	}
-	source := `use("fixture")
-let x = identity(42)
-println(x)
-`
-	diags, err := LintSource(g, filepath.Join(dir, "program.ai"), source, value.ScopeUser)
-	if err != nil {
-		t.Fatalf("LintSource error: %v", err)
-	}
-	for _, d := range diags {
-		if d.Severity == "error" && strings.Contains(d.Message, "undefined name: 'identity'") {
-			t.Fatalf("use(\"fixture\") did not bind registry export identity: %v", diags)
-		}
-	}
-}
-
 func TestLintCleanCode(t *testing.T) {
 	diags := lintSource(t, "let x = 5\nlet y = x + 1\n")
 	if len(diags) != 0 {
