@@ -16,11 +16,11 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	nezhafmt "nezha/cmd/internal/formatting"
 	"nezha/cmd/internal/targetresolve"
 	"nezha/cmd/internal/testfixture"
 	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
-	nezhafmt "nezha/internal/formatting"
 )
 
 const distributionWidth = 100

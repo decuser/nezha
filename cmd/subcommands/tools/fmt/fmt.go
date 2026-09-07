@@ -8,11 +8,11 @@ import (
 	"os"
 	"strings"
 
+	formatter "nezha/cmd/internal/formatting"
 	"nezha/cmd/internal/targetresolve"
 	"nezha/cmd/internal/testfixture"
 	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
-	formatter "nezha/internal/formatting"
 )
 
 // Config controls formatting behavior.

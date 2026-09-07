@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
+	nezhafmt "nezha/cmd/internal/formatting"
 	"nezha/cmd/internal/targetresolve"
 	"nezha/cmd/internal/testfixture"
 	"nezha/engine/syntax"
 	"nezha/engine/syntax/grammar"
-	nezhafmt "nezha/internal/formatting"
 )
 
 // CheckFormatting returns the list of files that are not already formatted.
