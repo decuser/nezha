@@ -24,7 +24,7 @@ func parseOptions() Options {
 	tracefile := flag.String("trace", "", "write runtime trace to file")
 
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: nezha [options] <file.ai [args...]>")
+		fmt.Fprintln(os.Stderr, "usage: nezha [options] <file.nez [args...]>")
 		fmt.Fprintln(os.Stderr, "       nezha <command> [command options] [args...]")
 		fmt.Fprintln(os.Stderr, "")
 		fmt.Fprintln(os.Stderr, "commands:")

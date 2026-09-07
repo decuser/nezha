@@ -69,7 +69,7 @@ func Run(args []string) int {
 		return 1
 	}
 	if st != stageEbnf && len(inputs) == 0 {
-		fmt.Fprintln(os.Stderr, "enginesmoke: no *_engine.ai files found")
+		fmt.Fprintln(os.Stderr, "enginesmoke: no *_engine.nez files found")
 		return 1
 	}
 
@@ -259,7 +259,7 @@ func collectInputsWithPolicy(args []string, all bool) ([]string, error) {
 	}
 	out := make([]string, 0, len(paths))
 	for _, path := range paths {
-		if strings.HasSuffix(path, "_engine.ai") {
+		if strings.HasSuffix(path, "_engine.nez") {
 			out = append(out, path)
 		}
 	}
@@ -350,7 +350,7 @@ func dumpEval(g *grammar.Grammar, file, source string) ([]byte, error) {
 		return nil, err
 	}
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
-	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.ai"))
+	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
 	if err := loadPrelude(g, rt, preludeEnv); err != nil {
 		return nil, err
 	}

@@ -8,10 +8,10 @@ import (
 func TestNodeIdentityDoesNotCollapseNames(t *testing.T) {
 	r := NewNodeRegistry()
 	primitive := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodePrimitive, Authority: "runtime", Name: "equal"}, Layer: "runtime"})
-	fnA := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "equal", File: "a.ai", Line: 10, Col: 1}, Layer: "semantic"})
-	fnB := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "equal", File: "b.ai", Line: 10, Col: 1}, Layer: "semantic"})
-	anonA := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, File: "a.ai", Line: 20, Col: 2}, Layer: "semantic"})
-	anonB := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, File: "a.ai", Line: 21, Col: 2}, Layer: "semantic"})
+	fnA := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "equal", File: "a.nez", Line: 10, Col: 1}, Layer: "semantic"})
+	fnB := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "equal", File: "b.nez", Line: 10, Col: 1}, Layer: "semantic"})
+	anonA := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, File: "a.nez", Line: 20, Col: 2}, Layer: "semantic"})
+	anonB := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, File: "a.nez", Line: 21, Col: 2}, Layer: "semantic"})
 
 	ids := []NodeID{primitive, fnA, fnB, anonA, anonB}
 	seen := map[NodeID]bool{}
@@ -21,7 +21,7 @@ func TestNodeIdentityDoesNotCollapseNames(t *testing.T) {
 		}
 		seen[id] = true
 	}
-	if again := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "equal", File: "a.ai", Line: 10, Col: 1}, Layer: "semantic"}); again != fnA {
+	if again := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "equal", File: "a.nez", Line: 10, Col: 1}, Layer: "semantic"}); again != fnA {
 		t.Fatalf("same identity changed ID: got %d want %d", again, fnA)
 	}
 }
@@ -55,7 +55,7 @@ func TestNetworkCursorCarriesCallerIdentity(t *testing.T) {
 	s := NewObservationSchema()
 	r := NewNodeRegistry()
 	root := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeRoot, Name: "<main>"}, Layer: "semantic"})
-	caller := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "caller", File: "x.ai", Line: 1}, Layer: "semantic"})
+	caller := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "caller", File: "x.nez", Line: 1}, Layer: "semantic"})
 	callee := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodePrimitive, Authority: "runtime", Name: "_equal"}, Layer: "runtime", Boundary: "runtime"})
 	n := NewNetwork(r, s, NetworkConfig{Depth: DepthEdges, EdgeCapacity: 8})
 
@@ -87,8 +87,8 @@ func TestNetworkCursorCarriesCallerIdentity(t *testing.T) {
 func TestEdgeCaptureConcurrentAndAllocationFreeAfterSetup(t *testing.T) {
 	s := NewObservationSchema()
 	r := NewNodeRegistry()
-	a := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "a", File: "x.ai", Line: 1}})
-	b := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "b", File: "x.ai", Line: 2}})
+	a := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "a", File: "x.nez", Line: 1}})
+	b := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "b", File: "x.nez", Line: 2}})
 	n := NewNetwork(r, s, NetworkConfig{Depth: DepthEdges, EdgeCapacity: 16})
 
 	// Use a separate network for the allocation witness because AllocsPerRun
@@ -127,10 +127,10 @@ func TestEdgeCaptureConcurrentAndAllocationFreeAfterSetup(t *testing.T) {
 func TestEdgeOverflowIsExplicit(t *testing.T) {
 	s := NewObservationSchema()
 	r := NewNodeRegistry()
-	a := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "a", File: "x.ai", Line: 1}})
-	b := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "b", File: "x.ai", Line: 2}})
-	c := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "c", File: "x.ai", Line: 3}})
-	d := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "d", File: "x.ai", Line: 4}})
+	a := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "a", File: "x.nez", Line: 1}})
+	b := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "b", File: "x.nez", Line: 2}})
+	c := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "c", File: "x.nez", Line: 3}})
+	d := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "d", File: "x.nez", Line: 4}})
 	n := NewNetwork(r, s, NetworkConfig{Depth: DepthEdges, EdgeCapacity: 2})
 
 	n.Edge(a, b)
@@ -148,7 +148,7 @@ func TestScopedEventsCaptureOnceAndDeriveFlatTotal(t *testing.T) {
 	network := NewNetwork(registry, schema, NetworkConfig{ScopedEventCapacity: 16})
 	capture := NewSemanticCapture(network, events, true)
 
-	site := SemanticSite{File: "x.ai", Line: 7, Col: 3, Function: "f", Detail: "+", Source: "a + b"}
+	site := SemanticSite{File: "x.nez", Line: 7, Col: 3, Function: "f", Detail: "+", Source: "a + b"}
 	capture.Hit(SemanticArithmetic, site)
 	capture.Hit(SemanticArithmetic, site)
 
@@ -177,8 +177,8 @@ func TestSemanticSitesWithSamePrintableDetailRemainDistinct(t *testing.T) {
 	network := NewNetwork(registry, schema, NetworkConfig{ScopedEventCapacity: 16})
 	capture := NewSemanticCapture(network, events, true)
 
-	capture.Hit(SemanticCall, SemanticSite{File: "a.ai", Line: 10, Col: 2, Function: "f", Detail: "work"})
-	capture.Hit(SemanticCall, SemanticSite{File: "b.ai", Line: 10, Col: 2, Function: "f", Detail: "work"})
+	capture.Hit(SemanticCall, SemanticSite{File: "a.nez", Line: 10, Col: 2, Function: "f", Detail: "work"})
+	capture.Hit(SemanticCall, SemanticSite{File: "b.nez", Line: 10, Col: 2, Function: "f", Detail: "work"})
 
 	m := capture.Measurement()
 	if m.Counts.Call != 2 || len(m.Sites) != 2 {
@@ -189,7 +189,7 @@ func TestSemanticSitesWithSamePrintableDetailRemainDistinct(t *testing.T) {
 func TestCallViewsDeriveOnlyFromEdges(t *testing.T) {
 	schema := NewObservationSchema()
 	registry := NewNodeRegistry()
-	caller := registry.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "f", File: "a.ai", Line: 1}, Boundary: "function"})
+	caller := registry.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "f", File: "a.nez", Line: 1}, Boundary: "function"})
 	primitive := registry.Register(NodeSpec{Identity: NodeIdentity{Kind: NodePrimitive, Authority: "runtime/primitives", Name: "_equal"}, Boundary: "runtime"})
 	n := NewNetwork(registry, schema, NetworkConfig{Depth: DepthEdges, EdgeCapacity: 8})
 	cursor := n.Cursor(caller)
@@ -210,7 +210,7 @@ func TestCallViewsDeriveOnlyFromEdges(t *testing.T) {
 func TestTargetedAllocationAttributionUsesEdgeIdentity(t *testing.T) {
 	r := NewNodeRegistry()
 	s := NewObservationSchema()
-	a := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Authority: "test", Name: "caller", File: "a.ai", Line: 1}})
+	a := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Authority: "test", Name: "caller", File: "a.nez", Line: 1}})
 	b := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodePrimitive, Authority: "test", Name: "_alloc"}, Boundary: "runtime"})
 	n := NewNetwork(r, s, NetworkConfig{Depth: DepthEdges, EdgeCapacity: 8})
 	n.EnableAllocationAttribution(8)
@@ -234,8 +234,8 @@ func TestTargetedAllocationAttributionUsesEdgeIdentity(t *testing.T) {
 func TestRoutineEdgeNetworkHasNoAllocationStorage(t *testing.T) {
 	r := NewNodeRegistry()
 	s := NewObservationSchema()
-	a := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Authority: "test", Name: "a", File: "a.ai", Line: 1}})
-	b := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Authority: "test", Name: "b", File: "a.ai", Line: 2}})
+	a := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Authority: "test", Name: "a", File: "a.nez", Line: 1}})
+	b := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Authority: "test", Name: "b", File: "a.nez", Line: 2}})
 	n := NewNetwork(r, s, NetworkConfig{Depth: DepthEdges, EdgeCapacity: 8})
 	n.Edge(a, b)
 	if got := n.Snapshot(); len(got.Allocations) != 0 || got.AllocationOverflow != 0 {

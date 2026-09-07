@@ -1,5 +1,5 @@
-1:1	COMMENT	"# 01_ops_engine.ai"
-1:19	NEWLINE	"\n"
+1:1	COMMENT	"# 01_ops_engine.nez"
+1:20	NEWLINE	"\n"
 2:1	COMMENT	"# Arithmetic, ordering, boolean, grouping."
 2:43	NEWLINE	"\n"
 3:1	COMMENT	"# Note: grammar does not define == or != operators. Use equal(a,b) and not equal(a,b)."

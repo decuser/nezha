@@ -62,7 +62,7 @@ func RunProfileDetailed(filename string, opts ProfileOptions) (ProfileRun, error
 	defer rt.CloseAllResources()
 
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
-	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.ai"))
+	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
 	if err := loadPrelude(g, rt, preludeEnv); err != nil {
 		return out, fmt.Errorf("loading prelude: %w", err)
 	}

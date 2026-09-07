@@ -24,7 +24,7 @@ let resty = (first, ...rest) { first }
 let value = 42
 export(:alpha, :resty)
 `
-	info, err := AnalyzeSource(testGrammar(t), "sample.ai", source)
+	info, err := AnalyzeSource(testGrammar(t), "sample.nez", source)
 	if err != nil {
 		t.Fatalf("AnalyzeSource: %v", err)
 	}
@@ -55,7 +55,7 @@ let outer = () {
 }
 export(:outer)
 `
-	info, err := AnalyzeSource(testGrammar(t), "sample.ai", source)
+	info, err := AnalyzeSource(testGrammar(t), "sample.nez", source)
 	if err != nil {
 		t.Fatalf("AnalyzeSource: %v", err)
 	}

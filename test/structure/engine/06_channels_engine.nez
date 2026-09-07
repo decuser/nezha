@@ -1,4 +1,4 @@
-# 06_channels_engine.ai
+# 06_channels_engine.nez
 # Concurrency primitives without imports.
 let ch = channel()
 

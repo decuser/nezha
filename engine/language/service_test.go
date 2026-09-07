@@ -25,7 +25,7 @@ func testService(t *testing.T) *Service {
 
 func TestDiagnosticsLexErrorStructured(t *testing.T) {
 	s := testService(t)
-	d := s.Diagnostics(Document{ID: "mem", Path: "test.ai", Source: "let x = `\n"}, value.ScopeUser)
+	d := s.Diagnostics(Document{ID: "mem", Path: "test.nez", Source: "let x = `\n"}, value.ScopeUser)
 	if len(d) != 1 || d[0].Source != "lex" || d[0].Pos.Line != 1 || d[0].Pos.Col != 9 || !strings.Contains(d[0].Message, "unexpected character") {
 		t.Fatalf("diagnostics = %#v", d)
 	}
@@ -33,7 +33,7 @@ func TestDiagnosticsLexErrorStructured(t *testing.T) {
 
 func TestDiagnosticsParseErrorStructured(t *testing.T) {
 	s := testService(t)
-	d := s.Diagnostics(Document{Path: "test.ai", Source: "let x =\n"}, value.ScopeUser)
+	d := s.Diagnostics(Document{Path: "test.nez", Source: "let x =\n"}, value.ScopeUser)
 	if len(d) != 1 || d[0].Source != "parse" || d[0].Pos.Line < 1 || d[0].Severity != "error" {
 		t.Fatalf("diagnostics = %#v", d)
 	}
@@ -41,7 +41,7 @@ func TestDiagnosticsParseErrorStructured(t *testing.T) {
 
 func TestDiagnosticsStructural(t *testing.T) {
 	s := testService(t)
-	d := s.Diagnostics(Document{Path: "test.ai", Source: "let x = missing\n"}, value.ScopeUser)
+	d := s.Diagnostics(Document{Path: "test.nez", Source: "let x = missing\n"}, value.ScopeUser)
 	if len(d) != 1 || d[0].Source != "lint" || d[0].Severity != "error" || !strings.Contains(d[0].Message, "undefined") {
 		t.Fatalf("diagnostics = %#v", d)
 	}
@@ -59,7 +59,7 @@ func (p *recordingProbe) HitLanguage(m languageobserve.Metric, n int64) { p.coun
 
 func TestObservationAndProbeAreBehaviorNeutral(t *testing.T) {
 	s := testService(t)
-	doc := Document{ID: "doc-1", Path: "test.ai", Source: "let x = missing\n"}
+	doc := Document{ID: "doc-1", Path: "test.nez", Source: "let x = missing\n"}
 	want := s.Diagnostics(doc, value.ScopeUser)
 	o := &recordingObserver{}
 	p := &recordingProbe{counts: make(map[languageobserve.Metric]int64)}
@@ -77,7 +77,7 @@ func TestObservationAndProbeAreBehaviorNeutral(t *testing.T) {
 func TestSymbolsAndDefinitionUseLexicalScopes(t *testing.T) {
 	s := testService(t)
 	src := "let outer = 1\nlet f = (x) {\n    let y = x\n    return y + outer\n}\n"
-	doc := Document{Path: "test.ai", Source: src}
+	doc := Document{Path: "test.nez", Source: src}
 	syms, err := s.Symbols(doc)
 	if err != nil {
 		t.Fatal(err)
@@ -110,7 +110,7 @@ func TestFormatUsesCanonicalFormatter(t *testing.T) {
 		t.Fatal(err)
 	}
 	svc := NewService(g)
-	doc := Document{ID: "test.ai", Path: "test.ai", Source: "let   x=1\n"}
+	doc := Document{ID: "test.nez", Path: "test.nez", Source: "let   x=1\n"}
 	got, err := svc.Format(doc)
 	if err != nil {
 		t.Fatal(err)
@@ -133,7 +133,7 @@ func TestFormatRejectsInvalidSource(t *testing.T) {
 		t.Fatal(err)
 	}
 	svc := NewService(g)
-	if _, err := svc.Format(Document{ID: "bad.ai", Path: "bad.ai", Source: "let x =\n"}); err == nil {
+	if _, err := svc.Format(Document{ID: "bad.nez", Path: "bad.nez", Source: "let x =\n"}); err == nil {
 		t.Fatal("expected invalid source to be rejected")
 	}
 }
@@ -158,7 +158,7 @@ func TestCompletionUsesLexicalScopeAndCatalog(t *testing.T) {
 	}
 	s := NewService(g, completionCatalog{})
 	src := "let outer = 1\nlet f = (x) {\n    let inner = x\n    return inner + outer\n}\n"
-	items, err := s.Completion(Document{Path: "test.ai", Source: src}, engine.Position{Line: 4, Col: 12}, value.ScopeUser)
+	items, err := s.Completion(Document{Path: "test.nez", Source: src}, engine.Position{Line: 4, Col: 12}, value.ScopeUser)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -179,7 +179,7 @@ func TestHoverUsesLexicalDefinitionAndAuthoredHelp(t *testing.T) {
 		t.Fatal(err)
 	}
 	s := NewService(g, completionCatalog{})
-	doc := Document{Path: "test.ai", Source: "let outer = 1\nlet f = () { return outer }\nlet z = print(outer)\n"}
+	doc := Document{Path: "test.nez", Source: "let outer = 1\nlet f = () { return outer }\nlet z = print(outer)\n"}
 	h, err := s.Hover(doc, engine.Position{Line: 2, Col: 21})
 	if err != nil {
 		t.Fatal(err)

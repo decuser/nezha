@@ -127,8 +127,8 @@ func (r *ModuleRegistry) scanDir(dir string, g *grammar.Grammar) error {
 			continue
 		}
 
-		// Only scan .ai files
-		if !strings.HasSuffix(entry.Name(), ".ai") {
+		// Only scan .nez files
+		if !strings.HasSuffix(entry.Name(), ".nez") {
 			continue
 		}
 
@@ -159,11 +159,11 @@ func (r *ModuleRegistry) scanDir(dir string, g *grammar.Grammar) error {
 	return nil
 }
 
-// loadModuleHelp loads .help and .doc files adjacent to the .ai file.
+// loadModuleHelp loads .help and .doc files adjacent to the .nez file.
 // For lib packages, both files are required.
 func (r *ModuleRegistry) loadModuleHelp(pkgName, aiPath string) error {
-	// Derive sibling paths: foo.ai -> foo.help, foo.doc
-	base := strings.TrimSuffix(aiPath, ".ai")
+	// Derive sibling paths: foo.nez -> foo.help, foo.doc
+	base := strings.TrimSuffix(aiPath, ".nez")
 	helpPath := base + ".help"
 	docPath := base + ".doc"
 

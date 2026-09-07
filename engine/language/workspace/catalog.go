@@ -91,8 +91,8 @@ func (c *Catalog) ModuleSource(currentFile, name string) (string, string, bool) 
 func (c *Catalog) resolveModulePath(currentFile, name string) string {
 	if modules.IsPathImport(name) {
 		path := name
-		if !strings.HasSuffix(path, ".ai") {
-			path += ".ai"
+		if !strings.HasSuffix(path, ".nez") {
+			path += ".nez"
 		}
 		if currentFile != "" && currentFile != "<unknown>" {
 			candidate := filepath.Join(filepath.Dir(currentFile), path)

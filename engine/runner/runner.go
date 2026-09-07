@@ -95,7 +95,7 @@ func runSourceWithRuntimeProbe(filename, source string, programArgs []string, rt
 
 	// Create prelude environment with ScopePrelude
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
-	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.ai"))
+	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
 
 	// Load prelude
 	if err := loadPrelude(g, rt, preludeEnv); err != nil {
@@ -184,7 +184,7 @@ func RunExpr(expr string) (string, error) {
 
 	// Create prelude environment with ScopePrelude
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
-	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.ai"))
+	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
 
 	// Load prelude
 	if err := loadPrelude(g, rt, preludeEnv); err != nil {

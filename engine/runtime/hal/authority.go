@@ -9,7 +9,7 @@ import (
 // trusted Nezha source. It is architectural policy; substrate code translates
 // host primitives to canonical HAL authority identities at runtime.
 var authorityPolicy = map[string][]string{
-	"engine/runtime/prelude/prelude.ai": {
+	"engine/runtime/prelude/prelude.nez": {
 		"_append",
 		"_apply",
 		"_channel",

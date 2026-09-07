@@ -63,7 +63,7 @@ func TestEncodeTranscriptRoundTrips(t *testing.T) {
 }
 
 func TestNegativeObservationRequiresDeclarationBothWays(t *testing.T) {
-	parseErr := []byte("parser: test.ai:1:1:\nexpected expression\n")
+	parseErr := []byte("parser: test.nez:1:1:\nexpected expression\n")
 	if err := validateNegativeObservation("declared", testfixture.NegativeParse, parseErr, 1); err != nil {
 		t.Fatalf("declared parse failure rejected: %v", err)
 	}
@@ -82,7 +82,7 @@ func TestCollectSmokeFilesSupportsArbitraryRecursiveSubtree(t *testing.T) {
 	if err := os.MkdirAll(sub, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	p := filepath.Join(sub, "x_smoke.ai")
+	p := filepath.Join(sub, "x_smoke.nez")
 	if err := os.WriteFile(p, []byte("let x = 1\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}

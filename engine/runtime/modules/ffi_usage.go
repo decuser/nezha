@@ -48,8 +48,8 @@ func FFIUsage(g *grammar.Grammar, entry string, roots []string) ([]string, error
 		for _, name := range info.Imports {
 			if IsPathImport(name) {
 				local := name
-				if !strings.HasSuffix(local, ".ai") {
-					local += ".ai"
+				if !strings.HasSuffix(local, ".nez") {
+					local += ".nez"
 				}
 				local = filepath.Join(filepath.Dir(path), local)
 				if _, err := os.Stat(local); err != nil {

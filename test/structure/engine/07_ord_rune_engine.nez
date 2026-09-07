@@ -1,4 +1,4 @@
-# 07_ord_rune_engine.ai
+# 07_ord_rune_engine.nez
 # Rune and ord coverage, no imports.
 print(ord('a'), "\n")
 print(ord('A'), "\n")

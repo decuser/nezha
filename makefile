@@ -83,17 +83,17 @@ smokegold: build
 
 
 nezhatest:
-	@if find . -name '*_test.ai' -print -quit | grep -q .; then \
+	@if find . -name '*_test.nez' -print -quit | grep -q .; then \
 		./nezha test ./...; \
 	else \
-		echo "nezhatest: no *_test.ai files found; skipping"; \
+		echo "nezhatest: no *_test.nez files found; skipping"; \
 	fi
 
 nezhatest-all:
-	@if find . -name '*_test.ai' -print -quit | grep -q .; then \
+	@if find . -name '*_test.nez' -print -quit | grep -q .; then \
 		./nezha test --all ./...; \
 	else \
-		echo "nezhatest-all: no *_test.ai files found; skipping"; \
+		echo "nezhatest-all: no *_test.nez files found; skipping"; \
 	fi
 
 enginecoverage: build fmt

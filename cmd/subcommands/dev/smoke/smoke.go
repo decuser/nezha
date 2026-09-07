@@ -28,7 +28,7 @@ func Run(args []string) int {
 		return 1
 	}
 	if len(targets) == 0 {
-		fmt.Fprintln(os.Stderr, "smoke: no *_smoke.ai files found")
+		fmt.Fprintln(os.Stderr, "smoke: no *_smoke.nez files found")
 		return 1
 	}
 
@@ -57,7 +57,7 @@ func Run(args []string) int {
 }
 
 func blessPair(aiPath string) error {
-	goldPath := strings.TrimSuffix(aiPath, ".ai") + ".gold"
+	goldPath := strings.TrimSuffix(aiPath, ".nez") + ".gold"
 	negativeKind, err := testfixture.NegativeKindOf(aiPath)
 	if err != nil {
 		return err
@@ -168,7 +168,7 @@ func collectSmokeFilesWithPolicy(args []string, all bool) ([]string, error) {
 	}
 	out := make([]string, 0, len(paths))
 	for _, path := range paths {
-		if strings.HasSuffix(path, "_smoke.ai") {
+		if strings.HasSuffix(path, "_smoke.nez") {
 			out = append(out, path)
 		}
 	}
@@ -176,7 +176,7 @@ func collectSmokeFilesWithPolicy(args []string, all bool) ([]string, error) {
 }
 
 func runPair(aiPath string) error {
-	goldPath := strings.TrimSuffix(aiPath, ".ai") + ".gold"
+	goldPath := strings.TrimSuffix(aiPath, ".nez") + ".gold"
 	negativeKind, err := testfixture.NegativeKindOf(aiPath)
 	if err != nil {
 		return err

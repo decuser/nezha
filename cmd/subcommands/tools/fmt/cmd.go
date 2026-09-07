@@ -29,7 +29,7 @@ func Run(args []string) int {
 		return 2
 	}
 	if fs.NArg() == 0 {
-		fmt.Fprintln(os.Stderr, "usage: nezha fmt <file.ai|path/...> [more targets]")
+		fmt.Fprintln(os.Stderr, "usage: nezha fmt <file.nez|path/...> [more targets]")
 		return 2
 	}
 	if *printOut && fs.NArg() != 1 {

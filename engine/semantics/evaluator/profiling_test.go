@@ -24,18 +24,18 @@ func makeEvalWithProfile(t *testing.T) (*Evaluator, *grammar.Grammar) {
 
 func evalSource(t *testing.T, ev *Evaluator, g *grammar.Grammar, source string) value.Value {
 	t.Helper()
-	lexer := syntax.NewLexer(g, "test.ai", source, engine.SilentObserver{})
+	lexer := syntax.NewLexer(g, "test.nez", source, engine.SilentObserver{})
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatalf("lex error: %v", err)
 	}
-	parser := syntax.NewParser(g, tokens, "test.ai", engine.SilentObserver{})
+	parser := syntax.NewParser(g, tokens, "test.nez", engine.SilentObserver{})
 	tree, err := parser.Parse()
 	if err != nil {
 		t.Fatalf("parse error: %v", err)
 	}
 	env := value.NewEnvWithScope(value.ScopeUser)
-	env.SetFile("test.ai")
+	env.SetFile("test.nez")
 	env.SetSource(source)
 	return ev.Eval(tree, env)
 }
@@ -151,7 +151,7 @@ func TestNumberRealizationUsesEnvironmentProbe(t *testing.T) {
 	ev.SetGrammar(g)
 	probe := NewProfileProbe(false)
 	source := "1 + 2 * 3"
-	lexer := syntax.NewLexer(g, "test.ai", source, engine.SilentObserver{})
+	lexer := syntax.NewLexer(g, "test.nez", source, engine.SilentObserver{})
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatalf("lex error: %v", err)
@@ -163,7 +163,7 @@ func TestNumberRealizationUsesEnvironmentProbe(t *testing.T) {
 	}
 	env := value.NewEnvWithScope(value.ScopeUser)
 	env.SetSemanticProbe(probe)
-	env.SetFile("test.ai")
+	env.SetFile("test.nez")
 	env.SetSource(source)
 	result := ev.Eval(tree, env)
 	if got := result.Inspect(); got != "9" {
@@ -209,7 +209,7 @@ func TestNumberCallRealizationUsesEnvironmentProbe(t *testing.T) {
 	ev.SetGrammar(g)
 	probe := NewProfileProbe(false)
 	source := "let f = () { 42 }\nf()\n"
-	lexer := syntax.NewLexer(g, "test.ai", source, engine.SilentObserver{})
+	lexer := syntax.NewLexer(g, "test.nez", source, engine.SilentObserver{})
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatalf("lex error: %v", err)
@@ -221,7 +221,7 @@ func TestNumberCallRealizationUsesEnvironmentProbe(t *testing.T) {
 	}
 	env := value.NewEnvWithScope(value.ScopeUser)
 	env.SetSemanticProbe(probe)
-	env.SetFile("test.ai")
+	env.SetFile("test.nez")
 	env.SetSource(source)
 	result := ev.Eval(tree, env)
 	if got := result.Inspect(); got != "42" {
@@ -330,7 +330,7 @@ func TestEvalProbeObservesEveryEvaluatorEntryWithoutSeparateCoverageAccounting(t
 		t.Fatal("eval probe observed no evaluator entries")
 	}
 	for _, hit := range probe.hits {
-		if hit.site.File != "test.ai" || hit.site.Line != 1 {
+		if hit.site.File != "test.nez" || hit.site.Line != 1 {
 			t.Fatalf("unexpected eval site: %#v", hit)
 		}
 		if hit.site.Detail != hit.node {

@@ -45,7 +45,7 @@ func mustCompile(pattern string) *regexp.Regexp {
 func tokenizeNoSkip(t *testing.T, src string) []Token {
 	t.Helper()
 	g := testGrammar()
-	l := NewLexer(g, "test.ai", src, nil)
+	l := NewLexer(g, "test.nez", src, nil)
 	tokens, err := l.Tokenize()
 	if err != nil {
 		t.Fatalf("tokenize error: %v", err)
@@ -237,7 +237,7 @@ func TestLexerObserver(t *testing.T) {
 		},
 	}
 
-	l := NewLexer(g, "test.ai", source, obs)
+	l := NewLexer(g, "test.nez", source, obs)
 	_, err := l.Tokenize()
 	if err != nil {
 		t.Fatalf("tokenize error: %v", err)
@@ -259,7 +259,7 @@ func TestLexerError(t *testing.T) {
 	g := testGrammar()
 	source := "let x = `invalid`"
 
-	l := NewLexer(g, "test.ai", source, nil)
+	l := NewLexer(g, "test.nez", source, nil)
 	_, err := l.Tokenize()
 	if err == nil {
 		t.Fatal("expected error for invalid character")

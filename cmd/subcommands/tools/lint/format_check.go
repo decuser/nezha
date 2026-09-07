@@ -36,10 +36,10 @@ func checkFormatting(args []string, includePrelude, all bool) ([]string, error) 
 	var bad []string
 	var checkErrs []error
 	for _, path := range paths {
-		if !strings.HasSuffix(path, ".ai") {
+		if !strings.HasSuffix(path, ".nez") {
 			continue
 		}
-		if !includePrelude && strings.HasSuffix(path, "engine/runtime/prelude/prelude.ai") {
+		if !includePrelude && strings.HasSuffix(path, "engine/runtime/prelude/prelude.nez") {
 			continue
 		}
 		skip, err := testfixture.IsParseNegative(path)

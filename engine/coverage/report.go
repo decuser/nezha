@@ -53,7 +53,7 @@ func Analyze(model Model, hits []observe.EvalSiteCount) Report {
 	metas := make(map[lineKey]*lineMeta)
 	for _, site := range model.Sites {
 		file := canonicalFile(site.File)
-		if file == "" || file == "<prelude>" || site.Line <= 0 || strings.HasSuffix(file, "_test.ai") {
+		if file == "" || file == "<prelude>" || site.Line <= 0 || strings.HasSuffix(file, "_test.nez") {
 			continue
 		}
 		key := lineKey{file, site.Line}
@@ -172,7 +172,7 @@ func HitCounts(hits []observe.EvalSiteCount) map[string]map[int]int64 {
 	out := make(map[string]map[int]int64)
 	for _, hit := range hits {
 		file := canonicalFile(hit.Site.File)
-		if file == "" || file == "<prelude>" || strings.HasSuffix(file, "_test.ai") || hit.Site.Line <= 0 {
+		if file == "" || file == "<prelude>" || strings.HasSuffix(file, "_test.nez") || hit.Site.Line <= 0 {
 			continue
 		}
 		if out[file] == nil {

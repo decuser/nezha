@@ -1,5 +1,5 @@
-1:1	COMMENT	"# 03_while_engine.ai"
-1:21	NEWLINE	"\n"
+1:1	COMMENT	"# 03_while_engine.nez"
+1:22	NEWLINE	"\n"
 2:1	COMMENT	"# while loop and assignment."
 2:29	NEWLINE	"\n"
 3:1	KEYWORD	"let"

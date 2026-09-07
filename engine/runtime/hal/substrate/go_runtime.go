@@ -331,8 +331,8 @@ func (g *GoRuntime) registerHost(op hal.HostOperation, fn BuiltinFunc) {
 // consult library or distribution module roots.
 func resolveModulePath(name string, env *value.Env) string {
 	candidates := []string{name}
-	if !strings.HasSuffix(name, ".ai") {
-		candidates = append([]string{name + ".ai"}, candidates...)
+	if !strings.HasSuffix(name, ".nez") {
+		candidates = append([]string{name + ".nez"}, candidates...)
 	}
 
 	currentFile := env.GetFile()

@@ -22,7 +22,7 @@ func Run(args []string) int {
 		return 2
 	}
 	if fs.NArg() == 0 {
-		fmt.Fprintln(os.Stderr, "usage: nezha tags [-o file] <file.ai|dir|path/...> [more targets]")
+		fmt.Fprintln(os.Stderr, "usage: nezha tags [-o file] <file.nez|dir|path/...> [more targets]")
 		return 2
 	}
 	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
@@ -91,7 +91,7 @@ func expandWithPolicy(args []string, all bool) ([]string, error) {
 	}
 	out := make([]string, 0, len(paths))
 	for _, path := range paths {
-		if strings.HasSuffix(path, ".ai") {
+		if strings.HasSuffix(path, ".nez") {
 			out = append(out, path)
 		}
 	}

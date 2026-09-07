@@ -65,7 +65,7 @@ func TestFrozenReleaseODTIsJustified(t *testing.T) {
 
 func TestEngineGoldWithoutSpecimenIsStructuralError(t *testing.T) {
 	root := minimalTree(t)
-	path := "test/structure/engine/orphan_engine.ai.lex.gold"
+	path := "test/structure/engine/orphan_engine.nez.lex.gold"
 	writeTestFile(t, root, path, "gold\n")
 
 	result, err := Check(root, "treecheck.allow")
@@ -82,7 +82,7 @@ func TestEngineGoldWithoutSpecimenIsStructuralError(t *testing.T) {
 
 func TestUnpairedBehaviorProgramIsOrphan(t *testing.T) {
 	root := minimalTree(t)
-	path := "test/behavior/old.ai"
+	path := "test/behavior/old.nez"
 	writeTestFile(t, root, path, "println(1)\n")
 
 	result, err := Check(root, "treecheck.allow")
@@ -96,7 +96,7 @@ func TestUnpairedBehaviorProgramIsOrphan(t *testing.T) {
 
 func TestSmokePairIsJustified(t *testing.T) {
 	root := minimalTree(t)
-	ai := "test/behavior/example_smoke.ai"
+	ai := "test/behavior/example_smoke.nez"
 	gold := "test/behavior/example_smoke.gold"
 	writeTestFile(t, root, ai, "println(1)\n")
 	writeTestFile(t, root, gold, "OUT:1\\n\n")
@@ -128,10 +128,10 @@ func TestAllowPrefixSuppressesIntentionalStandaloneTree(t *testing.T) {
 
 func TestBareImportDoesNotJustifyLocalPackageSource(t *testing.T) {
 	root := minimalTree(t)
-	writeTestFile(t, root, "test/behavior/import_smoke.ai", "import(\"target\", :x)\n")
+	writeTestFile(t, root, "test/behavior/import_smoke.nez", "import(\"target\", :x)\n")
 	writeTestFile(t, root, "test/behavior/import_smoke.gold", "EXIT:0\n")
 
-	local := "test/behavior/target.ai"
+	local := "test/behavior/target.nez"
 	writeTestFile(t, root, local, "package \"target\"\nexport(:x)\nlet x = 1\n")
 
 	result, err := Check(root, "treecheck.allow")
@@ -145,9 +145,9 @@ func TestBareImportDoesNotJustifyLocalPackageSource(t *testing.T) {
 
 func TestRelativeImportedHelperIsJustified(t *testing.T) {
 	root := minimalTree(t)
-	writeTestFile(t, root, "test/behavior/import_smoke.ai", "import(\"./import_target\", :x)\n")
+	writeTestFile(t, root, "test/behavior/import_smoke.nez", "import(\"./import_target\", :x)\n")
 	writeTestFile(t, root, "test/behavior/import_smoke.gold", "EXIT:0\n")
-	path := "test/behavior/import_target.ai"
+	path := "test/behavior/import_target.nez"
 	writeTestFile(t, root, path, "package \"import_target\"\nexport(:x)\nlet x = 1\n")
 
 	result, err := Check(root, "treecheck.allow")
@@ -165,7 +165,7 @@ func TestDeletedTrackedPathIsNotTreatedAsPresent(t *testing.T) {
 	}
 	root := t.TempDir()
 	writeTestFile(t, root, "treecheck.allow", "# test allow file\n")
-	path := "test/behavior/removed.ai"
+	path := "test/behavior/removed.nez"
 	writeTestFile(t, root, path, "println(1)\n")
 
 	for _, args := range [][]string{{"init"}, {"add", "treecheck.allow", path}} {

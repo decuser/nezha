@@ -6,14 +6,14 @@ import (
 )
 
 func TestFormatWithCaret(t *testing.T) {
-	pos := Position{File: "test.ai", Line: 4, Col: 10}
+	pos := Position{File: "test.nez", Line: 4, Col: 10}
 	source := "let x = 1 / 0"
 	msg := "division by zero"
 
 	result := FormatWithCaret(pos, source, msg)
 
 	// Check header
-	if !strings.Contains(result, "test.ai:4:10: division by zero") {
+	if !strings.Contains(result, "test.nez:4:10: division by zero") {
 		t.Errorf("expected header, got:\n%s", result)
 	}
 
@@ -41,7 +41,7 @@ func TestFormatWithCaretNoFile(t *testing.T) {
 }
 
 func TestFormatWithCaretNoSource(t *testing.T) {
-	pos := Position{File: "test.ai", Line: 1, Col: 1}
+	pos := Position{File: "test.nez", Line: 1, Col: 1}
 	msg := "something went wrong"
 
 	result := FormatWithCaret(pos, "", msg)
@@ -49,13 +49,13 @@ func TestFormatWithCaretNoSource(t *testing.T) {
 	if strings.Contains(result, "\n") {
 		t.Errorf("expected single line without source, got:\n%s", result)
 	}
-	if result != "test.ai:1:1: something went wrong" {
+	if result != "test.nez:1:1: something went wrong" {
 		t.Errorf("unexpected output: %s", result)
 	}
 }
 
 func TestFormatWithCaretCol1(t *testing.T) {
-	pos := Position{File: "test.ai", Line: 1, Col: 1}
+	pos := Position{File: "test.nez", Line: 1, Col: 1}
 	source := "let x = 1"
 	msg := "error at start"
 

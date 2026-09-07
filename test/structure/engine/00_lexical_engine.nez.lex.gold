@@ -1,5 +1,5 @@
-1:1	COMMENT	"# 00_lexical_engine.ai"
-1:23	NEWLINE	"\n"
+1:1	COMMENT	"# 00_lexical_engine.nez"
+1:24	NEWLINE	"\n"
 2:1	COMMENT	"# Lexical coverage: whitespace, comments, numbers, strings with backslashes."
 2:77	NEWLINE	"\n"
 3:1	KEYWORD	"let"

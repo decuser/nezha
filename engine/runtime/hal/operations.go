@@ -2,12 +2,12 @@ package hal
 
 var operationDefinitions = map[string]HostOperation{
 	"_print": hostOperation("HAL.io.print", "_print", "runtime.io", "may block", "fault", bindings(
-		binding("print", "engine/runtime/prelude/prelude.ai"),
-		binding("println", "engine/runtime/prelude/prelude.ai"),
+		binding("print", "engine/runtime/prelude/prelude.nez"),
+		binding("println", "engine/runtime/prelude/prelude.nez"),
 	)),
 	"_read": hostOperation("HAL.io.read", "_read", "runtime.io", "may block", "fault or shaped :io/:end result", bindings(
-		binding("read", "engine/runtime/prelude/prelude.ai"),
-		binding("input", "engine/runtime/prelude/prelude.ai"),
+		binding("read", "engine/runtime/prelude/prelude.nez"),
+		binding("input", "engine/runtime/prelude/prelude.nez"),
 	)),
 }
 

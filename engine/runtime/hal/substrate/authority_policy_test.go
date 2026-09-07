@@ -14,7 +14,7 @@ import (
 func TestAuthorityPolicyIsExplicitAndNarrow(t *testing.T) {
 	rt := NewGoRuntime()
 
-	unlisted := rt.AuthorityForSource("/tmp/project/example.ai")
+	unlisted := rt.AuthorityForSource("/tmp/project/example.nez")
 	if unlisted.Allows("HAL.io.print") || unlisted.Allows("_test_run") {
 		t.Fatal("ordinary source path alone must not confer authority")
 	}
@@ -22,7 +22,7 @@ func TestAuthorityPolicyIsExplicitAndNarrow(t *testing.T) {
 
 func TestPreludeAuthorityIsDeclaredNotUniversal(t *testing.T) {
 	rt := NewGoRuntime()
-	auth := rt.AuthorityForSource("engine/runtime/prelude/prelude.ai")
+	auth := rt.AuthorityForSource("engine/runtime/prelude/prelude.nez")
 	if !auth.Allows("HAL.io.print") || !auth.Allows("_length") {
 		t.Fatal("prelude missing declared primitive authority")
 	}

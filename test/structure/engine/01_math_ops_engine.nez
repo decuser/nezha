@@ -1,4 +1,4 @@
-# 01_math_ops_engine.ai
+# 01_math_ops_engine.nez
 # Arithmetic and precedence, no equality operators.
 print("ADD", "\n")
 print(1 + 1, "\n")

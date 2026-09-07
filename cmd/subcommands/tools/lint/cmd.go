@@ -32,7 +32,7 @@ func Run(args []string) int {
 		return 2
 	}
 	if fs.NArg() == 0 {
-		fmt.Fprintln(os.Stderr, "usage: nezha lint <file.ai|dir|path/...> [more targets]")
+		fmt.Fprintln(os.Stderr, "usage: nezha lint <file.nez|dir|path/...> [more targets]")
 		return 2
 	}
 
@@ -64,7 +64,7 @@ func Run(args []string) int {
 	if !*includePrelude {
 		filtered := make([]string, 0, len(files))
 		for _, p := range files {
-			if strings.HasSuffix(p, "engine/runtime/prelude/prelude.ai") {
+			if strings.HasSuffix(p, "engine/runtime/prelude/prelude.nez") {
 				continue
 			}
 			filtered = append(filtered, p)
@@ -80,7 +80,7 @@ func Run(args []string) int {
 			return 1
 		}
 		scope := value.ScopeUser
-		if strings.HasSuffix(path, "engine/runtime/prelude/prelude.ai") {
+		if strings.HasSuffix(path, "engine/runtime/prelude/prelude.nez") {
 			scope = value.ScopePrelude
 			if !*includePrelude {
 				continue

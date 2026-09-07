@@ -70,7 +70,7 @@ func (g *GoRuntime) recordTestFailure(ctx *hal.EvalContext, msg string) {
 	// The stack frames carry the call site line but the callee's file.
 	// For assertions inside a run() block, the "run" frame has the
 	// correct line (from the user's test file) but the wrong file
-	// (test.ai, because run's body is there). We use the runtime test file for
+	// (test.nez, because run's body is there). We use the runtime test file for
 	// the file and take the line from the deepest non-<main> frame.
 	if ctx != nil && ctx.Env != nil {
 		stack := ctx.Env.CopyStack()

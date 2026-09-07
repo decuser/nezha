@@ -10,8 +10,8 @@ import (
 )
 
 func TestProfileTimedReturnsCountsElapsedAndResolvedTimingRows(t *testing.T) {
-	caller := observe.Node{ID: 1, Identity: observe.NodeIdentity{Kind: observe.NodeFunction, Name: "caller", File: "a.ai"}, Layer: "semantic", Boundary: "function"}
-	callee := observe.Node{ID: 2, Identity: observe.NodeIdentity{Kind: observe.NodePrimitive, Name: "_x", File: "b.ai"}, Module: "m", Layer: "runtime", Boundary: "provider"}
+	caller := observe.Node{ID: 1, Identity: observe.NodeIdentity{Kind: observe.NodeFunction, Name: "caller", File: "a.nez"}, Layer: "semantic", Boundary: "function"}
+	callee := observe.Node{ID: 2, Identity: observe.NodeIdentity{Kind: observe.NodePrimitive, Name: "_x", File: "b.nez"}, Module: "m", Layer: "runtime", Boundary: "provider"}
 	ctx := &hal.EvalContext{
 		MeasureTimed: func(fn value.Value, args []value.Value, attributed bool) (value.Value, engine.SemanticMeasurement) {
 			return value.EMPTY, engine.SemanticMeasurement{

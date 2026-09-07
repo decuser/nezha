@@ -33,12 +33,12 @@ func withDistributionRoot(t *testing.T) {
 func TestLint_CheckFormatting(t *testing.T) {
 	withDistributionRoot(t)
 	dir := t.TempDir()
-	p1 := filepath.Join(dir, "a.ai")
+	p1 := filepath.Join(dir, "a.nez")
 	// Unformatted: missing spaces and brace on next line.
 	if err := os.WriteFile(p1, []byte("let x=1\nif x {\nreturn x\n}\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
-	p2 := filepath.Join(dir, "b.ai")
+	p2 := filepath.Join(dir, "b.nez")
 	if err := os.WriteFile(p2, []byte("let y = 2\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -61,7 +61,7 @@ func lintSource(t *testing.T, src string) []Diagnostic {
 	if err != nil {
 		t.Fatal(err)
 	}
-	diags, err := LintSource(g, "test.ai", src, value.ScopeUser)
+	diags, err := LintSource(g, "test.nez", src, value.ScopeUser)
 	if err != nil {
 		t.Fatalf("LintSource error: %v", err)
 	}
@@ -234,8 +234,8 @@ func TestLintSelectChannelExprUsesOuterScope(t *testing.T) {
 func TestRunFailsOnUndeclaredMalformedFile(t *testing.T) {
 	withDistributionRoot(t)
 	dir := t.TempDir()
-	bad := filepath.Join(dir, "bad.ai")
-	good := filepath.Join(dir, "good.ai")
+	bad := filepath.Join(dir, "bad.nez")
+	good := filepath.Join(dir, "good.nez")
 	if err := os.WriteFile(bad, []byte("let x =\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -250,8 +250,8 @@ func TestRunFailsOnUndeclaredMalformedFile(t *testing.T) {
 func TestCheckFormattingSkipsDeclaredParseNegative(t *testing.T) {
 	withDistributionRoot(t)
 	dir := t.TempDir()
-	negative := filepath.Join(dir, "negative_smoke.ai")
-	good := filepath.Join(dir, "good.ai")
+	negative := filepath.Join(dir, "negative_smoke.nez")
+	good := filepath.Join(dir, "good.nez")
 	if err := os.WriteFile(negative, []byte("# @negative parse\nlet x =\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -277,7 +277,7 @@ func TestCheckFormattingSkipsDeclaredParseNegative(t *testing.T) {
 func TestExpandLintPathsRejectsNegativeMarkerOutsideSmokeFixture(t *testing.T) {
 	withDistributionRoot(t)
 	dir := t.TempDir()
-	path := filepath.Join(dir, "ordinary.ai")
+	path := filepath.Join(dir, "ordinary.nez")
 	if err := os.WriteFile(path, []byte("# @negative parse\nlet x =\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -289,7 +289,7 @@ func TestExpandLintPathsRejectsNegativeMarkerOutsideSmokeFixture(t *testing.T) {
 func TestCheckFormattingReportsAllUndeclaredMalformedFiles(t *testing.T) {
 	withDistributionRoot(t)
 	dir := t.TempDir()
-	for _, name := range []string{"a.ai", "b.ai"} {
+	for _, name := range []string{"a.nez", "b.nez"} {
 		if err := os.WriteFile(filepath.Join(dir, name), []byte("let x =\n"), 0o644); err != nil {
 			t.Fatal(err)
 		}
@@ -299,7 +299,7 @@ func TestCheckFormattingReportsAllUndeclaredMalformedFiles(t *testing.T) {
 		t.Fatal("expected malformed files to fail formatting preflight")
 	}
 	msg := err.Error()
-	for _, name := range []string{"a.ai", "b.ai"} {
+	for _, name := range []string{"a.nez", "b.nez"} {
 		if !strings.Contains(msg, name) {
 			t.Fatalf("error %q does not mention %s", msg, name)
 		}

@@ -1,4 +1,4 @@
-# 08_select_engine.ai
+# 08_select_engine.nez
 # Select syntax with bound/unbound receive cases and default.
 let ch1 = channel()
 let ch2 = channel()

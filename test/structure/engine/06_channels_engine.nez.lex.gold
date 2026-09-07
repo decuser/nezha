@@ -1,5 +1,5 @@
-1:1	COMMENT	"# 06_channels_engine.ai"
-1:24	NEWLINE	"\n"
+1:1	COMMENT	"# 06_channels_engine.nez"
+1:25	NEWLINE	"\n"
 2:1	COMMENT	"# Concurrency primitives without imports."
 2:42	NEWLINE	"\n"
 3:1	KEYWORD	"let"

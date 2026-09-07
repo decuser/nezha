@@ -31,7 +31,7 @@ func Run(args []string) int {
 		return 2
 	}
 	if fs.NArg() != 1 {
-		fmt.Fprintln(os.Stderr, "usage: nezha profile [-counts] [-time] [-depth 0|N|full] [-callers name] [-from name] [-hops N] [-alloc-target primitive] [-cpu file] [-allocs file] [-trace file] file.ai")
+		fmt.Fprintln(os.Stderr, "usage: nezha profile [-counts] [-time] [-depth 0|N|full] [-callers name] [-from name] [-hops N] [-alloc-target primitive] [-cpu file] [-allocs file] [-trace file] file.nez")
 		return 2
 	}
 	depth, full, err := parseDepth(*depthText)

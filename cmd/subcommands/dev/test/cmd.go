@@ -4,7 +4,7 @@
 //
 //	nezha test ./...
 //	nezha test test/behavior
-//	nezha test path/to/foo_test.ai
+//	nezha test path/to/foo_test.nez
 //	nezha test -cover ./...
 //	nezha test -cover -coverview=file ./...
 //	nezha test -coverprofile=coverage.out ./...
@@ -56,7 +56,7 @@ func Run(args []string) int {
 		return 1
 	}
 	if len(files) == 0 {
-		fmt.Fprintln(os.Stderr, "nezha test: no *_test.ai files found")
+		fmt.Fprintln(os.Stderr, "nezha test: no *_test.nez files found")
 		return 1
 	}
 
@@ -325,7 +325,7 @@ func discoverCoverageSourcesWithPolicy(targets []string, all bool) (map[string]b
 }
 
 func coverableSourcePath(path string) bool {
-	if path == "" || strings.HasPrefix(path, "<") || !strings.HasSuffix(path, ".ai") || strings.HasSuffix(path, "_test.ai") {
+	if path == "" || strings.HasPrefix(path, "<") || !strings.HasSuffix(path, ".nez") || strings.HasSuffix(path, "_test.nez") {
 		return false
 	}
 	p := filepath.ToSlash(filepath.Clean(path))
@@ -335,7 +335,7 @@ func coverableSourcePath(path string) bool {
 			return false
 		}
 	}
-	if strings.HasSuffix(p, "engine/runtime/prelude/prelude.ai") {
+	if strings.HasSuffix(p, "engine/runtime/prelude/prelude.nez") {
 		return false
 	}
 	return true
@@ -384,7 +384,7 @@ func discoverTestsWithPolicy(targets []string, all bool) ([]string, error) {
 	}
 	files := make([]string, 0, len(paths))
 	for _, path := range paths {
-		if strings.HasSuffix(path, "_test.ai") {
+		if strings.HasSuffix(path, "_test.nez") {
 			files = append(files, path)
 		}
 	}

@@ -9,16 +9,16 @@ import (
 )
 
 func TestFromASTDefinesStaticSitesWithoutPunctuationLines(t *testing.T) {
-	root := &syntax.Node{Type: "program", Pos: engine.Position{File: "lib/demo/demo.ai", Line: 1, Col: 1}, Children: []*syntax.Node{
-		{Type: "statement", Pos: engine.Position{File: "lib/demo/demo.ai", Line: 1, Col: 1}, Children: []*syntax.Node{
-			{Type: "let_stmt", Pos: engine.Position{File: "lib/demo/demo.ai", Line: 1, Col: 1}, Children: []*syntax.Node{
-				{Type: "TERMINAL", Value: "let", Pos: engine.Position{File: "lib/demo/demo.ai", Line: 1, Col: 1}},
-				{Type: "NAME", Value: "f", Pos: engine.Position{File: "lib/demo/demo.ai", Line: 1, Col: 5}},
-				{Type: "expr", Pos: engine.Position{File: "lib/demo/demo.ai", Line: 1, Col: 9}, Children: []*syntax.Node{
-					{Type: "func_literal", Pos: engine.Position{File: "lib/demo/demo.ai", Line: 1, Col: 9}, Children: []*syntax.Node{
-						{Type: "block", Pos: engine.Position{File: "lib/demo/demo.ai", Line: 1, Col: 13}, Children: []*syntax.Node{
-							{Type: "statement", Pos: engine.Position{File: "lib/demo/demo.ai", Line: 2, Col: 2}},
-							{Type: "TERMINAL", Value: "}", Pos: engine.Position{File: "lib/demo/demo.ai", Line: 3, Col: 1}},
+	root := &syntax.Node{Type: "program", Pos: engine.Position{File: "lib/demo/demo.nez", Line: 1, Col: 1}, Children: []*syntax.Node{
+		{Type: "statement", Pos: engine.Position{File: "lib/demo/demo.nez", Line: 1, Col: 1}, Children: []*syntax.Node{
+			{Type: "let_stmt", Pos: engine.Position{File: "lib/demo/demo.nez", Line: 1, Col: 1}, Children: []*syntax.Node{
+				{Type: "TERMINAL", Value: "let", Pos: engine.Position{File: "lib/demo/demo.nez", Line: 1, Col: 1}},
+				{Type: "NAME", Value: "f", Pos: engine.Position{File: "lib/demo/demo.nez", Line: 1, Col: 5}},
+				{Type: "expr", Pos: engine.Position{File: "lib/demo/demo.nez", Line: 1, Col: 9}, Children: []*syntax.Node{
+					{Type: "func_literal", Pos: engine.Position{File: "lib/demo/demo.nez", Line: 1, Col: 9}, Children: []*syntax.Node{
+						{Type: "block", Pos: engine.Position{File: "lib/demo/demo.nez", Line: 1, Col: 13}, Children: []*syntax.Node{
+							{Type: "statement", Pos: engine.Position{File: "lib/demo/demo.nez", Line: 2, Col: 2}},
+							{Type: "TERMINAL", Value: "}", Pos: engine.Position{File: "lib/demo/demo.nez", Line: 3, Col: 1}},
 						}},
 					}},
 				}},
@@ -27,7 +27,7 @@ func TestFromASTDefinesStaticSitesWithoutPunctuationLines(t *testing.T) {
 	}}
 
 	model := FromAST(root)
-	lines := model.LinesByFile()["lib/demo/demo.ai"]
+	lines := model.LinesByFile()["lib/demo/demo.nez"]
 	if !lines[1] || !lines[2] {
 		t.Fatalf("coverable lines = %#v, want lines 1 and 2", lines)
 	}
@@ -51,7 +51,7 @@ func TestFromASTRealParserExcludesBlankCommentAndClosingBraceLines(t *testing.T)
 		t.Fatalf("load grammar: %v", err)
 	}
 	source := "# comment\n\nlet f = (x) {\n\treturn x + 1\n}\n"
-	lexer := syntax.NewLexer(g, "lib/demo/demo.ai", source, engine.SilentObserver{})
+	lexer := syntax.NewLexer(g, "lib/demo/demo.nez", source, engine.SilentObserver{})
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatalf("lex: %v", err)
@@ -61,7 +61,7 @@ func TestFromASTRealParserExcludesBlankCommentAndClosingBraceLines(t *testing.T)
 	if err != nil {
 		t.Fatalf("parse: %v", err)
 	}
-	lines := FromAST(ast).LinesByFile()["lib/demo/demo.ai"]
+	lines := FromAST(ast).LinesByFile()["lib/demo/demo.nez"]
 	if lines[1] || lines[2] || lines[5] {
 		t.Fatalf("comment/blank/closing-brace lines unexpectedly coverable: %#v", lines)
 	}

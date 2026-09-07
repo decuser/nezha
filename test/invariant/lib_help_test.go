@@ -15,7 +15,7 @@ import (
 	"nezha/engine/syntax/grammar"
 )
 
-// The engine already enforces that prelude.ai and prelude.help agree. That
+// The engine already enforces that prelude.nez and prelude.help agree. That
 // invariant stops at the prelude: nothing checked the supplied library modules,
 // which is how regex/ffi came to document every one of its procedures with the
 // arguments reversed while the whole test suite stayed green.
@@ -168,7 +168,7 @@ func loadModules(t *testing.T) []module {
 			mod.hasRest[fname] = fn.Rest != ""
 		}
 
-		base := strings.TrimSuffix(path, ".ai")
+		base := strings.TrimSuffix(path, ".nez")
 		mod.helpPath = base + ".help"
 		mod.docPath = base + ".doc"
 		mods = append(mods, mod)

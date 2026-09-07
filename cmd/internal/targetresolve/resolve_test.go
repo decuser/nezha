@@ -13,20 +13,20 @@ func makeTree(t *testing.T) string {
 	root := t.TempDir()
 	mustMkdirAll(t, filepath.Join(root, "src", "sub"))
 	mustMkdirAll(t, filepath.Join(root, "experiments", "demo"))
-	mustWrite(t, filepath.Join(root, "src", "a.ai"), "let a = 1\n")
-	mustWrite(t, filepath.Join(root, "src", "sub", "b.ai"), "let b = 2\n")
-	mustWrite(t, filepath.Join(root, "experiments", "demo", "e_test.ai"), "let e = 3\n")
+	mustWrite(t, filepath.Join(root, "src", "a.nez"), "let a = 1\n")
+	mustWrite(t, filepath.Join(root, "src", "sub", "b.nez"), "let b = 2\n")
+	mustWrite(t, filepath.Join(root, "experiments", "demo", "e_test.nez"), "let e = 3\n")
 	mustWrite(t, filepath.Join(root, ".nezhaignore"), "[test]\nexperiments/**\n")
 	return root
 }
 
 func TestRecursiveTargetsAreOrderedAndDeduplicated(t *testing.T) {
 	root := makeTree(t)
-	got, err := ResolveFrom(root, "test", []string{"src/...", "src/a.ai"}, true)
+	got, err := ResolveFrom(root, "test", []string{"src/...", "src/a.nez"}, true)
 	if err != nil {
 		t.Fatalf("ResolveFrom returned error: %v", err)
 	}
-	want := []string{"src/a.ai", "src/sub/b.ai"}
+	want := []string{"src/a.nez", "src/sub/b.nez"}
 	assertStrings(t, got, want)
 }
 
@@ -36,7 +36,7 @@ func TestPolicyPrunesExperimentsFromBroadRecursion(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveFrom returned error: %v", err)
 	}
-	want := []string{".nezhaignore", "src/a.ai", "src/sub/b.ai"}
+	want := []string{".nezhaignore", "src/a.nez", "src/sub/b.nez"}
 	assertStrings(t, got, want)
 }
 
@@ -46,7 +46,7 @@ func TestExplicitRecursiveTargetWinsOverRepositoryPolicy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveFrom returned error: %v", err)
 	}
-	want := []string{"experiments/demo/e_test.ai"}
+	want := []string{"experiments/demo/e_test.nez"}
 	assertStrings(t, got, want)
 }
 
@@ -56,7 +56,7 @@ func TestPlainDirectoryBehaviorIsCallerControlled(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveFrom returned error: %v", err)
 	}
-	want := []string{"src/a.ai", "src/sub/b.ai"}
+	want := []string{"src/a.nez", "src/sub/b.nez"}
 	assertStrings(t, got, want)
 
 	_, err = ResolveFrom(root, "lint", []string{"src"}, false)
@@ -71,7 +71,7 @@ func TestExhaustiveResolutionBypassesRepositoryPolicy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ResolveAllFrom returned error: %v", err)
 	}
-	want := []string{".nezhaignore", "experiments/demo/e_test.ai", "src/a.ai", "src/sub/b.ai"}
+	want := []string{".nezhaignore", "experiments/demo/e_test.nez", "src/a.nez", "src/sub/b.nez"}
 	assertStrings(t, got, want)
 }
 

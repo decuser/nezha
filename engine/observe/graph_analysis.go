@@ -324,7 +324,7 @@ func ModuleFromFile(file string) string {
 	} else {
 		return ""
 	}
-	p = strings.TrimSuffix(p, ".ai")
+	p = strings.TrimSuffix(p, ".nez")
 	parts := strings.Split(p, "/")
 	if len(parts) > 1 && parts[len(parts)-1] == parts[len(parts)-2] {
 		parts = parts[:len(parts)-1]

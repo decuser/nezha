@@ -12,8 +12,8 @@ Loads and evaluates an nezha source file.
 
 load(path)
 
-load("utils.ai")
-load("helpers.ai")
+load("utils.nez")
+load("helpers.nez")
 ===
 stack_limit
 @unchecked

@@ -49,7 +49,7 @@ func formatTarget(path string, cfg Config, all bool) (bool, error) {
 	changedAny := false
 	var formatErrs []error
 	for _, resolved := range paths {
-		if !strings.HasSuffix(resolved, ".ai") {
+		if !strings.HasSuffix(resolved, ".nez") {
 			continue
 		}
 		skip, ferr := testfixture.IsParseNegative(resolved)

@@ -29,7 +29,7 @@ func withDistributionRoot(t *testing.T) {
 func TestTagsWritesTopLevelDefinitions(t *testing.T) {
 	withDistributionRoot(t)
 	d := t.TempDir()
-	p := filepath.Join(d, "sample.ai")
+	p := filepath.Join(d, "sample.nez")
 	if err := os.WriteFile(p, []byte("let outer = 1\nlet f = (x) { let y = x; return y }\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func TestExpandSupportsArbitraryRecursiveSubtree(t *testing.T) {
 	if err := os.MkdirAll(sub, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	p := filepath.Join(sub, "x.ai")
+	p := filepath.Join(sub, "x.nez")
 	if err := os.WriteFile(p, []byte("let x = 1\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}

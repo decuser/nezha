@@ -53,7 +53,7 @@ func TestInitializeAndPublishDiagnostics(t *testing.T) {
 	var in bytes.Buffer
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{}}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "initialized", "params": map[string]any{}}))
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai", "languageId": "nezha", "version": 1, "text": "let x =\n"}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez", "languageId": "nezha", "version": 1, "text": "let x =\n"}}}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 2, "method": "shutdown"}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "exit"}))
 	var out bytes.Buffer
@@ -88,9 +88,9 @@ func TestDefinitionAndDocumentSymbols(t *testing.T) {
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{}}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "initialized", "params": map[string]any{}}))
 	src := "let outer = 1\nlet f = () { return outer }\n"
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai", "languageId": "nezha", "version": 1, "text": src}}}))
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 2, "method": "textDocument/definition", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai"}, "position": map[string]any{"line": 1, "character": 20}}}))
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 3, "method": "textDocument/documentSymbol", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai"}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez", "languageId": "nezha", "version": 1, "text": src}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 2, "method": "textDocument/definition", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez"}, "position": map[string]any{"line": 1, "character": 20}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 3, "method": "textDocument/documentSymbol", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez"}}}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 4, "method": "shutdown"}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "exit"}))
 	var out bytes.Buffer
@@ -109,8 +109,8 @@ func TestFormattingUsesLanguageService(t *testing.T) {
 	var in bytes.Buffer
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{}}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "initialized", "params": map[string]any{}}))
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai", "languageId": "nezha", "version": 1, "text": "let   x=1\n"}}}))
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 2, "method": "textDocument/formatting", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai"}, "options": map[string]any{"tabSize": 4, "insertSpaces": false}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez", "languageId": "nezha", "version": 1, "text": "let   x=1\n"}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 2, "method": "textDocument/formatting", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez"}, "options": map[string]any{"tabSize": 4, "insertSpaces": false}}}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 3, "method": "shutdown"}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "exit"}))
 	var out bytes.Buffer
@@ -129,8 +129,8 @@ func TestFormattingRejectsInvalidSource(t *testing.T) {
 	var in bytes.Buffer
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{}}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "initialized", "params": map[string]any{}}))
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai", "languageId": "nezha", "version": 1, "text": "let x =\n"}}}))
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 2, "method": "textDocument/formatting", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai"}, "options": map[string]any{}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez", "languageId": "nezha", "version": 1, "text": "let x =\n"}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 2, "method": "textDocument/formatting", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez"}, "options": map[string]any{}}}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "exit"}))
 	var out bytes.Buffer
 	if err := Serve(&in, &out, testLSPService(t)); err != nil {
@@ -146,9 +146,9 @@ func TestCompletionAndHoverUseLanguageService(t *testing.T) {
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{}}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "initialized", "params": map[string]any{}}))
 	src := "let outer = 1\nlet f = (x) { return outer + x }\n"
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai", "languageId": "nezha", "version": 1, "text": src}}}))
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 2, "method": "textDocument/completion", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai"}, "position": map[string]any{"line": 1, "character": 23}}}))
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 3, "method": "textDocument/hover", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai"}, "position": map[string]any{"line": 1, "character": 24}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez", "languageId": "nezha", "version": 1, "text": src}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 2, "method": "textDocument/completion", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez"}, "position": map[string]any{"line": 1, "character": 23}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 3, "method": "textDocument/hover", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez"}, "position": map[string]any{"line": 1, "character": 24}}}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 4, "method": "shutdown"}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "exit"}))
 	var out bytes.Buffer
@@ -168,9 +168,9 @@ func TestNullableResponsesIncludeExplicitNullResult(t *testing.T) {
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": map[string]any{}}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "initialized", "params": map[string]any{}}))
 	src := "let x = 1\n"
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai", "languageId": "nezha", "version": 1, "text": src}}}))
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 2, "method": "textDocument/hover", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai"}, "position": map[string]any{"line": 0, "character": 0}}}))
-	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 3, "method": "textDocument/definition", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.ai"}, "position": map[string]any{"line": 0, "character": 0}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez", "languageId": "nezha", "version": 1, "text": src}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 2, "method": "textDocument/hover", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez"}, "position": map[string]any{"line": 0, "character": 0}}}))
+	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 3, "method": "textDocument/definition", "params": map[string]any{"textDocument": map[string]any{"uri": "file:///tmp/test.nez"}, "position": map[string]any{"line": 0, "character": 0}}}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "id": 4, "method": "shutdown"}))
 	in.Write(framed(map[string]any{"jsonrpc": "2.0", "method": "exit"}))
 	var out bytes.Buffer

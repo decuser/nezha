@@ -8,7 +8,7 @@ import (
 )
 
 func TestAnalyzeCombinesStaticLinesWithNetworkEvalHits(t *testing.T) {
-	file := filepath.Join(t.TempDir(), "lib", "demo", "demo.ai")
+	file := filepath.Join(t.TempDir(), "lib", "demo", "demo.nez")
 	model := Model{Sites: []Site{
 		{File: file, Line: 1, Col: 1, Node: "let_stmt", Function: "<main>", Module: "demo", Layer: "semantic"},
 		{File: file, Line: 2, Col: 2, Node: "expr", Function: "f", Module: "demo", Layer: "semantic"},

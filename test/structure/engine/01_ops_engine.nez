@@ -1,4 +1,4 @@
-# 01_ops_engine.ai
+# 01_ops_engine.nez
 # Arithmetic, ordering, boolean, grouping.
 # Note: grammar does not define == or != operators. Use equal(a,b) and not equal(a,b).
 let x = 1 + 2 * 3 - 4 / 2

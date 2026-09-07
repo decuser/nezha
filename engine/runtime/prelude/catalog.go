@@ -29,7 +29,7 @@ func LoadCatalog(g *grammar.Grammar) (*Catalog, error) {
 // invariant tests can deliberately mutate one authority without duplicating the
 // join logic.
 func ValidateSources(g *grammar.Grammar, source, helpSource, docSource string) (*Catalog, error) {
-	info, err := modules.AnalyzeSource(g, "engine/runtime/prelude/prelude.ai", source)
+	info, err := modules.AnalyzeSource(g, "engine/runtime/prelude/prelude.nez", source)
 	if err != nil {
 		return nil, fmt.Errorf("analyzing prelude source: %w", err)
 	}

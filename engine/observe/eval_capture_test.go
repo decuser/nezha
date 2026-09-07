@@ -9,7 +9,7 @@ func TestEvalCaptureCachesBindingAndUsesNetworkNodeHits(t *testing.T) {
 	capture := NewEvalCapture(network)
 
 	var expr, name NodeBinding
-	site := SemanticSite{File: "lib/demo/demo.ai", Line: 7, Col: 3, Function: "f", Source: "x + 1"}
+	site := SemanticSite{File: "lib/demo/demo.nez", Line: 7, Col: 3, Function: "f", Source: "x + 1"}
 	if capture.Hit(&expr) {
 		t.Fatal("unbound AST node unexpectedly hit")
 	}
@@ -48,7 +48,7 @@ func TestNodeHitSteadyStateAllocatesZero(t *testing.T) {
 	network := NewNetwork(NewNodeRegistry(), schema, NetworkConfig{NodeHitCapacity: 8})
 	capture := NewEvalCapture(network)
 	var binding NodeBinding
-	capture.BindAndHit("expr", SemanticSite{File: "x.ai", Line: 1, Col: 1}, &binding)
+	capture.BindAndHit("expr", SemanticSite{File: "x.nez", Line: 1, Col: 1}, &binding)
 	allocs := testing.AllocsPerRun(1000, func() {
 		if !capture.Hit(&binding) {
 			t.Fatal("binding unexpectedly missed")

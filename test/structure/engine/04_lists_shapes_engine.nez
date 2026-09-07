@@ -1,4 +1,4 @@
-# 04_lists_shapes_engine.ai
+# 04_lists_shapes_engine.nez
 # List literals, shapes, and list ops.
 let msg = [@ok, "hi", 1, 2/1]
 print(shape(msg), "\n")

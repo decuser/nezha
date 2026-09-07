@@ -47,8 +47,8 @@ func NegativeKindOf(path string) (NegativeKind, error) {
 		if found != NegativeNone {
 			return NegativeNone, fmt.Errorf("%s:%d: duplicate @negative declaration", path, lineNo)
 		}
-		if !strings.HasSuffix(path, "_smoke.ai") {
-			return NegativeNone, fmt.Errorf("%s:%d: @negative declarations are only valid on *_smoke.ai fixtures", path, lineNo)
+		if !strings.HasSuffix(path, "_smoke.nez") {
+			return NegativeNone, fmt.Errorf("%s:%d: @negative declarations are only valid on *_smoke.nez fixtures", path, lineNo)
 		}
 		raw := strings.TrimSpace(strings.TrimPrefix(text, markerPrefix))
 		switch NegativeKind(raw) {

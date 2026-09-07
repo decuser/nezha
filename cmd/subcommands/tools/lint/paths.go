@@ -38,7 +38,7 @@ func expandLintPathsWithPolicy(args []string, all bool) ([]string, error) {
 // linter's AST traversal. Parse-negative smoke fixtures are intentionally
 // excluded; ordinary source, including malformed source, remains lint input.
 func lintSourceCandidate(path string) (bool, error) {
-	if !strings.HasSuffix(path, ".ai") || strings.HasSuffix(path, "_test.ai") {
+	if !strings.HasSuffix(path, ".nez") || strings.HasSuffix(path, "_test.nez") {
 		return false, nil
 	}
 	skip, err := testfixture.IsParseNegative(path)

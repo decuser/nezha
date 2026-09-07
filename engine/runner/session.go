@@ -27,7 +27,7 @@ func NewSession() (*Session, error) {
 
 	// Create prelude environment with ScopePrelude
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
-	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.ai"))
+	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
 
 	// Load prelude
 	if err := loadPrelude(g, rt, preludeEnv); err != nil {
@@ -73,7 +73,7 @@ func (s *Session) Eval(source string) value.Value {
 func (s *Session) Reset() error {
 
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
-	preludeEnv.SetAuthority(s.Runtime.AuthorityForSource("engine/runtime/prelude/prelude.ai"))
+	preludeEnv.SetAuthority(s.Runtime.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
 	if err := loadPrelude(s.Grammar, s.Runtime, preludeEnv); err != nil {
 		return err
 	}

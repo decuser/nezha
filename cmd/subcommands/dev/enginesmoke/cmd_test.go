@@ -53,7 +53,7 @@ func TestCollectInputsSupportsArbitraryRecursiveSubtree(t *testing.T) {
 	if err := os.MkdirAll(sub, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	p := filepath.Join(sub, "x_engine.ai")
+	p := filepath.Join(sub, "x_engine.nez")
 	if err := os.WriteFile(p, []byte("let x = 1\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}

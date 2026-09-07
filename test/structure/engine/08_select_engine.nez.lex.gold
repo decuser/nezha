@@ -1,5 +1,5 @@
-1:1	COMMENT	"# 08_select_engine.ai"
-1:22	NEWLINE	"\n"
+1:1	COMMENT	"# 08_select_engine.nez"
+1:23	NEWLINE	"\n"
 2:1	COMMENT	"# Select syntax with bound/unbound receive cases and default."
 2:62	NEWLINE	"\n"
 3:1	KEYWORD	"let"

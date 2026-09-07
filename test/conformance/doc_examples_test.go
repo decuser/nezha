@@ -96,7 +96,7 @@ func buildNezha(t *testing.T) string {
 }
 
 func runNezhaSource(exe, source, workDir string) (stdout, stderr string, exitCode int, err error) {
-	tmp, err := os.CreateTemp("", "nezha-doc-*.ai")
+	tmp, err := os.CreateTemp("", "nezha-doc-*.nez")
 	if err != nil {
 		return "", "", 1, err
 	}

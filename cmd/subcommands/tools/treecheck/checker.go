@@ -200,19 +200,19 @@ func (c *Checker) seedBuiltins() {
 			c.mark(p, "Go implementation/test source")
 		case filepath.Base(p) == ".gitignore":
 			c.mark(p, "directory ignore policy")
-		case p == "engine/runtime/prelude/prelude_test.ai":
+		case p == "engine/runtime/prelude/prelude_test.nez":
 			c.mark(p, "Nezha-native prelude test")
-		case (strings.HasPrefix(p, "test/behavior/") || strings.HasPrefix(p, "test/visual/")) && strings.HasSuffix(p, "_smoke.ai"):
+		case (strings.HasPrefix(p, "test/behavior/") || strings.HasPrefix(p, "test/visual/")) && strings.HasSuffix(p, "_smoke.nez"):
 			c.mark(p, "smoke-test specimen")
-		case strings.HasPrefix(p, "test/structure/engine/") && strings.HasSuffix(p, "_engine.ai"):
+		case strings.HasPrefix(p, "test/structure/engine/") && strings.HasSuffix(p, "_engine.nez"):
 			c.mark(p, "engine structural specimen")
-		case strings.HasPrefix(p, "test/nativeffi/") && strings.HasSuffix(p, "_contract.ai"):
+		case strings.HasPrefix(p, "test/nativeffi/") && strings.HasSuffix(p, "_contract.nez"):
 			c.mark(p, "native/FFI semantic conformance specimen")
 		case strings.HasPrefix(p, "docs/releases/") && strings.HasSuffix(p, ".md"):
 			c.mark(p, "release note")
 		case strings.HasPrefix(p, "docs/releases/") && strings.HasSuffix(p, ".odt"):
 			c.mark(p, "frozen release document")
-		case strings.HasPrefix(p, "samples/") && strings.HasSuffix(p, ".ai"):
+		case strings.HasPrefix(p, "samples/") && strings.HasSuffix(p, ".nez"):
 			c.mark(p, "repository sample program")
 		case strings.HasPrefix(p, "engineering/profiling/"):
 			c.mark(p, "engineering profiling workload/evidence")
@@ -230,7 +230,7 @@ func (c *Checker) seedBuiltins() {
 			c.mark(p, "durable engineering record")
 		case p == "engine/syntax/grammar.ebnfx" || p == "engine/syntax/grammar.help" || p == "engine/syntax/grammar.ebnfx.ebnf.gold":
 			c.mark(p, "authoritative grammar artifact")
-		case p == "engine/runtime/prelude/prelude.ai" || p == "engine/runtime/prelude/prelude.help" || p == "engine/runtime/prelude/prelude.doc":
+		case p == "engine/runtime/prelude/prelude.nez" || p == "engine/runtime/prelude/prelude.help" || p == "engine/runtime/prelude/prelude.doc":
 			c.mark(p, "prelude artifact")
 		}
 	}
@@ -238,7 +238,7 @@ func (c *Checker) seedBuiltins() {
 
 func matchedProfileDriver(p string) bool {
 	base := filepath.Base(p)
-	if len(base) < len("00-.ai") || !strings.HasSuffix(base, ".ai") {
+	if len(base) < len("00-.nez") || !strings.HasSuffix(base, ".nez") {
 		return false
 	}
 	return base[0] >= '0' && base[0] <= '9' && base[1] >= '0' && base[1] <= '9' && base[2] == '-'
@@ -246,13 +246,13 @@ func matchedProfileDriver(p string) bool {
 
 func (c *Checker) checkStructuralPairs() {
 	for p := range c.files {
-		if (strings.HasPrefix(p, "test/behavior/") || strings.HasPrefix(p, "test/visual/")) && strings.HasSuffix(p, "_smoke.ai") {
-			gold := strings.TrimSuffix(p, ".ai") + ".gold"
+		if (strings.HasPrefix(p, "test/behavior/") || strings.HasPrefix(p, "test/visual/")) && strings.HasSuffix(p, "_smoke.nez") {
+			gold := strings.TrimSuffix(p, ".nez") + ".gold"
 			if c.files[gold] {
 				c.mark(gold, "smoke-test gold")
 			}
 		}
-		if strings.HasPrefix(p, "test/structure/engine/") && strings.HasSuffix(p, "_engine.ai") {
+		if strings.HasPrefix(p, "test/structure/engine/") && strings.HasSuffix(p, "_engine.nez") {
 			for _, stage := range []string{"lex", "parse", "eval"} {
 				gold := p + "." + stage + ".gold"
 				if c.files[gold] {
@@ -310,26 +310,26 @@ func (c *Checker) structuralErrors() []Finding {
 		out = append(out, Finding{Path: "engineering/proposals", Reason: "proposal disposition tree missing README.md"})
 	}
 	for p := range c.files {
-		if (strings.HasPrefix(p, "test/behavior/") || strings.HasPrefix(p, "test/visual/")) && strings.HasSuffix(p, "_smoke.ai") {
-			gold := strings.TrimSuffix(p, ".ai") + ".gold"
+		if (strings.HasPrefix(p, "test/behavior/") || strings.HasPrefix(p, "test/visual/")) && strings.HasSuffix(p, "_smoke.nez") {
+			gold := strings.TrimSuffix(p, ".nez") + ".gold"
 			if !c.files[gold] {
 				out = append(out, Finding{Path: p, Reason: "smoke specimen missing .gold"})
 			}
 		}
 		if (strings.HasPrefix(p, "test/behavior/") || strings.HasPrefix(p, "test/visual/")) && strings.HasSuffix(p, ".gold") {
-			ai := strings.TrimSuffix(p, ".gold") + ".ai"
+			ai := strings.TrimSuffix(p, ".gold") + ".nez"
 			if !c.files[ai] {
-				out = append(out, Finding{Path: p, Reason: "smoke gold has no .ai specimen"})
+				out = append(out, Finding{Path: p, Reason: "smoke gold has no .nez specimen"})
 			}
 		}
-		if strings.HasPrefix(p, "test/structure/engine/") && strings.Contains(p, "_engine.ai.") && strings.HasSuffix(p, ".gold") {
-			i := strings.Index(p, ".ai.")
-			ai := p[:i+3]
+		if strings.HasPrefix(p, "test/structure/engine/") && strings.Contains(p, "_engine.nez.") && strings.HasSuffix(p, ".gold") {
+			i := strings.Index(p, ".nez.")
+			ai := p[:i+4]
 			if !c.files[ai] {
-				out = append(out, Finding{Path: p, Reason: "engine gold has no .ai specimen"})
+				out = append(out, Finding{Path: p, Reason: "engine gold has no .nez specimen"})
 			}
 		}
-		if strings.HasPrefix(p, "test/structure/engine/") && strings.HasSuffix(p, "_engine.ai") {
+		if strings.HasPrefix(p, "test/structure/engine/") && strings.HasSuffix(p, "_engine.nez") {
 			for _, stage := range []string{"lex", "parse", "eval"} {
 				gold := p + "." + stage + ".gold"
 				if !c.files[gold] {
@@ -389,7 +389,7 @@ func (c *Checker) resolveNezhaPackageReferences() {
 	for changed {
 		changed = false
 		for p := range c.justified {
-			if !strings.HasSuffix(p, ".ai") {
+			if !strings.HasSuffix(p, ".nez") {
 				continue
 			}
 			data, err := os.ReadFile(filepath.Join(c.Root, filepath.FromSlash(p)))
@@ -401,7 +401,7 @@ func (c *Checker) resolveNezhaPackageReferences() {
 				if strings.HasPrefix(name, "./") || strings.HasPrefix(name, "../") {
 					target := filepath.ToSlash(filepath.Clean(filepath.Join(filepath.Dir(p), name)))
 					if filepath.Ext(target) == "" {
-						target += ".ai"
+						target += ".nez"
 					}
 					if c.files[target] {
 						if _, ok := c.justified[target]; !ok {
@@ -482,7 +482,7 @@ func (c *Checker) resolveDirectoryReadmes() {
 
 func isTextPath(p string) bool {
 	switch strings.ToLower(filepath.Ext(p)) {
-	case ".go", ".ai", ".md", ".help", ".doc", ".sh", ".lang", ".ebnfx":
+	case ".go", ".nez", ".md", ".help", ".doc", ".sh", ".lang", ".ebnfx":
 		return true
 	}
 	return filepath.Base(p) == "makefile" || strings.HasPrefix(p, "engineering/git-hooks/")

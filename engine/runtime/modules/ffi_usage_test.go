@@ -10,23 +10,23 @@ import (
 func TestFFIUsageFollowsNativeAliasesAndTransitiveFFI(t *testing.T) {
 	root := t.TempDir()
 	lib := filepath.Join(root, "lib")
-	mustWriteUsageFile(t, filepath.Join(lib, "thing", "native.ai"), `package "thing/native"
+	mustWriteUsageFile(t, filepath.Join(lib, "thing", "native.nez"), `package "thing/native"
 export()
 `)
 	mustWriteUsageFile(t, filepath.Join(lib, "thing", "native.help"), "@summary \"test thing native module\"\n")
 	mustWriteUsageFile(t, filepath.Join(lib, "thing", "native.doc"), ``)
-	mustWriteUsageFile(t, filepath.Join(lib, "fast", "ffi.ai"), `package "fast/ffi"
+	mustWriteUsageFile(t, filepath.Join(lib, "fast", "ffi.nez"), `package "fast/ffi"
 export()
 `)
 	mustWriteUsageFile(t, filepath.Join(lib, "fast", "ffi.help"), "@summary \"test fast ffi module\"\n")
 	mustWriteUsageFile(t, filepath.Join(lib, "fast", "ffi.doc"), ``)
-	mustWriteUsageFile(t, filepath.Join(lib, "mixed", "mixed.ai"), `package "mixed"
+	mustWriteUsageFile(t, filepath.Join(lib, "mixed", "mixed.nez"), `package "mixed"
 let fast = import("fast/ffi")
 export()
 `)
 	mustWriteUsageFile(t, filepath.Join(lib, "mixed", "mixed.help"), "@summary \"test mixed module\"\n")
 	mustWriteUsageFile(t, filepath.Join(lib, "mixed", "mixed.doc"), ``)
-	entry := filepath.Join(root, "main.ai")
+	entry := filepath.Join(root, "main.nez")
 	mustWriteUsageFile(t, entry, `let native = import("thing")
 let mixed = import("mixed")
 `)
@@ -43,15 +43,15 @@ let mixed = import("mixed")
 func TestFFIUsageFollowsRelativeImports(t *testing.T) {
 	root := t.TempDir()
 	lib := filepath.Join(root, "lib")
-	mustWriteUsageFile(t, filepath.Join(lib, "fast", "ffi.ai"), `package "fast/ffi"
+	mustWriteUsageFile(t, filepath.Join(lib, "fast", "ffi.nez"), `package "fast/ffi"
 export()
 `)
 	mustWriteUsageFile(t, filepath.Join(lib, "fast", "ffi.help"), "@summary \"test fast ffi module\"\n")
 	mustWriteUsageFile(t, filepath.Join(lib, "fast", "ffi.doc"), ``)
-	entry := filepath.Join(root, "main.ai")
+	entry := filepath.Join(root, "main.nez")
 	mustWriteUsageFile(t, entry, `let local = import("./local")
 `)
-	mustWriteUsageFile(t, filepath.Join(root, "local.ai"), `let fast = import("fast/ffi")
+	mustWriteUsageFile(t, filepath.Join(root, "local.nez"), `let fast = import("fast/ffi")
 `)
 
 	got, err := FFIUsage(testGrammar(t), entry, []string{lib})

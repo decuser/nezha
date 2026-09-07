@@ -1,4 +1,4 @@
-# 00_lexical_engine.ai
+# 00_lexical_engine.nez
 # Lexical coverage: whitespace, comments, numbers, strings with backslashes.
 let a = 1
 let b = 2.50

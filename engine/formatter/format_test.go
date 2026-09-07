@@ -21,11 +21,11 @@ func testGrammar(t *testing.T) *grammar.Grammar {
 func TestFormatSourceIdempotentAndParsePreserving(t *testing.T) {
 	g := testGrammar(t)
 	src := "# header\nlet x=1  #eol\nif x {\n  return x\n}\n"
-	out, err := FormatSource(g, "test.ai", src)
+	out, err := FormatSource(g, "test.nez", src)
 	if err != nil {
 		t.Fatalf("format: %v", err)
 	}
-	out2, err := FormatSource(g, "test.ai", out)
+	out2, err := FormatSource(g, "test.nez", out)
 	if err != nil {
 		t.Fatalf("format second pass: %v", err)
 	}
@@ -54,7 +54,7 @@ func contains(s, sub string) bool {
 func TestFormatSourceSelect(t *testing.T) {
 	g := testGrammar(t)
 	src := "select{let x=recv(a){println(x)}recv(b){println(:b)}default{println(:idle)}}\n"
-	out, err := FormatSource(g, "test.ai", src)
+	out, err := FormatSource(g, "test.nez", src)
 	if err != nil {
 		t.Fatalf("format: %v", err)
 	}
@@ -117,11 +117,11 @@ let env_get = (env, name) { env.get(name) }
 let env_define = (env, name, value) { env.define(name, value) }
 let env_assign = (env, name, value) { env.assign(name, value) }
 `
-	out, err := FormatSource(g, "test.ai", src)
+	out, err := FormatSource(g, "test.nez", src)
 	if err != nil {
 		t.Fatalf("format: %v", err)
 	}
-	out2, err := FormatSource(g, "test.ai", out)
+	out2, err := FormatSource(g, "test.nez", out)
 	if err != nil {
 		t.Fatalf("format second pass: %v", err)
 	}
@@ -150,7 +150,7 @@ let f = (
 	)
 }
 `
-	out, err := FormatSource(g, "test.ai", src)
+	out, err := FormatSource(g, "test.nez", src)
 	if err != nil {
 		t.Fatalf("format: %v", err)
 	}
@@ -163,7 +163,7 @@ let f = (
 			t.Fatalf("multiline layout not preserved; missing %q:\n%s", want, out)
 		}
 	}
-	out2, err := FormatSource(g, "test.ai", out)
+	out2, err := FormatSource(g, "test.nez", out)
 	if err != nil {
 		t.Fatalf("format second pass: %v", err)
 	}
@@ -175,7 +175,7 @@ let f = (
 func TestFormatKeepsCompactCollectionsAndCallsCompact(t *testing.T) {
 	g := testGrammar(t)
 	src := "let xs = [alpha, beta, gamma]\nlet f = (a, b) { return g(a, b) }\n"
-	out, err := FormatSource(g, "test.ai", src)
+	out, err := FormatSource(g, "test.nez", src)
 	if err != nil {
 		t.Fatalf("format: %v", err)
 	}
@@ -197,7 +197,7 @@ func TestFormatDoesNotExpandCompactCallWithMultilineFunctionArgument(t *testing.
 	return x
 })
 `
-	out, err := FormatSource(g, "test.ai", src)
+	out, err := FormatSource(g, "test.nez", src)
 	if err != nil {
 		t.Fatalf("format: %v", err)
 	}

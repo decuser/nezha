@@ -1,4 +1,4 @@
-# worker.ai - producer/consumer pattern
+# worker.nez - producer/consumer pattern
 let work_ch = channel()
 let result_ch = channel()
 

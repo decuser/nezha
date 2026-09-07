@@ -10,7 +10,7 @@ import (
 )
 
 // This is a focused unit test for the same invariant that smoke exercises:
-// prelude.help must fully cover the functions defined in prelude.ai.
+// prelude.help must fully cover the functions defined in prelude.nez.
 func TestPreludeHelpRegistryComplete(t *testing.T) {
 	g, err := grammar.Load("grammar.ebnfx", syntax.EbnfxSource, "grammar.help", syntax.HelpSource)
 	if err != nil {
@@ -25,7 +25,7 @@ func TestPreludeHelpRegistryComplete(t *testing.T) {
 	}
 
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
-	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.ai"))
+	preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
 	if err := loadPrelude(g, rt, preludeEnv); err != nil {
 		t.Fatalf("loadPrelude: %v", err)
 	}

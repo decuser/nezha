@@ -33,8 +33,8 @@ func writeTestModule(t *testing.T, root, rel, pkg string) string {
 
 func TestRegistryNativeDefaultAlias(t *testing.T) {
 	root := t.TempDir()
-	nativePath := writeTestModule(t, root, "math/native.ai", "math/native")
-	writeTestModule(t, root, "math/ffi.ai", "math/ffi")
+	nativePath := writeTestModule(t, root, "math/native.nez", "math/native")
+	writeTestModule(t, root, "math/ffi.nez", "math/ffi")
 
 	r := NewModuleRegistry([]string{root})
 	if err := r.Scan(testRegistryGrammar(t)); err != nil {
@@ -59,8 +59,8 @@ func TestRegistryNativeDefaultAlias(t *testing.T) {
 
 func TestRegistryExplicitBareWins(t *testing.T) {
 	root := t.TempDir()
-	barePath := writeTestModule(t, root, "foo.ai", "foo")
-	writeTestModule(t, root, "foo/native.ai", "foo/native")
+	barePath := writeTestModule(t, root, "foo.nez", "foo")
+	writeTestModule(t, root, "foo/native.nez", "foo/native")
 
 	r := NewModuleRegistry([]string{root})
 	if err := r.Scan(testRegistryGrammar(t)); err != nil {
@@ -78,7 +78,7 @@ func TestRegistryExplicitBareWins(t *testing.T) {
 
 func TestRegistryFFIOnlyDoesNotBecomeDefault(t *testing.T) {
 	root := t.TempDir()
-	writeTestModule(t, root, "regex/ffi.ai", "regex/ffi")
+	writeTestModule(t, root, "regex/ffi.nez", "regex/ffi")
 
 	r := NewModuleRegistry([]string{root})
 	if err := r.Scan(testRegistryGrammar(t)); err != nil {
@@ -95,8 +95,8 @@ func TestRegistryFFIOnlyDoesNotBecomeDefault(t *testing.T) {
 
 func TestRegistryCanonicalListExcludesAliases(t *testing.T) {
 	root := t.TempDir()
-	writeTestModule(t, root, "bytes/native.ai", "bytes/native")
-	writeTestModule(t, root, "bytes/ffi.ai", "bytes/ffi")
+	writeTestModule(t, root, "bytes/native.nez", "bytes/native")
+	writeTestModule(t, root, "bytes/ffi.nez", "bytes/ffi")
 
 	r := NewModuleRegistry([]string{root})
 	if err := r.Scan(testRegistryGrammar(t)); err != nil {

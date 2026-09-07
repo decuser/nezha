@@ -26,7 +26,7 @@ func Run(args []string) int {
 		return 2
 	}
 	if fs.NArg() == 0 {
-		fmt.Fprintln(os.Stderr, "usage: nezha distfmt <file.ai|file.go|path/...> [more targets]")
+		fmt.Fprintln(os.Stderr, "usage: nezha distfmt <file.nez|file.go|path/...> [more targets]")
 		return 2
 	}
 	if *printOut && fs.NArg() != 1 {

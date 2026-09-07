@@ -5,9 +5,9 @@ import "testing"
 func testGraphMeasurement(t *testing.T) GraphMeasurement {
 	t.Helper()
 	r := NewNodeRegistry()
-	root := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeRoot, Name: "<main>", File: "main.ai"}, Layer: "semantic", Boundary: "function", Function: "<main>"})
-	f := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "f", File: "/tmp/nezha/lib/foo/foo.ai", Line: 1}, Layer: "semantic", Boundary: "function", Function: "f"})
-	g := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "g", File: "/tmp/nezha/lib/foo/native.ai", Line: 2}, Layer: "semantic", Boundary: "function", Function: "g"})
+	root := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeRoot, Name: "<main>", File: "main.nez"}, Layer: "semantic", Boundary: "function", Function: "<main>"})
+	f := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "f", File: "/tmp/nezha/lib/foo/foo.nez", Line: 1}, Layer: "semantic", Boundary: "function", Function: "f"})
+	g := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Name: "g", File: "/tmp/nezha/lib/foo/native.nez", Line: 2}, Layer: "semantic", Boundary: "function", Function: "g"})
 	p := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodePrimitive, Authority: "runtime/primitives", Name: "_equal"}, Layer: "runtime", Boundary: "runtime", Function: "_equal"})
 	return GraphMeasurement{Nodes: r.Nodes(), Edges: []EdgeCount{{Caller: root, Callee: f, Count: 2}, {Caller: f, Callee: g, Count: 3}, {Caller: g, Callee: p, Count: 5}}}
 }
@@ -54,7 +54,7 @@ func TestGraphAnalysisRollups(t *testing.T) {
 
 func TestAllocationEdgesResolveExistingNodeIdentity(t *testing.T) {
 	r := NewNodeRegistry()
-	caller := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Authority: "test", Name: "work", File: "x.ai", Line: 1}, Function: "work"})
+	caller := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodeFunction, Authority: "test", Name: "work", File: "x.nez", Line: 1}, Function: "work"})
 	callee := r.Register(NodeSpec{Identity: NodeIdentity{Kind: NodePrimitive, Authority: "test", Name: "_alloc"}, Function: "_alloc", Boundary: "runtime"})
 	g := GraphMeasurement{
 		Nodes:       r.Nodes(),

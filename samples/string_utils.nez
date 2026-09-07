@@ -1,4 +1,4 @@
-# string_utils.ai - string manipulation using rune operations
+# string_utils.nez - string manipulation using rune operations
 #
 # Demonstrates that strings are rune sequences and can be
 # manipulated with list operations plus to_str/chr/ord.

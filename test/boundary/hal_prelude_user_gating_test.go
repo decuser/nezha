@@ -222,13 +222,13 @@ func evalWithScope(code string, scope value.Scope, loadPrel bool) (value.Value, 
 	// Create env with specified scope
 	env := value.NewEnvWithScope(scope)
 	if scope == value.ScopePrelude {
-		env.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.ai"))
+		env.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
 	}
 
 	// Optionally load prelude first (into a prelude-scope env, then enclose)
 	if loadPrel {
 		preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
-		preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.ai"))
+		preludeEnv.SetAuthority(rt.AuthorityForSource("engine/runtime/prelude/prelude.nez"))
 		if err := loadPreludeInto(g, rt, preludeEnv); err != nil {
 			return nil, err
 		}
@@ -254,7 +254,7 @@ func evalWithScope(code string, scope value.Scope, loadPrel bool) (value.Value, 
 	return ev.Eval(ast, env), nil
 }
 
-// loadPreludeInto loads prelude.ai into the environment.
+// loadPreludeInto loads prelude.nez into the environment.
 func loadPreludeInto(g *grammar.Grammar, rt *substrate.GoRuntime, env *value.Env) error {
 	lexer := syntax.NewLexer(g, "<prelude>", prelude.Source, nil)
 	tokens, err := lexer.Tokenize()

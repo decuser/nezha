@@ -11,7 +11,7 @@ import (
 
 func TestLibModulesHaveDoc(t *testing.T) {
 	for name, aiPath := range shippedModulePaths(t) {
-		docPath := strings.TrimSuffix(aiPath, ".ai") + ".doc"
+		docPath := strings.TrimSuffix(aiPath, ".nez") + ".doc"
 		if _, err := os.Stat(docPath); err != nil {
 			t.Errorf("%s: no doc file at %s", name, filepath.Base(docPath))
 		}

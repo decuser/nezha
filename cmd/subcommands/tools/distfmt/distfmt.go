@@ -55,10 +55,10 @@ func formatTarget(path string, cfg Config, all bool) (bool, error) {
 	var formatErrs []error
 	for _, resolved := range paths {
 		ext := filepath.Ext(resolved)
-		if ext != ".ai" && ext != ".go" {
+		if ext != ".nez" && ext != ".go" {
 			continue
 		}
-		if ext == ".ai" {
+		if ext == ".nez" {
 			skip, ferr := testfixture.IsParseNegative(resolved)
 			if ferr != nil {
 				return changedAny, ferr
@@ -93,7 +93,7 @@ func formatFile(path string, cfg Config, stdout io.Writer) (bool, error) {
 	switch filepath.Ext(path) {
 	case ".go":
 		formatted, err = formatGo(path, string(data))
-	case ".ai":
+	case ".nez":
 		formatted, err = formatNezha(path, string(data))
 	default:
 		return false, fmt.Errorf("unsupported file type: %s", path)

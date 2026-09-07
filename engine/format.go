@@ -9,7 +9,7 @@ import (
 //
 // Output:
 //
-//	file.ai:4:10: message
+//	file.nez:4:10: message
 //	    let x = 1 / 0
 //	             ^
 func FormatWithCaret(pos Position, source string, message string) string {

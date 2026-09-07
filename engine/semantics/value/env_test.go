@@ -154,15 +154,15 @@ func TestResetCallEnvClearsInvocationState(t *testing.T) {
 
 func TestEnvColdMetadataPreservesInheritanceAndReset(t *testing.T) {
 	root := NewEnv()
-	root.SetFile("root.ai")
+	root.SetFile("root.nez")
 	root.SetSource("one\ntwo\n")
 	root.SetExports([]string{"x"})
 	root.SetPackageName("pkg")
 	root.DefineShape(&ShapeDef{Name: "point"})
 
 	child := NewEnclosedEnv(root)
-	if got := child.GetFile(); got != "root.ai" {
-		t.Fatalf("child file = %q, want root.ai", got)
+	if got := child.GetFile(); got != "root.nez" {
+		t.Fatalf("child file = %q, want root.nez", got)
 	}
 	if got := child.GetSourceLine(2); got != "two" {
 		t.Fatalf("child source line = %q, want two", got)
@@ -172,15 +172,15 @@ func TestEnvColdMetadataPreservesInheritanceAndReset(t *testing.T) {
 	}
 
 	call := NewCallEnv(root, child)
-	call.SetFile("call.ai")
+	call.SetFile("call.nez")
 	call.SetSource("call\nsource\n")
 	call.SetExports([]string{"temp"})
 	call.SetPackageName("temporary")
 	call.DefineShape(&ShapeDef{Name: "temp"})
 	call.ResetCallEnv(root, child)
 
-	if got := call.GetFile(); got != "root.ai" {
-		t.Fatalf("reset call file = %q, want inherited root.ai", got)
+	if got := call.GetFile(); got != "root.nez" {
+		t.Fatalf("reset call file = %q, want inherited root.nez", got)
 	}
 	if got := call.GetSourceLine(2); got != "two" {
 		t.Fatalf("reset call source line = %q, want inherited two", got)

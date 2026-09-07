@@ -22,8 +22,8 @@ var _ hal.ProfilePrimitive = (*profileTestPrimitive)(nil)
 
 func TestProfileCallIdentityDoesNotCollapseSamePrintableName(t *testing.T) {
 	p := NewProfileProbeWithDepth(false, observe.DepthEdges)
-	f1 := &value.Function{Name: "same", ProfileFile: "a.ai", ProfileLine: 10, ProfileCol: 2}
-	f2 := &value.Function{Name: "same", ProfileFile: "b.ai", ProfileLine: 10, ProfileCol: 2}
+	f1 := &value.Function{Name: "same", ProfileFile: "a.nez", ProfileLine: 10, ProfileCol: 2}
+	f2 := &value.Function{Name: "same", ProfileFile: "b.nez", ProfileLine: 10, ProfileCol: 2}
 	id1 := p.userFunctionNode(f1)
 	id2 := p.userFunctionNode(f2)
 	if id1 == id2 {
@@ -42,8 +42,8 @@ func TestProfileCallIdentityDoesNotCollapseSamePrintableName(t *testing.T) {
 
 func TestProfileCallSteadyStateAllocatesZero(t *testing.T) {
 	p := NewProfileProbeWithDepth(false, observe.DepthEdges)
-	root := p.rootCursor("alloc.ai")
-	fn := &value.Function{Name: "f", ProfileFile: "alloc.ai", ProfileLine: 1, ProfileCol: 1}
+	root := p.rootCursor("alloc.nez")
+	fn := &value.Function{Name: "f", ProfileFile: "alloc.nez", ProfileLine: 1, ProfileCol: 1}
 	// First encounter performs registration and installs the function's compact
 	// registry-token/NodeID cache. The steady state below must remain integer-only.
 	child := p.callCursor(fn, root)
@@ -62,7 +62,7 @@ func TestCallRealizationTransitionPopulationFlatAndEdgesAgree(t *testing.T) {
 		t.Fatal("_equal missing from primitive profile catalog")
 	}
 	primitive := &profileTestPrimitive{ordinal: ordinal}
-	fn := &value.Function{Name: "f", ProfileFile: "calls.ai", ProfileLine: 1, ProfileCol: 1}
+	fn := &value.Function{Name: "f", ProfileFile: "calls.nez", ProfileLine: 1, ProfileCol: 1}
 
 	flat := NewProfileProbe(false)
 	flat.callCursor(fn, observe.Cursor{})
@@ -73,7 +73,7 @@ func TestCallRealizationTransitionPopulationFlatAndEdgesAgree(t *testing.T) {
 	}
 
 	edges := NewProfileProbeWithDepth(false, observe.DepthEdges)
-	root := edges.rootCursor("calls.ai")
+	root := edges.rootCursor("calls.nez")
 	child := edges.callCursor(fn, root)
 	if child.Node() == 0 {
 		t.Fatal("missing function cursor")
@@ -158,7 +158,7 @@ func TestTargetedPrimitiveAllocationUsesNetworkEdgeIdentity(t *testing.T) {
 		t.Fatal("failed to enable _equal allocation attribution")
 	}
 	env := value.NewEnvWithScope(value.ScopeUser)
-	env.SetFile("alloc-target.ai")
+	env.SetFile("alloc-target.nez")
 	env.SetSemanticProbe(probe)
 	ev := New(nil, engine.SilentObserver{})
 	primitive := &profileAllocPrimitive{ordinal: ordinal}

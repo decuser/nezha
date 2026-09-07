@@ -65,7 +65,7 @@ func TestEqual(t *testing.T) {
 func TestNoAuthorityGetsNothing(t *testing.T) {
 	rt := NewGoRuntime()
 
-	// No-authority code cannot see anything - all access comes from prelude.ai bindings in Env
+	// No-authority code cannot see anything - all access comes from prelude.nez bindings in Env
 	if rt.HasBuiltin("first", value.NoAuthority()) {
 		t.Error("user should NOT see first from runtime")
 	}
@@ -87,7 +87,7 @@ func TestNoAuthorityGetsNothing(t *testing.T) {
 func TestExplicitAuthoritySeesOnlyGrantedPrefixed(t *testing.T) {
 	rt := NewGoRuntime()
 
-	// Authority does not expose non-prefixed (those come from prelude.ai, not registry)
+	// Authority does not expose non-prefixed (those come from prelude.nez, not registry)
 	if rt.HasBuiltin("first", value.NewAuthority("_first")) {
 		t.Error("authority should NOT see non-prefixed 'first' from registry")
 	}

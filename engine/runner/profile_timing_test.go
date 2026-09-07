@@ -10,7 +10,7 @@ import (
 
 func writeProfileTimingProgram(t *testing.T, source string) string {
 	t.Helper()
-	path := filepath.Join(t.TempDir(), "profile-timing.ai")
+	path := filepath.Join(t.TempDir(), "profile-timing.nez")
 	if err := os.WriteFile(path, []byte(source), 0o644); err != nil {
 		t.Fatalf("write program: %v", err)
 	}

@@ -5,7 +5,7 @@ import (
 	_ "embed"
 )
 
-//go:embed prelude.ai
+//go:embed prelude.nez
 var Source string
 
 //go:embed prelude.help

@@ -29,8 +29,8 @@ func withDistributionRoot(t *testing.T) {
 func TestRunFailsOnUndeclaredMalformedFile(t *testing.T) {
 	withDistributionRoot(t)
 	dir := t.TempDir()
-	bad := filepath.Join(dir, "bad.ai")
-	good := filepath.Join(dir, "good.ai")
+	bad := filepath.Join(dir, "bad.nez")
+	good := filepath.Join(dir, "good.nez")
 	if err := os.WriteFile(bad, []byte("let x =\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -45,7 +45,7 @@ func TestRunFailsOnUndeclaredMalformedFile(t *testing.T) {
 func TestFormatPathSkipsDeclaredParseNegative(t *testing.T) {
 	withDistributionRoot(t)
 	dir := t.TempDir()
-	path := filepath.Join(dir, "negative_smoke.ai")
+	path := filepath.Join(dir, "negative_smoke.nez")
 	if err := os.WriteFile(path, []byte("# @negative parse\nlet x =\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -57,7 +57,7 @@ func TestFormatPathSkipsDeclaredParseNegative(t *testing.T) {
 func TestFormatPathRejectsNegativeMarkerOutsideSmokeFixture(t *testing.T) {
 	withDistributionRoot(t)
 	dir := t.TempDir()
-	path := filepath.Join(dir, "ordinary.ai")
+	path := filepath.Join(dir, "ordinary.nez")
 	if err := os.WriteFile(path, []byte("# @negative parse\nlet x =\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +69,7 @@ func TestFormatPathRejectsNegativeMarkerOutsideSmokeFixture(t *testing.T) {
 func TestFormatDirReportsAllUndeclaredMalformedFiles(t *testing.T) {
 	withDistributionRoot(t)
 	dir := t.TempDir()
-	for _, name := range []string{"a.ai", "b.ai"} {
+	for _, name := range []string{"a.nez", "b.nez"} {
 		if err := os.WriteFile(filepath.Join(dir, name), []byte("let x =\n"), 0o644); err != nil {
 			t.Fatal(err)
 		}
@@ -79,7 +79,7 @@ func TestFormatDirReportsAllUndeclaredMalformedFiles(t *testing.T) {
 		t.Fatal("expected malformed files to fail formatting")
 	}
 	msg := err.Error()
-	for _, name := range []string{"a.ai", "b.ai"} {
+	for _, name := range []string{"a.nez", "b.nez"} {
 		if !strings.Contains(msg, name) {
 			t.Fatalf("error %q does not mention %s", msg, name)
 		}

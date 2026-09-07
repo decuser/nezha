@@ -18,7 +18,7 @@ func loadTestGrammar(t *testing.T) *grammar.Grammar {
 
 func parseSource(t *testing.T, source string) *Node {
 	g := loadTestGrammar(t)
-	lexer := NewLexer(g, "test.ai", source, nil)
+	lexer := NewLexer(g, "test.nez", source, nil)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatalf("lexer error: %v", err)
@@ -165,7 +165,7 @@ func TestParserObserver(t *testing.T) {
 	g := loadTestGrammar(t)
 	source := `let x = 1`
 
-	lexer := NewLexer(g, "test.ai", source, nil)
+	lexer := NewLexer(g, "test.nez", source, nil)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatalf("lexer error: %v", err)
@@ -205,7 +205,7 @@ func TestParserError(t *testing.T) {
 	g := loadTestGrammar(t)
 	source := `let = 1` // missing name
 
-	lexer := NewLexer(g, "test.ai", source, nil)
+	lexer := NewLexer(g, "test.nez", source, nil)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatalf("lexer error: %v", err)
@@ -226,11 +226,11 @@ func TestParserError(t *testing.T) {
 func TestParserSuppressionIgnoresUnmatchedCloser(t *testing.T) {
 	g := loadTestGrammar(t)
 	tokens := []Token{
-		{Type: "DELIMITER", Lexeme: "]", Pos: engine.Position{File: "test.ai", Line: 1, Col: 1}},
-		{Type: "DELIMITER", Lexeme: "(", Pos: engine.Position{File: "test.ai", Line: 1, Col: 2}},
-		{Type: "NUMBER", Lexeme: "1", Pos: engine.Position{File: "test.ai", Line: 1, Col: 3}},
-		{Type: "NEWLINE", Lexeme: "\n", Pos: engine.Position{File: "test.ai", Line: 1, Col: 4}},
-		{Type: "DELIMITER", Lexeme: ")", Pos: engine.Position{File: "test.ai", Line: 2, Col: 1}},
+		{Type: "DELIMITER", Lexeme: "]", Pos: engine.Position{File: "test.nez", Line: 1, Col: 1}},
+		{Type: "DELIMITER", Lexeme: "(", Pos: engine.Position{File: "test.nez", Line: 1, Col: 2}},
+		{Type: "NUMBER", Lexeme: "1", Pos: engine.Position{File: "test.nez", Line: 1, Col: 3}},
+		{Type: "NEWLINE", Lexeme: "\n", Pos: engine.Position{File: "test.nez", Line: 1, Col: 4}},
+		{Type: "DELIMITER", Lexeme: ")", Pos: engine.Position{File: "test.nez", Line: 2, Col: 1}},
 	}
 
 	p := NewParser(g, tokens, "]\n(1\n)", nil)
@@ -331,7 +331,7 @@ func TestParserSelect(t *testing.T) {
 func TestParserConsumesGrammarNewlineCompletionRule(t *testing.T) {
 	g := loadTestGrammar(t)
 	source := "let x = 1\n\t+ 2\n"
-	lexer := NewLexer(g, "test.ai", source, nil)
+	lexer := NewLexer(g, "test.nez", source, nil)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatalf("lexer error: %v", err)
@@ -364,7 +364,7 @@ func TestParserNewlineContinuationDiagnosticUsesGrammarHelp(t *testing.T) {
 	g.Newline.Meta.Help = "TEST NEWLINE POLICY"
 	source := "let x = 1\n\t+ 2\n"
 
-	lexer := NewLexer(g, "test.ai", source, nil)
+	lexer := NewLexer(g, "test.nez", source, nil)
 	tokens, err := lexer.Tokenize()
 	if err != nil {
 		t.Fatal(err)
@@ -390,7 +390,7 @@ func TestParserNewlineContinuationDiagnosticUsesGrammarHelp(t *testing.T) {
 
 func TestRecordFailureStoresRelevantProductionWithoutStackMaterialization(t *testing.T) {
 	p := &Parser{errorProduction: "expression"}
-	pos := engine.Position{File: "test.ai", Line: 3, Col: 7}
+	pos := engine.Position{File: "test.nez", Line: 3, Col: 7}
 	p.pos = 11
 	p.recordFailure(pos, "+", "term")
 
@@ -410,7 +410,7 @@ func TestRecordFailureStoresRelevantProductionWithoutStackMaterialization(t *tes
 
 func TestRecordFailureSpeculativeReplacementAllocatesZero(t *testing.T) {
 	p := &Parser{errorProduction: "expression"}
-	pos := engine.Position{File: "test.ai", Line: 1, Col: 1}
+	pos := engine.Position{File: "test.nez", Line: 1, Col: 1}
 	p.pos = 1
 
 	allocs := testing.AllocsPerRun(1000, func() {
@@ -426,7 +426,7 @@ func TestTerminalMismatchUsesZeroAllocationControlFlow(t *testing.T) {
 		tokens: []Token{{
 			Type:   "IDENT",
 			Lexeme: "actual",
-			Pos:    engine.Position{File: "test.ai", Line: 1, Col: 1},
+			Pos:    engine.Position{File: "test.nez", Line: 1, Col: 1},
 		}},
 		observer: engine.SilentObserver{},
 	}
@@ -460,14 +460,14 @@ func TestTerminalMismatchRenderingPreservesQuotedExpectation(t *testing.T) {
 		tokens: []Token{{
 			Type:   "IDENT",
 			Lexeme: "actual",
-			Pos:    engine.Position{File: "test.ai", Line: 1, Col: 1},
+			Pos:    engine.Position{File: "test.nez", Line: 1, Col: 1},
 		}},
 		source:   source,
 		observer: engine.SilentObserver{},
 	}
 
 	parser.recordTerminalFailure(
-		engine.Position{File: "test.ai", Line: 1, Col: 1},
+		engine.Position{File: "test.nez", Line: 1, Col: 1},
 		"actual",
 		"=",
 	)

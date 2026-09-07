@@ -8,7 +8,7 @@ import (
 
 func writeFixture(t *testing.T, body string) string {
 	t.Helper()
-	path := filepath.Join(t.TempDir(), "fixture_smoke.ai")
+	path := filepath.Join(t.TempDir(), "fixture_smoke.nez")
 	if err := os.WriteFile(path, []byte(body), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -45,11 +45,11 @@ func TestNegativeUnknownKindFails(t *testing.T) {
 }
 
 func TestNegativeMarkerRejectedOutsideSmokeFixture(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "ordinary.ai")
+	path := filepath.Join(t.TempDir(), "ordinary.nez")
 	if err := os.WriteFile(path, []byte("# @negative parse\nlet x =\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	if _, err := NegativeKindOf(path); err == nil {
-		t.Fatal("expected marker outside *_smoke.ai to fail")
+		t.Fatal("expected marker outside *_smoke.nez to fail")
 	}
 }

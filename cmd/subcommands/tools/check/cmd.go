@@ -19,7 +19,7 @@ func Run(args []string) int {
 		return 2
 	}
 	if !*ffiUse || fs.NArg() != 1 {
-		fmt.Fprintln(os.Stderr, "usage: nezha check --ffi-use file.ai")
+		fmt.Fprintln(os.Stderr, "usage: nezha check --ffi-use file.nez")
 		return 2
 	}
 

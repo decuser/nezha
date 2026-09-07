@@ -16,7 +16,7 @@ let f = () {
 }
 export(:f)
 `
-	info, err := AnalyzeSource(g, "sample.ai", source)
+	info, err := AnalyzeSource(g, "sample.nez", source)
 	if err != nil {
 		t.Fatalf("AnalyzeSource: %v", err)
 	}
@@ -33,7 +33,7 @@ let helper = (x) { _provider(x) }
 let outer = (x) { helper(x) }
 export(:outer)
 `
-	info, err := AnalyzeSource(g, "sample.ai", source)
+	info, err := AnalyzeSource(g, "sample.nez", source)
 	if err != nil {
 		t.Fatalf("AnalyzeSource: %v", err)
 	}
