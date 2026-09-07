@@ -22,7 +22,7 @@ type command struct {
 var commands = []command{
 	{Name: "debug", Description: "inspect lexer/parser/evaluator stages", Run: nezhadebug.Run},
 	{Name: "fmt", Description: "format Nezha source", Run: nezhafmt.Run},
-	{Name: "gate", Description: "run repository validation gates", Run: runGate},
+	{Name: "gate", Description: "run repository coherence gates", Run: runGate},
 	{Name: "lint", Description: "lint Nezha source", Run: nezhalint.Run},
 	{Name: "version", Description: "print the Nezha version", Run: func([]string) int {
 		fmt.Println(Version)

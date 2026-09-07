@@ -14,7 +14,7 @@ import (
 //	-p     print restyled source to stdout (single file only; no write)
 //	-b     create a .bak file before overwriting (only when changes occur)
 func Run(args []string) int {
-	fs := flag.NewFlagSet("distfmt", flag.ContinueOnError)
+	fs := flag.NewFlagSet("gate distfmt", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
 
 	noWrite := fs.Bool("n", false, "do not write; list files that would change")
@@ -26,7 +26,7 @@ func Run(args []string) int {
 		return 2
 	}
 	if fs.NArg() == 0 {
-		fmt.Fprintln(os.Stderr, "usage: nezha distfmt <file.nez|file.go|path/...> [more targets]")
+		fmt.Fprintln(os.Stderr, "usage: nezha gate distfmt <file.nez|file.go|path/...> [more targets]")
 		return 2
 	}
 	if *printOut && fs.NArg() != 1 {

@@ -33,7 +33,7 @@ const (
 )
 
 func Run(args []string) int {
-	fs := flag.NewFlagSet("enginesmoke", flag.ContinueOnError)
+	fs := flag.NewFlagSet("gate enginesmoke", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
 
 	var stageName string

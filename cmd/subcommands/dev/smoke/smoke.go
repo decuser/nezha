@@ -14,7 +14,7 @@ import (
 )
 
 func Run(args []string) int {
-	fs := flag.NewFlagSet("smoke", flag.ContinueOnError)
+	fs := flag.NewFlagSet("gate smoke", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
 	gold := fs.Bool("gold", false, "write blessed .gold transcripts")
 	allTargets := fs.Bool("all", false, "include targets excluded by .nezhaignore")

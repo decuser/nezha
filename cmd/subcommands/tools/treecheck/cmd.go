@@ -7,7 +7,7 @@ import (
 )
 
 func Run(args []string) int {
-	fs := flag.NewFlagSet("treecheck", flag.ContinueOnError)
+	fs := flag.NewFlagSet("gate treecheck", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
 	root := fs.String("root", ".", "repository root")
 	allow := fs.String("allow", "treecheck.allow", "root exception manifest")
@@ -15,7 +15,7 @@ func Run(args []string) int {
 		return 2
 	}
 	if fs.NArg() != 0 {
-		fmt.Fprintln(os.Stderr, "usage: nezha treecheck [-root dir] [-allow file]")
+		fmt.Fprintln(os.Stderr, "usage: nezha gate treecheck [-root dir] [-allow file]")
 		return 2
 	}
 

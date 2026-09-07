@@ -35,8 +35,19 @@ package, evaluator profiling hooks, and the engine-wide observer callback
 interface are removed. Debug remains command-side phase inspection rather than
 an engine event bus.
 
-## Next audit targets
+## Command surface disposition
 
-- language-service/LSP surface versus language surface
-- smoke/engine-smoke tooling surface
-- debug/tags/treecheck as development tooling
+The command surface now distinguishes ordinary language workflows from repository gates.
+Top-level commands are reserved for script execution and author workflows such as
+`fmt`, `lint`, `debug`, and `version`. Repository coherence checks live under
+`nezha gate`, including `smoke`, `enginesmoke`, `treecheck`, and `distfmt`.
+
+This keeps drift anchors available without presenting repository-maintenance
+commands as ordinary language surface. LSP and tags tooling were removed rather
+than retained as language-facing commands.
+
+## Remaining audit targets
+
+- final prelude surface versus language specimen
+- debug command surface versus command-side phase inspection
+- grammar/help/doc alignment for the retained specimen

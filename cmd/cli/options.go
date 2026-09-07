@@ -22,10 +22,16 @@ func parseOptions() Options {
 	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, "usage: nezha [options] <file.nez [args...]>")
 		fmt.Fprintln(os.Stderr, "       nezha <command> [command options] [args...]")
+		fmt.Fprintln(os.Stderr, "       nezha gate <command> [command options] [args...]")
 		fmt.Fprintln(os.Stderr, "")
 		fmt.Fprintln(os.Stderr, "commands:")
 		for _, cmd := range commands {
 			fmt.Fprintf(os.Stderr, "  %-12s %s\n", cmd.Name, cmd.Description)
+		}
+		fmt.Fprintln(os.Stderr, "")
+		fmt.Fprintln(os.Stderr, "gate commands:")
+		for _, cmd := range gateCommands {
+			fmt.Fprintf(os.Stderr, "  gate %-7s %s\n", cmd.Name, cmd.Description)
 		}
 		fmt.Fprintln(os.Stderr, "")
 		fmt.Fprintln(os.Stderr, "options:")
