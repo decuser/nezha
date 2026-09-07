@@ -2,14 +2,12 @@
 package substrate
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
 	"sync"
 
 	"nezha/engine/runtime/hal"
-	"nezha/engine/runtime/help"
 	"nezha/engine/runtime/primitives"
 	"nezha/engine/semantics/value"
 )
@@ -55,15 +53,8 @@ type GoRuntime struct {
 	hostRegistry      map[string]*Builtin
 	services          map[string]*Builtin
 	hostBindings      map[string]hal.HostOperation
-	stdin             io.Reader
-	stdinReader       *bufio.Reader
 	stdout            io.Writer
-	stderr            io.Writer
-	pageOutput        func(string) bool
-	userEnv           *value.Env
-	helpRegistry      *help.Registry
 	mu                sync.RWMutex
-	asyncFaults       chan *value.Fault
 }
 
 // Verify GoRuntime implements RuntimeContract
@@ -79,82 +70,22 @@ func NewGoRuntime() *GoRuntime {
 		hostRegistry:      make(map[string]*Builtin),
 		services:          make(map[string]*Builtin),
 		hostBindings:      make(map[string]hal.HostOperation),
-		stdin:             os.Stdin,
-		stdinReader:       bufio.NewReader(os.Stdin),
 		stdout:            os.Stdout,
-		stderr:            os.Stderr,
-		asyncFaults:       make(chan *value.Fault, 1),
 	}
 	rt.registerHAL()
-	if err := rt.ValidateProfile(hal.DefaultRuntimeProfile); err != nil {
-		panic(err)
-	}
 	return rt
 }
 
-// SetIO replaces the runtime-owned standard input/output endpoints. Nil values
-// restore the corresponding process defaults.
-func (g *GoRuntime) SetIO(in io.Reader, out io.Writer) {
+// SetIO replaces the runtime-owned output endpoint. The input argument is
+// ignored and retained only so existing test harnesses can keep a stable call
+// shape while Nezha has no host input operation. A nil output restores stdout.
+func (g *GoRuntime) SetIO(_ io.Reader, out io.Writer) {
 	g.mu.Lock()
-	if in == nil {
-		in = os.Stdin
-	}
 	if out == nil {
 		out = os.Stdout
 	}
-	g.stdin = in
-	g.stdinReader = bufio.NewReader(in)
 	g.stdout = out
 	g.mu.Unlock()
-}
-
-// SetErrorOutput replaces the runtime-owned standard error endpoint. Nil
-// restores the process default.
-func (g *GoRuntime) SetErrorOutput(out io.Writer) {
-	g.mu.Lock()
-	if out == nil {
-		out = os.Stderr
-	}
-	g.stderr = out
-	g.mu.Unlock()
-}
-
-// SetPageOutput installs the optional runtime-owned pageable-text presenter.
-func (g *GoRuntime) SetPageOutput(fn func(string) bool) {
-	g.mu.Lock()
-	g.pageOutput = fn
-	g.mu.Unlock()
-}
-
-// SetUserEnv sets the session user environment used by REPL-only services for session-owned state.
-func (g *GoRuntime) SetUserEnv(env *value.Env) {
-	g.mu.Lock()
-	g.userEnv = env
-	g.mu.Unlock()
-}
-
-// SetHelpRegistry installs the runtime-owned prelude help/documentation registry.
-func (g *GoRuntime) SetHelpRegistry(registry *help.Registry) {
-	g.mu.Lock()
-	g.helpRegistry = registry
-	g.mu.Unlock()
-}
-
-// Execute calls a registered primitive function.
-// AsyncFaults returns the runtime's first-pending asynchronous fault channel.
-func (g *GoRuntime) AsyncFaults() <-chan *value.Fault { return g.asyncFaults }
-
-// ReportAsyncFault records a spawned fault without blocking the failing worker.
-// A buffer of one preserves the first pending fault until a blocking operation
-// observes it.
-func (g *GoRuntime) ReportAsyncFault(fault *value.Fault) {
-	if fault == nil {
-		return
-	}
-	select {
-	case g.asyncFaults <- fault:
-	default:
-	}
 }
 
 func (g *GoRuntime) Execute(name string, args []value.Value, ctx *hal.EvalContext) (value.Value, error) {
@@ -232,11 +163,3 @@ func (g *GoRuntime) registerHost(op hal.HostOperation, fn BuiltinFunc) {
 	g.registerPrimitive(op.Primitive, fn)
 	g.hostBindings[op.Primitive] = op
 }
-
-// SetProgramArgs is retained for runner compatibility. Program argument exposure
-// belonged to the removed unregistered system builtin surface.
-func (g *GoRuntime) SetProgramArgs(args []string) {}
-
-// CloseAllResources is retained for runner compatibility after removal of
-// unregistered resource-owning builtin families.
-func (g *GoRuntime) CloseAllResources() {}

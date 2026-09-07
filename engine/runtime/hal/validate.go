@@ -7,58 +7,33 @@ import (
 )
 
 var validContexts = map[string]bool{
-	"runtime.clock":      true,
-	"runtime.filesystem": true,
-	"runtime.graphics":   true,
-	"runtime.io":         true,
-	"runtime.platform":   true,
-	"runtime.process":    true,
-	"runtime.random":     true,
-	"runtime.resources":  true,
-	"runtime.signals":    true,
+	"runtime.io": true,
 }
 
 var validEffects = map[string]bool{
-	"async source":         true,
-	"bounded call":         true,
-	"resource acquisition": true,
-	"state mutation":       true,
+	"bounded call": true,
 }
 
 var validBlocking = map[string]bool{
-	"may block":        true,
-	"nonblocking":      true,
-	"waits externally": true,
+	"may block": true,
 }
 
 var validLifetimes = map[string]bool{
-	"operates on resource": true,
-	"returns resource":     true,
-	"runtime-owned state":  true,
-	"stateless":            true,
+	"stateless": true,
 }
 
 var validOptionality = map[string]bool{
 	"constitutive": true,
-	"optional":     true,
 }
 
 var validErrorContracts = map[string]bool{
-	"fault":                                       true,
-	"fault or shaped :environment result":         true,
-	"fault or shaped :io result":                  true,
-	"fault or shaped :io/:end result":             true,
-	"fault or shaped :process result":             true,
-	"fault or shaped :signal result":              true,
-	"fault or shaped :signal/:unsupported result": true,
-	"fault, false, or shaped :lock result":        true,
-	"fault or shaped :lock result":                true,
+	"fault": true,
 }
 
 // ValidateMetadata verifies the internal HAL metadata graph. Inputs are explicit
 // so invariant tests can exercise the same validator with deliberately malformed
 // graphs rather than duplicating validation logic.
-func ValidateMetadata(operations map[string]HostOperation, capabilities map[string]Capability, profiles map[string]RuntimeProfile) error {
+func ValidateMetadata(operations map[string]HostOperation) error {
 	var problems []string
 
 	identities := map[string]string{}
@@ -106,41 +81,6 @@ func ValidateMetadata(operations map[string]HostOperation, capabilities map[stri
 		}
 	}
 
-	for name, capability := range capabilities {
-		if name != capability.Name {
-			problems = append(problems, fmt.Sprintf("capability key %s disagrees with name %s", name, capability.Name))
-		}
-		if len(capability.Operations) == 0 {
-			problems = append(problems, fmt.Sprintf("capability %s has no HAL operations", name))
-		}
-		seen := map[string]bool{}
-		for _, identity := range capability.Operations {
-			if _, ok := identities[identity]; !ok {
-				problems = append(problems, fmt.Sprintf("capability %s names unknown HAL operation %s", name, identity))
-			}
-			if seen[identity] {
-				problems = append(problems, fmt.Sprintf("capability %s repeats HAL operation %s", name, identity))
-			}
-			seen[identity] = true
-		}
-	}
-
-	for name, profile := range profiles {
-		if name != profile.Name {
-			problems = append(problems, fmt.Sprintf("profile key %s disagrees with name %s", name, profile.Name))
-		}
-		seen := map[string]bool{}
-		for _, capability := range profile.Capabilities {
-			if _, ok := capabilities[capability]; !ok {
-				problems = append(problems, fmt.Sprintf("profile %s names unknown capability %s", name, capability))
-			}
-			if seen[capability] {
-				problems = append(problems, fmt.Sprintf("profile %s repeats capability %s", name, capability))
-			}
-			seen[capability] = true
-		}
-	}
-
 	if len(problems) == 0 {
 		return nil
 	}
@@ -150,5 +90,5 @@ func ValidateMetadata(operations map[string]HostOperation, capabilities map[stri
 
 // ValidateCanonicalMetadata verifies the repository's authoritative HAL graph.
 func ValidateCanonicalMetadata() error {
-	return ValidateMetadata(OperationDefinitions(), Capabilities(), RuntimeProfiles())
+	return ValidateMetadata(OperationDefinitions())
 }

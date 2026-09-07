@@ -37,7 +37,6 @@ func NewSession() (*Session, error) {
 	// Create user environment enclosed by prelude
 	userEnv := value.NewEnclosedEnvWithScope(preludeEnv, value.ScopeUser)
 	userEnv.SetAuthority(value.NoAuthority())
-	rt.SetUserEnv(userEnv)
 
 	ev := evaluator.New(rt, nil)
 	ev.SetGrammar(g)
@@ -79,6 +78,5 @@ func (s *Session) Reset() error {
 	}
 	s.Env = value.NewEnclosedEnvWithScope(preludeEnv, value.ScopeUser)
 	s.Env.SetAuthority(value.NoAuthority())
-	s.Runtime.SetUserEnv(s.Env)
 	return nil
 }

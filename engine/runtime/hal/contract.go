@@ -9,8 +9,7 @@ import (
 )
 
 // ContextCallable is a host callable that needs the active Nezha evaluation
-// context. It avoids storing mutable call context in the runtime, which is
-// important when spawned computations execute concurrently.
+// context.
 type ContextCallable interface {
 	value.Callable
 	CallWithContext(args []value.Value, ctx *EvalContext) value.Value
@@ -24,24 +23,13 @@ type EvalContextRequired interface {
 	NeedsEvalContext() bool
 }
 
-// AsyncFaultSource exposes faults raised by spawned computations. Blocking
-// concurrency operations may observe this channel so a worker fault cannot
-// leave another computation waiting forever for a message that will never
-// arrive.
-type AsyncFaultSource interface {
-	AsyncFaults() <-chan *value.Fault
-	ReportAsyncFault(*value.Fault)
-}
-
 // EvalContext provides evaluation context to builtins that need it.
-// Most builtins ignore this; intrinsics such as apply and load use it to
+// Most builtins ignore this; intrinsics such as apply use it to
 // access the evaluator, grammar, and environment.
 type EvalContext struct {
-	Env              *value.Env
-	Node             *syntax.Node
-	Grammar          *grammar.Grammar
-	AsyncFault       <-chan *value.Fault
-	ReportAsyncFault func(*value.Fault)
+	Env     *value.Env
+	Node    *syntax.Node
+	Grammar *grammar.Grammar
 	// Eval is a callback to evaluate AST nodes. Used by apply.
 	Eval func(*syntax.Node, *value.Env) value.Value
 }

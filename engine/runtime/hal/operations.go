@@ -33,35 +33,6 @@ func hostOperation(identity, primitive, context, blocking, errors string, nezha 
 	}
 }
 
-func fileOperation(identity, primitive, observation string, b NezhaBinding) HostOperation {
-	op := hostOperation(identity, primitive, "runtime.filesystem", "may block", "fault or shaped :io result", bindings(b))
-	op.SemanticObservation = observation
-	return op
-}
-
-func pathOperation(identity, primitive, observation string, b NezhaBinding) HostOperation {
-	return fileOperation(identity, primitive, observation, b)
-}
-
-func optionalPathOperation(identity, primitive, observation string, b NezhaBinding) HostOperation {
-	op := fileOperation(identity, primitive, observation, b)
-	op.Optionality = "optional"
-	return op
-}
-
-func resourceAcquisition(identity, primitive, observation string, b NezhaBinding) HostOperation {
-	op := fileOperation(identity, primitive, observation, b)
-	op.Effect = "resource acquisition"
-	op.Lifetime = "returns resource"
-	return op
-}
-
-func resourceOperation(identity, primitive, observation string, b NezhaBinding) HostOperation {
-	op := fileOperation(identity, primitive, observation, b)
-	op.Lifetime = "operates on resource"
-	return op
-}
-
 // OperationDefinition returns the architectural contract for a substrate primitive.
 // Substrate provenance is intentionally supplied by the substrate binding layer.
 func OperationDefinition(primitive string) (HostOperation, bool) {

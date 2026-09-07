@@ -24,7 +24,6 @@ func executionResultError(result value.Value) error {
 // through system.args(), excluding the interpreter and source filename.
 func Run(filename string, programArgs ...string) error {
 	rt := substrate.NewGoRuntime()
-	defer rt.CloseAllResources()
 	return RunWithRuntime(filename, rt, programArgs...)
 }
 
@@ -41,7 +40,6 @@ func RunWithRuntime(filename string, rt *substrate.GoRuntime, programArgs ...str
 // RunSource executes Nezha source code.
 func RunSource(filename, source string) error {
 	rt := substrate.NewGoRuntime()
-	defer rt.CloseAllResources()
 	return runSourceWithRuntime(filename, source, nil, rt)
 }
 
@@ -61,8 +59,6 @@ func runSourceWithRuntimeDirect(filename, source string, programArgs []string, r
 	if err != nil {
 		return fmt.Errorf("loading grammar: %w", err)
 	}
-
-	rt.SetProgramArgs(programArgs)
 
 	// Create prelude environment with ScopePrelude
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)
@@ -103,7 +99,7 @@ func runSourceWithRuntimeDirect(filename, source string, programArgs []string, r
 // loadPrelude parses and evaluates the prelude.
 func loadPrelude(g *grammar.Grammar, rt *substrate.GoRuntime, env *value.Env) error {
 	// Initialize help registry
-	if err := initHelpRegistry(g, rt); err != nil {
+	if err := initHelpRegistry(g); err != nil {
 		return fmt.Errorf("loading help: %w", err)
 	}
 
@@ -133,13 +129,9 @@ func loadPrelude(g *grammar.Grammar, rt *substrate.GoRuntime, env *value.Env) er
 
 // initHelpRegistry loads prelude help and doc files with validation.
 
-func initHelpRegistry(g *grammar.Grammar, rt *substrate.GoRuntime) error {
-	catalog, err := prelude.LoadCatalog(g)
-	if err != nil {
-		return err
-	}
-	rt.SetHelpRegistry(catalog.Registry)
-	return nil
+func initHelpRegistry(g *grammar.Grammar) error {
+	_, err := prelude.LoadCatalog(g)
+	return err
 }
 
 // RunExpr evaluates a single expression and returns the result.
@@ -150,7 +142,6 @@ func RunExpr(expr string) (string, error) {
 	}
 
 	rt := substrate.NewGoRuntime()
-	defer rt.CloseAllResources()
 
 	// Create prelude environment with ScopePrelude
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)

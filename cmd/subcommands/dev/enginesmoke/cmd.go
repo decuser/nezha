@@ -289,13 +289,9 @@ func loadGrammar(overridePath string) (*grammar.Grammar, error) {
 	return grammar.Load(overridePath, string(data), "grammar.help", syntax.HelpSource)
 }
 
-func initHelpRegistry(g *grammar.Grammar, rt *substrate.GoRuntime) error {
-	catalog, err := prelude.LoadCatalog(g)
-	if err != nil {
-		return err
-	}
-	rt.SetHelpRegistry(catalog.Registry)
-	return nil
+func initHelpRegistry(g *grammar.Grammar) error {
+	_, err := prelude.LoadCatalog(g)
+	return err
 }
 
 func runStage(s stage, g *grammar.Grammar, file, source string) ([]byte, error) {
@@ -346,7 +342,7 @@ func dumpEval(g *grammar.Grammar, file, source string) ([]byte, error) {
 	// Load prelude into a fresh environment.
 	rt := substrate.NewGoRuntime()
 	rt.SetIO(nil, &out)
-	if err := initHelpRegistry(g, rt); err != nil {
+	if err := initHelpRegistry(g); err != nil {
 		return nil, err
 	}
 	preludeEnv := value.NewEnvWithScope(value.ScopePrelude)

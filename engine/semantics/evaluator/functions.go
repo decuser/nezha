@@ -61,10 +61,6 @@ func (e *Evaluator) callSubstrateValue(f value.Callable, args []value.Value, nod
 		Grammar: e.grammar,
 		Eval:    e.Eval,
 	}
-	if faults, ok := e.runtime.(hal.AsyncFaultSource); ok {
-		ctx.AsyncFault = faults.AsyncFaults()
-		ctx.ReportAsyncFault = faults.ReportAsyncFault
-	}
 	return cf.CallWithContext(args, ctx)
 }
 
