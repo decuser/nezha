@@ -11,6 +11,7 @@ import (
 	nezhafmt "nezha/cmd/subcommands/tools/fmt"
 	nezhalint "nezha/cmd/subcommands/tools/lint"
 	nezhatreecheck "nezha/cmd/subcommands/tools/treecheck"
+	nezharepl "nezha/cmd/subcommands/ux/repl"
 )
 
 type command struct {
@@ -24,6 +25,7 @@ var commands = []command{
 	{Name: "fmt", Description: "format Nezha source", Run: nezhafmt.Run},
 	{Name: "gate", Description: "run repository coherence gates", Run: runGate},
 	{Name: "lint", Description: "lint Nezha source", Run: nezhalint.Run},
+	{Name: "repl", Description: "start an interactive Nezha session", Run: nezharepl.Run},
 	{Name: "version", Description: "print the Nezha version", Run: func([]string) int {
 		fmt.Println(Version)
 		return 0

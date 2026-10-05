@@ -5,10 +5,26 @@ import (
 	"nezha/engine/syntax"
 )
 
+// interruptValue is an evaluator-private control sentinel. Like tailCallValue,
+// it exists only to move engine control through the value-returning evaluator
+// without adding a script-visible value kind.
+type interruptValue struct{}
+
+func (*interruptValue) Type() value.Type { return value.Type("interrupt") }
+func (*interruptValue) Inspect() string  { return "<interrupt>" }
+
+var interrupted value.Value = &interruptValue{}
+
+// isInterrupted reports whether a result is the evaluator-private interruption sentinel.
+func isInterrupted(v value.Value) bool {
+	_, ok := v.(*interruptValue)
+	return ok
+}
+
 // shouldHalt returns true if evaluation should halt on this value.
-// Faults halt evaluation. Shaped errors flow as data.
+// Faults and host interruption halt evaluation. Shaped errors flow as data.
 func shouldHalt(v value.Value) bool {
-	return value.IsFault(v)
+	return value.IsFault(v) || isInterrupted(v)
 }
 
 func (e *Evaluator) nonTerminalChildren(node *syntax.Node) []*syntax.Node {

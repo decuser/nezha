@@ -10,6 +10,8 @@ export function OpenDocument():Promise<main.fileResponse>;
 
 export function Quit():Promise<void>;
 
-export function Run(arg1:string,arg2:string):Promise<main.runResponse>;
-
 export function SaveDocument(arg1:string,arg2:string,arg3:boolean):Promise<main.fileResponse>;
+
+export function Start(arg1:string,arg2:string):Promise<main.runResponse>;
+
+export function Stop():Promise<boolean>;

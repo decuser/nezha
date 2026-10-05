@@ -1,14 +1,17 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"embed"
+	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	goruntime "runtime"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/menu"
@@ -17,8 +20,8 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 	wruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 
+	"nezha/engine/program"
 	"nezha/engine/runtime/hal/substrate"
-	"nezha/runner"
 )
 
 const (
@@ -31,11 +34,16 @@ var webAssets embed.FS
 
 type App struct {
 	ctx context.Context
+
+	runMu          sync.Mutex
+	runSession     *program.Session
+	outputSink     func(string)
+	completionSink func(runResponse)
 }
 
 type runResponse struct {
-	Output string `json:"output"`
-	Error  string `json:"error,omitempty"`
+	Error   string `json:"error,omitempty"`
+	Stopped bool   `json:"stopped,omitempty"`
 }
 
 type fileResponse struct {
@@ -69,6 +77,9 @@ func main() {
 
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	wruntime.EventsOn(ctx, "run:stop", func(_ ...interface{}) {
+		a.Stop()
+	})
 }
 
 func buildMenu(app *App) *menu.Menu {
@@ -109,20 +120,198 @@ func (a *App) emit(name string) {
 	}
 }
 
-// Run executes generated Nezha source with the supplied text as the runtime
-// input endpoint. Blockly remains only a source producer; the ordinary Nezha
-// runner and runtime remain authoritative for execution.
-func (a *App) Run(source, input string) runResponse {
+// Start launches generated Nezha source in a fresh canonical program session
+// and returns immediately. The active session is retained only while the run
+// is executing so Stop can interrupt it. Runtime output and completion are
+// delivered independently, which keeps the Wails bridge free to service Stop.
+func (a *App) Start(source, input string) runResponse {
 	if len(source) > maxSourceBytes {
 		return runResponse{Error: fmt.Sprintf("source is too large: %d bytes", len(source))}
 	}
-	output, err := runSource(source, input)
-	response := runResponse{Output: output}
+
+	rt := substrate.NewGoRuntime()
+	rt.SetInput(strings.NewReader(input))
+
+	stream := newOutputStream(a.emitRunOutput)
+	rt.SetOutput(stream)
+
+	session, err := program.NewSession(rt)
 	if err != nil {
-		response.Error = err.Error()
+		return runResponse{Error: err.Error()}
 	}
-	return response
+	if !a.beginRun(session) {
+		return runResponse{Error: "a program is already running"}
+	}
+
+	go a.executeRun(session, source, stream)
+	return runResponse{}
 }
+
+func (a *App) executeRun(session *program.Session, source string, stream *outputStream) {
+	result := runResponse{}
+	_, err := session.Eval("blockly.nez", source)
+	if errors.Is(err, program.ErrInterrupted) {
+		result.Stopped = true
+	} else if err != nil {
+		result.Error = err.Error()
+	}
+
+	stream.Close()
+	a.endRun(session)
+	a.emitRunFinished(result)
+}
+
+func (a *App) Stop() bool {
+	a.runMu.Lock()
+	session := a.runSession
+	a.runMu.Unlock()
+	if session == nil {
+		return false
+	}
+	return session.Interrupt()
+}
+
+func (a *App) beginRun(session *program.Session) bool {
+	a.runMu.Lock()
+	defer a.runMu.Unlock()
+	if a.runSession != nil {
+		return false
+	}
+	a.runSession = session
+	return true
+}
+
+func (a *App) endRun(session *program.Session) {
+	a.runMu.Lock()
+	if a.runSession == session {
+		a.runSession = nil
+	}
+	a.runMu.Unlock()
+}
+
+func (a *App) emitRunOutput(chunk string) {
+	if chunk == "" {
+		return
+	}
+	if a.outputSink != nil {
+		a.outputSink(chunk)
+		return
+	}
+	if a.ctx != nil {
+		wruntime.EventsEmit(a.ctx, "run:output", chunk)
+	}
+}
+
+func (a *App) emitRunFinished(result runResponse) {
+	if a.completionSink != nil {
+		a.completionSink(result)
+		return
+	}
+	if a.ctx != nil {
+		wruntime.EventsEmit(a.ctx, "run:finished", result)
+	}
+}
+
+const (
+	outputFlushInterval = 50 * time.Millisecond
+	outputBufferBytes   = 8 * 1024
+)
+
+type outputStream struct {
+	mu     sync.Mutex
+	cond   *sync.Cond
+	buf    strings.Builder
+	emit   func(string)
+	done   chan struct{}
+	closed bool
+}
+
+func newOutputStream(emit func(string)) *outputStream {
+	s := &outputStream{
+		emit: emit,
+		done: make(chan struct{}),
+	}
+	s.cond = sync.NewCond(&s.mu)
+	go s.run()
+	return s
+}
+
+func (s *outputStream) Write(p []byte) (int, error) {
+	written := 0
+	for written < len(p) {
+		s.mu.Lock()
+		for !s.closed && s.buf.Len() >= outputBufferBytes {
+			s.cond.Wait()
+		}
+		if s.closed {
+			s.mu.Unlock()
+			return len(p), nil
+		}
+
+		room := outputBufferBytes - s.buf.Len()
+		if room <= 0 {
+			s.mu.Unlock()
+			continue
+		}
+		n := len(p) - written
+		if n > room {
+			n = room
+		}
+		_, _ = s.buf.Write(p[written : written+n])
+		written += n
+		s.mu.Unlock()
+	}
+	return len(p), nil
+}
+
+func (s *outputStream) run() {
+	ticker := time.NewTicker(outputFlushInterval)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			s.flush()
+		case <-s.done:
+			s.flush()
+			return
+		}
+	}
+}
+
+func (s *outputStream) flush() {
+	s.mu.Lock()
+	if s.buf.Len() == 0 {
+		s.mu.Unlock()
+		return
+	}
+	chunk := s.buf.String()
+	s.buf.Reset()
+	s.cond.Broadcast()
+	s.mu.Unlock()
+
+	if s.emit != nil {
+		s.emit(chunk)
+	}
+}
+
+func (s *outputStream) Close() {
+	s.mu.Lock()
+	if s.closed {
+		s.mu.Unlock()
+		return
+	}
+	s.closed = true
+	s.cond.Broadcast()
+	close(s.done)
+	s.mu.Unlock()
+}
+
+type writerFunc func([]byte) (int, error)
+
+func (fn writerFunc) Write(p []byte) (int, error) { return fn(p) }
+
+var _ io.Writer = writerFunc(nil)
 
 func (a *App) OpenDocument() fileResponse {
 	path, err := wruntime.OpenFileDialog(a.ctx, wruntime.OpenDialogOptions{
@@ -227,13 +416,4 @@ func readTextFile(path string) (string, error) {
 
 func writeTextFile(path, content string) error {
 	return os.WriteFile(path, []byte(content), 0o644)
-}
-
-func runSource(source, input string) (string, error) {
-	var output bytes.Buffer
-	rt := substrate.NewGoRuntime()
-	rt.SetInput(strings.NewReader(input))
-	rt.SetOutput(&output)
-	err := runner.RunSourceWithRuntime("blockly.nez", source, rt)
-	return output.String(), err
 }

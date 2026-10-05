@@ -2,6 +2,7 @@
 
 const DOCUMENT_FORMAT = 'nezha-blockly';
 const DOCUMENT_VERSION = 1;
+const MAX_VISIBLE_OUTPUT = 1024 * 1024;
 
 const searchableBlocks = [
   {name: 'assignment', type: 'nezha_assign', category: 'Statements'},
@@ -34,7 +35,6 @@ const baseToolbox = {
         {kind: 'block', type: 'nezha_while'}
       ]
     },
-    {kind: 'category', name: 'Data', contents: []},
     {
       kind: 'category',
       name: 'Expressions',
@@ -85,6 +85,7 @@ const inputEl = document.getElementById('input');
 const outputEl = document.getElementById('output');
 const statusEl = document.getElementById('status');
 const runButton = document.getElementById('run');
+const stopButton = document.getElementById('stop');
 const tabs = Array.from(document.querySelectorAll('.tab'));
 const views = Array.from(document.querySelectorAll('.view'));
 
@@ -274,6 +275,30 @@ inputEl.addEventListener('input', function() {
   if (!loading) setDirty(true);
 });
 
+function appendRunOutput(chunk) {
+  if (typeof chunk !== 'string' || chunk.length === 0) return;
+  outputEl.textContent += chunk;
+  if (outputEl.textContent.length > MAX_VISIBLE_OUTPUT) {
+    outputEl.textContent = outputEl.textContent.slice(-MAX_VISIBLE_OUTPUT);
+  }
+  outputEl.scrollTop = outputEl.scrollHeight;
+}
+
+function finishRun(result) {
+  runButton.disabled = false;
+  stopButton.disabled = true;
+
+  if (result && result.error) {
+    outputEl.classList.add('error');
+    outputEl.textContent += (outputEl.textContent ? '\n' : '') + result.error + '\n';
+    statusEl.textContent = 'error';
+  } else if (result && result.stopped) {
+    statusEl.textContent = 'stopped';
+  } else {
+    statusEl.textContent = 'done';
+  }
+}
+
 runButton.addEventListener('click', async function() {
   switchView('editor');
   const source = sourceEl.textContent;
@@ -281,24 +306,27 @@ runButton.addEventListener('click', async function() {
   outputEl.textContent = '';
   statusEl.textContent = 'running';
   runButton.disabled = true;
+  stopButton.disabled = false;
 
   try {
-    const result = await appBridge().Run(source, inputEl.value);
-    outputEl.textContent = result.output || '';
-    if (result.error) {
-      outputEl.classList.add('error');
-      outputEl.textContent += (outputEl.textContent ? '\n' : '') + result.error + '\n';
-      statusEl.textContent = 'error';
-    } else {
-      statusEl.textContent = 'done';
-    }
+    const result = await appBridge().Start(source, inputEl.value);
+    if (result.error) finishRun(result);
   } catch (err) {
-    outputEl.classList.add('error');
-    outputEl.textContent = err.message + '\n';
-    statusEl.textContent = 'error';
-  } finally {
-    runButton.disabled = false;
+    finishRun({error: err.message});
   }
+});
+
+stopButton.addEventListener('click', function() {
+  if (!window.runtime || !window.runtime.EventsEmit) {
+    outputEl.classList.add('error');
+    outputEl.textContent += (outputEl.textContent ? '\n' : '') + 'Wails event bridge is not available\n';
+    statusEl.textContent = 'error';
+    return;
+  }
+
+  stopButton.disabled = true;
+  statusEl.textContent = 'stopping';
+  window.runtime.EventsEmit('run:stop');
 });
 
 function makeBlock(type) {
@@ -542,6 +570,8 @@ function registerMenuEvents() {
   window.runtime.EventsOn('view:editor', () => switchView('editor'));
   window.runtime.EventsOn('view:samples', () => switchView('samples'));
   window.runtime.EventsOn('view:help', () => switchView('help'));
+  window.runtime.EventsOn('run:output', appendRunOutput);
+  window.runtime.EventsOn('run:finished', finishRun);
 }
 
 registerMenuEvents();

@@ -18,10 +18,14 @@ export function Quit() {
   return window['go']['main']['App']['Quit']();
 }
 
-export function Run(arg1, arg2) {
-  return window['go']['main']['App']['Run'](arg1, arg2);
-}
-
 export function SaveDocument(arg1, arg2, arg3) {
   return window['go']['main']['App']['SaveDocument'](arg1, arg2, arg3);
+}
+
+export function Start(arg1, arg2) {
+  return window['go']['main']['App']['Start'](arg1, arg2);
+}
+
+export function Stop() {
+  return window['go']['main']['App']['Stop']();
 }

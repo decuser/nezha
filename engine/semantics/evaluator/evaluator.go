@@ -82,6 +82,10 @@ type Evaluator struct {
 	// argFrames reuses exclusively-owned argument carriers for user functions
 	// whose call environments are structurally proven not to escape.
 	argFrames sync.Pool // *argFrame
+
+	// interruptCheck is host execution control, not a Nezha-visible value or
+	// HAL capability. When configured, Eval observes it at evaluator boundaries.
+	interruptCheck func() bool
 }
 
 // New creates an evaluator with a runtime.
@@ -89,6 +93,12 @@ func New(runtime hal.RuntimeContract) *Evaluator {
 	return &Evaluator{
 		runtime: runtime,
 	}
+}
+
+// SetInterruptCheck installs a host-owned execution interruption probe.
+// The probe is intentionally outside HAL: scripts cannot observe or invoke it.
+func (e *Evaluator) SetInterruptCheck(check func() bool) {
+	e.interruptCheck = check
 }
 
 // SetGrammar sets the grammar and validates handler coverage.
@@ -143,8 +153,23 @@ func (e *Evaluator) isBinaryOperator(s string) bool {
 	return ok
 }
 
+// EvalInterruptible evaluates an AST node and reports host interruption
+// separately from Nezha values. The private control sentinel never crosses this
+// boundary.
+func (e *Evaluator) EvalInterruptible(node *syntax.Node, env *value.Env) (value.Value, bool) {
+	result := e.Eval(node, env)
+	if isInterrupted(result) {
+		return nil, true
+	}
+	return result, false
+}
+
 // Eval evaluates an AST node.
 func (e *Evaluator) Eval(node *syntax.Node, env *value.Env) value.Value {
+	if e.interruptCheck != nil && e.interruptCheck() {
+		return interrupted
+	}
+
 	h, ok := handlers[node.Type]
 	if !ok {
 		// Should never happen after validation

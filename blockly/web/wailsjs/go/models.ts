@@ -17,8 +17,8 @@ export namespace main {
 	    }
 	}
 	export class runResponse {
-	    output: string;
 	    error?: string;
+	    stopped?: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new runResponse(source);
@@ -26,8 +26,8 @@ export namespace main {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.output = source["output"];
 	        this.error = source["error"];
+	        this.stopped = source["stopped"];
 	    }
 	}
 
