@@ -1,0 +1,10 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "nezha-blockly",
+  "outputfilename": "nezha-blockly",
+  "frontend:dir": "web",
+  "frontend:install": "",
+  "frontend:build": "",
+  "frontend:dev:watcher": "",
+  "author": {"name": ""}
+}

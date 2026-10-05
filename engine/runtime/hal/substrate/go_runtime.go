@@ -2,6 +2,7 @@
 package substrate
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -75,6 +76,7 @@ var _ value.Callable = (*Builtin)(nil)
 type GoRuntime struct {
 	builtins     map[string]*Builtin
 	hostBindings map[string]hal.HostOperation
+	stdin        *bufio.Reader
 	stdout       io.Writer
 }
 
@@ -87,10 +89,19 @@ func NewGoRuntime() *GoRuntime {
 	rt := &GoRuntime{
 		builtins:     make(map[string]*Builtin),
 		hostBindings: make(map[string]hal.HostOperation),
+		stdin:        bufio.NewReader(os.Stdin),
 		stdout:       os.Stdout,
 	}
 	rt.registerHAL()
 	return rt
+}
+
+// SetInput replaces the runtime-owned input endpoint. A nil input restores stdin.
+func (g *GoRuntime) SetInput(in io.Reader) {
+	if in == nil {
+		in = os.Stdin
+	}
+	g.stdin = bufio.NewReader(in)
 }
 
 // SetOutput replaces the runtime-owned output endpoint. A nil output restores stdout.

@@ -303,7 +303,7 @@ imperative control where retained,
 pattern matching,
 left-to-right expression evaluation,
 pipe syntax,
-and one HAL-backed output operation.
+and compact HAL-backed text I/O operations.
 ```
 
 This is the starting specimen for later evaluation-character work.

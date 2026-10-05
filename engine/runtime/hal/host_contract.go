@@ -1,8 +1,8 @@
 package hal
 
 // HostOperation describes one canonical crossing from Nezha into the host.
-// The current specimen has one such crossing: _print writes to the runtime
-// output endpoint. This metadata records that boundary without preserving the
+// The current specimen has a deliberately small set of host crossings for
+// text I/O. This metadata records those boundaries without preserving the
 // larger Aiki-era capability/profile taxonomy.
 type HostOperation struct {
 	Identity            string

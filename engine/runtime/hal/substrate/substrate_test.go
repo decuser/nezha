@@ -2,6 +2,7 @@ package substrate
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"nezha/engine/semantics/value"
@@ -58,6 +59,22 @@ func TestPrint(t *testing.T) {
 	callBuiltin(t, rt, "_print", []value.Value{&value.String{Val: "hello"}})
 	if buf.String() != "hello" {
 		t.Errorf("got %q", buf.String())
+	}
+}
+
+func TestRead(t *testing.T) {
+	rt := NewGoRuntime()
+	rt.SetInput(strings.NewReader("alpha\nbeta\r\ngamma"))
+
+	for i, want := range []string{"alpha", "beta", "gamma", ""} {
+		got := callBuiltin(t, rt, "_read", nil)
+		str, ok := got.(*value.String)
+		if !ok {
+			t.Fatalf("read %d returned %T, want string", i, got)
+		}
+		if str.Val != want {
+			t.Fatalf("read %d = %q, want %q", i, str.Val, want)
+		}
 	}
 }
 

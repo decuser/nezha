@@ -19,11 +19,11 @@ func TestNoAuthorityIsEmpty(t *testing.T) {
 func TestPreludeAuthorityIsDeclaredNotUniversal(t *testing.T) {
 	rt := NewGoRuntime()
 	auth := rt.PreludeAuthority()
-	if !auth.Allows("HAL.io.print") || !auth.Allows("_length") {
+	if !auth.Allows("HAL.io.print") || !auth.Allows("HAL.io.read") || !auth.Allows("_length") {
 		t.Fatal("prelude missing declared primitive authority")
 	}
-	if auth.Allows("_print") {
-		t.Fatal("prelude must receive canonical host identity, not raw _print authority")
+	if auth.Allows("_print") || auth.Allows("_read") {
+		t.Fatal("prelude must receive canonical host identities, not raw host primitive authority")
 	}
 	if auth.Allows("_test_run") {
 		t.Fatal("prelude must not receive test harness authority")
@@ -69,12 +69,15 @@ func TestPreludeAuthorityMatchesPreludeDependencies(t *testing.T) {
 
 func TestHostBindingAuthorizationUsesCanonicalHALIdentity(t *testing.T) {
 	rt := NewGoRuntime()
-	canonical := value.NewAuthority("HAL.io.print")
-	if !rt.HasBuiltin("_print", canonical) {
-		t.Fatal("HAL.io.print authority must authorize the _print substrate binding")
-	}
-	raw := value.NewAuthority("_print")
-	if rt.HasBuiltin("_print", raw) {
-		t.Fatal("raw _print name must not itself grant canonical host authority")
+	for primitive, identity := range map[string]string{
+		"_print": "HAL.io.print",
+		"_read":  "HAL.io.read",
+	} {
+		if !rt.HasBuiltin(primitive, value.NewAuthority(identity)) {
+			t.Fatalf("%s authority must authorize the %s substrate binding", identity, primitive)
+		}
+		if rt.HasBuiltin(primitive, value.NewAuthority(primitive)) {
+			t.Fatalf("raw %s name must not itself grant canonical host authority", primitive)
+		}
 	}
 }

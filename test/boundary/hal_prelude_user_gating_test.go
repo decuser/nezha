@@ -230,3 +230,33 @@ func loadPreludeInto(g *grammar.Grammar, rt *substrate.GoRuntime, env *value.Env
 
 	return nil
 }
+
+func TestUserCannotSeeHALRead(t *testing.T) {
+	result, err := evalWithScope(`_read()`, value.ScopeUser, false)
+	if err != nil {
+		t.Fatalf("eval error: %v", err)
+	}
+	if !value.IsFault(result) || result.(*value.Fault).Message != "undefined: _read" {
+		t.Fatalf("expected undefined _read fault, got %s", result.Inspect())
+	}
+}
+
+func TestUserCanSeeReadAfterPrelude(t *testing.T) {
+	result, err := evalWithScope(`read`, value.ScopeUser, true)
+	if err != nil {
+		t.Fatalf("eval error: %v", err)
+	}
+	if value.IsFault(result) {
+		t.Fatalf("expected read to resolve after prelude, got %s", result.Inspect())
+	}
+}
+
+func TestPreludeCanSeeHALRead(t *testing.T) {
+	result, err := evalWithScope(`_read`, value.ScopePrelude, false)
+	if err != nil {
+		t.Fatalf("eval error: %v", err)
+	}
+	if value.IsFault(result) {
+		t.Fatalf("expected _read to resolve with canonical host authority, got %s", result.Inspect())
+	}
+}

@@ -10,6 +10,10 @@
 @template "println(...args)"
 @help "Write values and then a newline."
 
+@func read
+@template "read()"
+@help "Read one line from input and return it without the line ending."
+
 @func first
 @template "first(list)"
 @help "Return the first list element."

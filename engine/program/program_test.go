@@ -2,6 +2,7 @@ package program_test
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"nezha/engine/program"
@@ -33,5 +34,19 @@ func TestRunSourceUsesRuntimeOutput(t *testing.T) {
 	}
 	if got := out.String(); got != "hello\n" {
 		t.Fatalf("got %q, want %q", got, "hello\\n")
+	}
+}
+
+func TestRunSourceUsesRuntimeInput(t *testing.T) {
+	var out bytes.Buffer
+	rt := substrate.NewGoRuntime()
+	rt.SetInput(strings.NewReader("Ada\n"))
+	rt.SetOutput(&out)
+
+	if err := program.RunSource(rt, "test.nez", "let name = read()\nprintln(name)\n"); err != nil {
+		t.Fatal(err)
+	}
+	if got := out.String(); got != "Ada\n" {
+		t.Fatalf("got %q, want %q", got, "Ada\\n")
 	}
 }

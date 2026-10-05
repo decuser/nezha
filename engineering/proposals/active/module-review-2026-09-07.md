@@ -186,17 +186,18 @@ async fault source
 path-based authority policy
 ```
 
-HAL now documents one host crossing:
+HAL now documents the compact text-I/O host crossings:
 
 ```text
 _print -> HAL.io.print -> print/println
+_read  -> HAL.io.read  -> read
 ```
 
 Boundary note:
 
 ```text
-_print remains host-effect metadata
-_read/input are intentionally absent
+_print and _read remain host-effect metadata
+read is the single public input operation; input/readln aliases are absent
 ```
 
 ## engine/runtime/hal/substrate

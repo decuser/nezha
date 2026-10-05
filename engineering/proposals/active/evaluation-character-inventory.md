@@ -8,7 +8,7 @@ inventory, not an implementation plan for `eval.spec`.
 The current language is a single loaded script evaluated with the embedded
 prelude. It has lexical scope, lists and shaped lists as structure, functions,
 rest parameters, imperative control, pattern matching, pipe syntax, and one
-HAL-backed output operation.
+HAL-backed text I/O operations.
 
 The runtime boundary is now clean enough for this inventory:
 
@@ -18,6 +18,7 @@ evaluator-owned intrinsic:
 
 substrate leaf primitives:
 - _print
+- _read
 - _first
 - _rest
 - _length
@@ -56,7 +57,7 @@ invoke         call a callable
 apply          invoke a function with a list of arguments
 return         unwind from a function body with a value
 fault          halt local evaluation with an error value
-effect         cross the HAL boundary for observable output
+effect         cross the HAL boundary for observable text I/O
 pipe           feed a value left-to-right into a callable expression
 ```
 

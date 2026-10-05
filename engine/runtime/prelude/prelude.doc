@@ -22,6 +22,14 @@ println(val, ...)
 
 println("Hello")
 ===
+read
+@unchecked
+Reads one line from input and returns it without the line ending. At end of input, returns an empty string.
+
+read()
+
+let name = read()
+===
 first
 Returns the first element of a list.
 

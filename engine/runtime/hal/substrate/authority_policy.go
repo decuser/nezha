@@ -15,6 +15,7 @@ var preludePrimitiveAuthority = []string{
 	"_make_shaped_list",
 	"_prepend",
 	"_print",
+	"_read",
 	"_rest",
 	"_shape",
 	"_to_str",

@@ -16,6 +16,10 @@ let println = (...args) {
 	_print("\n")
 }
 
+let read = () {
+	_read()
+}
+
 # List intrinsics (wrappers over _ builtins)
 let first = (list) {
 	_first(list)

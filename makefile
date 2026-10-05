@@ -1,4 +1,4 @@
-.PHONY: build clean baseline run reference test fmt fmt-all lint lint-all treecheck cleanroom check check-all bless validate-lang validate-all smoke smoke-all smokegold enginesmoke enginesmoke-all enginesmokegold enginecoverage enginecoverage-all rigorous fuzz
+.PHONY: build clean baseline run blockly reference test fmt fmt-all lint lint-all treecheck cleanroom check check-all bless validate-lang validate-all smoke smoke-all smokegold enginesmoke enginesmoke-all enginesmokegold enginecoverage enginecoverage-all rigorous fuzz
 
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 LDFLAGS := -ldflags "-X nezha/cmd/cli.Version=$(VERSION)"
@@ -39,6 +39,11 @@ baseline:
 
 run: build
 	./nezha
+
+# Launch the Blockly/Wails structural editor. The Wails app is its own Go module
+# so desktop UI dependencies do not enter the Nezha language/runtime module.
+blockly:
+	cd blockly && wails dev -tags webkit2_41
 
 # Execute the canonical, commented language specimens through the ordinary CLI.
 # The corpus is intentionally human-readable reference material, not smoke gold.

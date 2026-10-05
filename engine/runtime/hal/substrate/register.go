@@ -5,6 +5,7 @@ package substrate
 // crosses the HAL boundary.
 func (g *GoRuntime) registerHAL() {
 	g.registerHost(goHostOperation("_print"), variadicArity(0), g.halPrint)
+	g.registerHost(goHostOperation("_read"), fixedArity(0), g.halRead)
 
 	for name, spec := range map[string]struct {
 		arity Arity

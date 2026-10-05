@@ -1,0 +1,4 @@
+let first_name = read()
+let second_name = read()
+println(first_name)
+println(second_name)

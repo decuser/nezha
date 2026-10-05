@@ -28,7 +28,7 @@ func TestBuiltinRegistryMatchesPrimitiveCatalog(t *testing.T) {
 		}
 	}
 
-	for _, name := range []string{"_first", "_print"} {
+	for _, name := range []string{"_first", "_print", "_read"} {
 		if _, ok := rt.lookupBuiltin(name); !ok {
 			t.Errorf("runtime lookup lost %s", name)
 		}

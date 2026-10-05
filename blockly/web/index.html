@@ -16,16 +16,66 @@
     header {
       display: flex;
       align-items: center;
-      gap: 1rem;
-      padding: .6rem .8rem;
+      gap: .75rem;
+      padding: .55rem .8rem;
       border-bottom: 1px solid #bbb;
       background: white;
     }
-    header h1 { font-size: 1rem; margin: 0; font-weight: 600; }
-    button { font: inherit; padding: .35rem .9rem; }
-    #status { font-size: .9rem; color: #555; }
-    main {
-      min-height: 0;
+    header h1 { font-size: 1rem; margin: 0 .5rem 0 0; font-weight: 600; }
+    button { font: inherit; padding: .35rem .65rem; }
+    .tabs { display: flex; gap: .2rem; }
+    .tab {
+      border: 0;
+      background: transparent;
+      padding: .4rem .65rem;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+    }
+    .tab.active { border-bottom-color: #333; font-weight: 600; }
+    #blockSearchPanel {
+      position: absolute;
+      z-index: 100;
+      width: 16rem;
+      box-sizing: border-box;
+      padding: .5rem;
+      border: 1px solid #aaa;
+      border-radius: .35rem;
+      background: white;
+      box-shadow: 0 .2rem .8rem rgba(0,0,0,.18);
+    }
+    #blockSearchPanel[hidden] { display: none; }
+    #blockSearchInput {
+      width: 100%;
+      box-sizing: border-box;
+      font: inherit;
+      padding: .4rem .5rem;
+      margin-bottom: .4rem;
+    }
+    #blockSearchResults {
+      max-height: 20rem;
+      overflow: auto;
+    }
+    .blockSearchResult {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      width: 100%;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      padding: .4rem .45rem;
+      cursor: pointer;
+    }
+    .blockSearchResult:hover,
+    .blockSearchResult:focus { background: #eee; }
+    .blockSearchResult small { color: #666; }
+    .blockSearchEmpty { padding: .5rem; color: #666; }
+    #run { margin-left: auto; }
+    #status { min-width: 7rem; font-size: .9rem; color: #555; }
+    .view { min-height: 0; display: none; }
+    .view.active { display: block; }
+    #view-editor.active {
+      position: relative;
       display: grid;
       grid-template-columns: minmax(0, 2fr) minmax(18rem, 1fr);
     }
@@ -34,7 +84,7 @@
       min-width: 0;
       min-height: 0;
       display: grid;
-      grid-template-rows: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
       border-left: 1px solid #bbb;
     }
     section { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
@@ -48,7 +98,7 @@
       background: #e9e9e9;
       border-bottom: 1px solid #ccc;
     }
-    pre {
+    pre, textarea {
       box-sizing: border-box;
       margin: 0;
       padding: .65rem;
@@ -58,9 +108,53 @@
       font-size: .9rem;
       background: white;
     }
+    textarea {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      resize: none;
+      outline: none;
+    }
     #output.error { color: #8b0000; }
+    .page {
+      box-sizing: border-box;
+      height: 100%;
+      overflow: auto;
+      padding: 1.25rem 1.5rem 2rem;
+      background: white;
+    }
+    .page h2 {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      text-transform: none;
+      letter-spacing: 0;
+      font-size: 1.25rem;
+      margin-bottom: .35rem;
+    }
+    .page p { max-width: 52rem; line-height: 1.45; }
+    .samples {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(17rem, 24rem));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .sample-card {
+      border: 1px solid #bbb;
+      border-radius: .35rem;
+      padding: 1rem;
+      background: #fafafa;
+    }
+    .sample-card h3 { margin: 0 0 .4rem; font-size: 1rem; }
+    .sample-card p { margin: 0 0 .8rem; font-size: .92rem; }
+    .help-code {
+      display: inline-block;
+      padding: .1rem .3rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #eee;
+    }
     @media (max-width: 800px) {
-      main { grid-template-columns: 1fr; grid-template-rows: minmax(24rem, 2fr) minmax(18rem, 1fr); }
+      #view-editor.active { grid-template-columns: 1fr; grid-template-rows: minmax(24rem, 2fr) minmax(18rem, 1fr); }
       #side { border-left: 0; border-top: 1px solid #bbb; }
     }
   </style>
@@ -68,12 +162,26 @@
 <body>
   <header>
     <h1>Nezha Blockly</h1>
+    <nav class="tabs" aria-label="Application views">
+      <button class="tab active" type="button" data-view="editor">Editor</button>
+      <button class="tab" type="button" data-view="samples">Samples</button>
+      <button class="tab" type="button" data-view="help">Help</button>
+    </nav>
     <button id="run" type="button">Run</button>
     <span id="status">ready</span>
   </header>
-  <main>
+
+  <main id="view-editor" class="view active">
     <div id="blocklyDiv"></div>
+    <div id="blockSearchPanel" hidden>
+      <input id="blockSearchInput" type="search" placeholder="Search blocks…" autocomplete="off" spellcheck="false">
+      <div id="blockSearchResults"></div>
+    </div>
     <div id="side">
+      <section>
+        <h2>Input</h2>
+        <textarea id="input" spellcheck="false" placeholder="one input line per read(); EOF follows the last character"></textarea>
+      </section>
       <section>
         <h2>Nezha source</h2>
         <pre id="source"></pre>
@@ -82,6 +190,34 @@
         <h2>Output</h2>
         <pre id="output"></pre>
       </section>
+    </div>
+  </main>
+
+  <main id="view-samples" class="view">
+    <div class="page">
+      <h2>Samples</h2>
+      <p>Select a sample to open it in the editor. It becomes an ordinary editable program with the full Blockly toolbox.</p>
+      <div class="samples">
+        <article class="sample-card">
+          <h3>Input / Output</h3>
+          <p>Reads <span class="help-code">Max</span> from the input pane and prints <span class="help-code">hello, Max</span>.</p>
+          <button type="button" data-sample="io">Open sample</button>
+        </article>
+        <article class="sample-card">
+          <h3>Hello World</h3>
+          <p>The smallest output-only program.</p>
+          <button type="button" data-sample="hello">Open sample</button>
+        </article>
+      </div>
+    </div>
+  </main>
+
+  <main id="view-help" class="view">
+    <div class="page">
+      <h2>Help</h2>
+      <p>This is the placeholder for Nezha-backed editor help. The eventual goal is to project the language's own help/reference metadata rather than maintain a second documentation system here.</p>
+      <p><span class="help-code">read()</span> consumes one line from the Input pane. The pane is a preloaded input buffer, not a live terminal; EOF follows its last character.</p>
+      <p>Save stores the visual program and its Input buffer. Export Nezha Source writes the generated <span class="help-code">.nezha</span> program.</p>
     </div>
   </main>
 

@@ -11,6 +11,15 @@ var operationDefinitions = map[string]HostOperation{
 			{Name: "println", Source: "engine/runtime/prelude/prelude.nez"},
 		},
 	},
+	"_read": {
+		Identity:  "HAL.io.read",
+		Primitive: "_read",
+		Effect:    "read input",
+		Blocking:  true,
+		NezhaBindings: []NezhaBinding{
+			{Name: "read", Source: "engine/runtime/prelude/prelude.nez"},
+		},
+	},
 }
 
 // OperationDefinition returns the architectural contract for a substrate primitive.

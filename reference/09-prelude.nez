@@ -1,8 +1,8 @@
 # 09-prelude.nez — public prelude vocabulary
 #
 # The reference language runs with the embedded prelude. This specimen invokes
-# every current public prelude procedure so the cleanroom witness covers that
-# execution surface as well as grammar forms.
+# the non-blocking public prelude procedures so the cleanroom witness covers that
+# execution surface as well as grammar forms. read() is covered by controlled-input tests.
 println("== prelude ==")
 
 let add = (a, b) {
