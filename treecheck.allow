@@ -3,3 +3,4 @@
 # Lines ending in / allow that subtree. Other lines are filepath.Match-style
 # patterns relative to the repository root. This is an exception list, not a
 # complete distribution manifest.
+blockly/

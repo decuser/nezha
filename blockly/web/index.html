@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nezha Blockly</title>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    body {
+      font-family: sans-serif;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      background: #f5f5f5;
+      color: #222;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: .6rem .8rem;
+      border-bottom: 1px solid #bbb;
+      background: white;
+    }
+    header h1 { font-size: 1rem; margin: 0; font-weight: 600; }
+    button { font: inherit; padding: .35rem .9rem; }
+    #status { font-size: .9rem; color: #555; }
+    main {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(18rem, 1fr);
+    }
+    #blocklyDiv { min-width: 0; min-height: 0; background: white; }
+    #side {
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      border-left: 1px solid #bbb;
+    }
+    section { min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+    section + section { border-top: 1px solid #bbb; }
+    h2 {
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin: 0;
+      padding: .45rem .6rem;
+      background: #e9e9e9;
+      border-bottom: 1px solid #ccc;
+    }
+    pre {
+      box-sizing: border-box;
+      margin: 0;
+      padding: .65rem;
+      overflow: auto;
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .9rem;
+      background: white;
+    }
+    #output.error { color: #8b0000; }
+    @media (max-width: 800px) {
+      main { grid-template-columns: 1fr; grid-template-rows: minmax(24rem, 2fr) minmax(18rem, 1fr); }
+      #side { border-left: 0; border-top: 1px solid #bbb; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Nezha Blockly</h1>
+    <button id="run" type="button">Run</button>
+    <span id="status">ready</span>
+  </header>
+  <main>
+    <div id="blocklyDiv"></div>
+    <div id="side">
+      <section>
+        <h2>Nezha source</h2>
+        <pre id="source"></pre>
+      </section>
+      <section>
+        <h2>Output</h2>
+        <pre id="output"></pre>
+      </section>
+    </div>
+  </main>
+
+  <script src="vendor/blockly/blockly_compressed.js"></script>
+  <script src="vendor/blockly/msg/en.js"></script>
+  <script src="nezha_blocks.js"></script>
+  <script src="nezha_generator.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
