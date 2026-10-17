@@ -5,18 +5,20 @@ const DOCUMENT_VERSION = 1;
 const MAX_VISIBLE_OUTPUT = 1024 * 1024;
 
 const searchableBlocks = [
-  {name: 'assignment', type: 'nezha_assign', category: 'Statements'},
-  {name: 'binary', type: 'nezha_binary', category: 'Expressions'},
+  {name: 'assignment', type: 'nezha_assign', category: 'Operations'},
+  {name: 'binary', type: 'nezha_binary', category: 'Operations'},
   {name: 'boolean', type: 'nezha_boolean', category: 'Values'},
-  {name: 'equal', type: 'nezha_equal', category: 'Expressions'},
-  {name: 'if', type: 'nezha_if', category: 'Control'},
-  {name: 'let', type: 'nezha_let', category: 'Statements'},
+  {name: 'equal', type: 'nezha_equal', category: 'Operations'},
+  {name: 'if', type: 'nezha_if_plain', category: 'Control'},
+  {name: 'if / else', type: 'nezha_if', category: 'Control'},
+  {name: 'let', type: 'nezha_let', category: 'Operations'},
   {name: 'name', type: 'nezha_name', category: 'Values'},
-  {name: 'not', type: 'nezha_not', category: 'Expressions'},
+  {name: 'negative', type: 'nezha_negative', category: 'Operations'},
+  {name: 'not', type: 'nezha_not', category: 'Operations'},
   {name: 'number', type: 'nezha_number', category: 'Values'},
-  {name: 'print', type: 'nezha_print', category: 'Statements'},
-  {name: 'println', type: 'nezha_println', category: 'Statements'},
-  {name: 'read', type: 'nezha_read', category: 'Statements'},
+  {name: 'print', type: 'nezha_print', category: 'Operations'},
+  {name: 'println', type: 'nezha_println', category: 'Operations'},
+  {name: 'read', type: 'nezha_read', category: 'Operations'},
   {name: 'rune', type: 'nezha_rune', category: 'Values'},
   {name: 'string', type: 'nezha_string', category: 'Values'},
   {name: 'symbol', type: 'nezha_symbol', category: 'Values'},
@@ -31,26 +33,22 @@ const baseToolbox = {
       kind: 'category',
       name: 'Control',
       contents: [
+        {kind: 'block', type: 'nezha_if_plain'},
         {kind: 'block', type: 'nezha_if'},
         {kind: 'block', type: 'nezha_while'}
-      ]
-    },
-    {
-      kind: 'category',
-      name: 'Expressions',
-      contents: [
-        {kind: 'block', type: 'nezha_binary'},
-        {kind: 'block', type: 'nezha_equal'},
-        {kind: 'block', type: 'nezha_not'}
       ]
     },
     {kind: 'category', name: 'Functions', contents: []},
     {
       kind: 'category',
-      name: 'Statements',
+      name: 'Operations',
       contents: [
         {kind: 'block', type: 'nezha_assign'},
+        {kind: 'block', type: 'nezha_binary'},
+        {kind: 'block', type: 'nezha_equal'},
         {kind: 'block', type: 'nezha_let'},
+        {kind: 'block', type: 'nezha_negative'},
+        {kind: 'block', type: 'nezha_not'},
         {kind: 'block', type: 'nezha_print'},
         {kind: 'block', type: 'nezha_println'},
         {kind: 'block', type: 'nezha_read'}

@@ -1,7 +1,13 @@
 'use strict';
 
-function nezhaNameField(defaultValue) {
+function nezhaTextField(defaultValue) {
   const field = new Blockly.FieldTextInput(defaultValue);
+  field.setSpellcheck(false);
+  return field;
+}
+
+function nezhaNameField(defaultValue) {
+  const field = nezhaTextField(defaultValue);
   field.setValidator(function(value) {
     return /^[A-Za-z_][A-Za-z0-9_]*$/.test(value) ? value : null;
   });
@@ -60,7 +66,7 @@ function nezhaBindingField() {
 
 Blockly.Blocks['nezha_number'] = {
   init: function() {
-    const field = new Blockly.FieldTextInput('42');
+    const field = nezhaTextField('42');
     field.setValidator(function(value) {
       return /^[0-9]+(?:\.[0-9]+)?(?:\/[0-9]+)?$/.test(value) ? value : null;
     });
@@ -74,7 +80,7 @@ Blockly.Blocks['nezha_string'] = {
   init: function() {
     this.appendDummyInput()
       .appendField('string')
-      .appendField(new Blockly.FieldTextInput('hello'), 'VALUE');
+      .appendField(nezhaTextField('hello'), 'VALUE');
     this.setOutput(true, 'NezhaValue');
     this.setColour(160);
   }
@@ -82,7 +88,7 @@ Blockly.Blocks['nezha_string'] = {
 
 Blockly.Blocks['nezha_rune'] = {
   init: function() {
-    const field = new Blockly.FieldTextInput('N');
+    const field = nezhaTextField('N');
     field.setValidator(function(value) {
       return Array.from(value).length === 1 ? value : null;
     });
@@ -94,7 +100,7 @@ Blockly.Blocks['nezha_rune'] = {
 
 Blockly.Blocks['nezha_symbol'] = {
   init: function() {
-    const field = new Blockly.FieldTextInput('ready');
+    const field = nezhaTextField('ready');
     field.setValidator(function(value) {
       return /^[A-Za-z_][A-Za-z0-9_]*$/.test(value) ? value : null;
     });
@@ -182,6 +188,19 @@ Blockly.Blocks['nezha_assign'] = {
   }
 };
 
+Blockly.Blocks['nezha_if_plain'] = {
+  init: function() {
+    this.appendValueInput('COND')
+      .setCheck('NezhaValue')
+      .appendField('if');
+    this.appendStatementInput('DO')
+      .setCheck('NezhaStatement');
+    this.setPreviousStatement(true, 'NezhaStatement');
+    this.setNextStatement(true, 'NezhaStatement');
+    this.setColour(120);
+  }
+};
+
 Blockly.Blocks['nezha_if'] = {
   init: function() {
     this.appendValueInput('COND')
@@ -189,6 +208,9 @@ Blockly.Blocks['nezha_if'] = {
       .appendField('if');
     this.appendStatementInput('DO')
       .setCheck('NezhaStatement');
+    this.appendStatementInput('ELSE')
+      .setCheck('NezhaStatement')
+      .appendField('else');
     this.setPreviousStatement(true, 'NezhaStatement');
     this.setNextStatement(true, 'NezhaStatement');
     this.setColour(120);
@@ -213,6 +235,16 @@ Blockly.Blocks['nezha_not'] = {
     this.appendValueInput('VALUE')
       .setCheck('NezhaValue')
       .appendField('not');
+    this.setOutput(true, 'NezhaValue');
+    this.setColour(210);
+  }
+};
+
+Blockly.Blocks['nezha_negative'] = {
+  init: function() {
+    this.appendValueInput('VALUE')
+      .setCheck('NezhaValue')
+      .appendField('-');
     this.setOutput(true, 'NezhaValue');
     this.setColour(210);
   }

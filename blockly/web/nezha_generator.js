@@ -47,6 +47,11 @@ function nezhaValue(block) {
       if (value === null) return null;
       return '(not ' + value + ')';
     }
+    case 'nezha_negative': {
+      const value = nezhaValue(block.getInputTargetBlock('VALUE'));
+      if (value === null) return null;
+      return '(-' + value + ')';
+    }
     case 'nezha_binary': {
       const left = nezhaValue(block.getInputTargetBlock('LEFT'));
       const right = nezhaValue(block.getInputTargetBlock('RIGHT'));
@@ -108,6 +113,17 @@ function nezhaStatement(block, depth) {
       }
       return indent + 'println(' + value + ')\n';
     }
+    case 'nezha_if_plain': {
+      const condition = nezhaValue(block.getInputTargetBlock('COND'));
+      if (condition === null) {
+        return indent + '# if has an empty condition socket\n';
+      }
+      let source = indent + 'if ' + condition + ' {\n';
+      const body = block.getInputTargetBlock('DO');
+      if (body) source += nezhaStatementChain(body, depth + 1);
+      source += indent + '}\n';
+      return source;
+    }
     case 'nezha_if': {
       const condition = nezhaValue(block.getInputTargetBlock('COND'));
       if (condition === null) {
@@ -116,6 +132,18 @@ function nezhaStatement(block, depth) {
       let source = indent + 'if ' + condition + ' {\n';
       const body = block.getInputTargetBlock('DO');
       if (body) source += nezhaStatementChain(body, depth + 1);
+      source += indent + '}';
+
+      const otherwise = block.getInputTargetBlock('ELSE');
+      if (!otherwise) return source + '\n';
+
+      if ((otherwise.type === 'nezha_if' || otherwise.type === 'nezha_if_plain') && !otherwise.getNextBlock()) {
+        const nested = nezhaStatement(otherwise, depth);
+        return source + ' else ' + nested.slice(indent.length);
+      }
+
+      source += ' else {\n';
+      source += nezhaStatementChain(otherwise, depth + 1);
       source += indent + '}\n';
       return source;
     }

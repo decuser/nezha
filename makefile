@@ -43,7 +43,7 @@ run: build
 # Launch the Blockly/Wails structural editor. The Wails app is its own Go module
 # so desktop UI dependencies do not enter the Nezha language/runtime module.
 blockly:
-	cd blockly && wails dev -tags webkit2_41
+	cd blockly && WEBKIT_DISABLE_COMPOSITING_MODE=1 wails dev -tags webkit2_41
 
 # Execute the canonical, commented language specimens through the ordinary CLI.
 # The corpus is intentionally human-readable reference material, not smoke gold.
