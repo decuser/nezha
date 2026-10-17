@@ -92,6 +92,10 @@ With Wails and the required desktop dependencies installed, try:
 make blockly
 ```
 
+### Blockly interface screenshot
+
+![Nezha experimental Blockly interface](nezha-blockly-ui.png)
+
 ## Design and contributor guidance
 
 - [Evaluation architecture proposal](engineering/proposals/active/nezha-evaluation-architecture-proposal.md): hypothesis, semantic boundaries, and development cuts.
