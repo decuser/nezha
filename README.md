@@ -1,18 +1,22 @@
 # Nezha
 
-Nezha is a deliberately contained descendant of Aiki.
+**Nezha is Aiki’s smaller, tougher sibling.**
 
-The current purpose of the repository is to test whether the evaluation mechanics of a small, well-structured language can be expressed using a finite and small set of declarative evaluation characters.
+The name recalls Nezha (哪吒), the youthful warrior of Chinese mythology: small in stature, formidable in combat, and unwilling to accept inherited constraints. Nezha the language takes a similar approach to its Aiki ancestry—not by growing larger, but by stripping away what it does not need and confronting the harder question of what makes evaluation work.
 
-Nezha separates:
+Nezha is an experimental programming language descended from Aiki, intended to test whether language evaluation can be described declaratively.
+
+Its central hypothesis is that the evaluation mechanics of a small, well-structured language can be expressed using a **finite, small set of composable evaluation characters**, separately from syntax and implementation strategy.
+
+The intended separation is:
 
 ```text
 syntax
-evaluation
-realization
+ evaluation
+ realization
 ```
 
-The intended long-term shape is:
+The proposed long-term architecture is:
 
 ```text
 syntax.ebnfx
@@ -25,35 +29,23 @@ eval-spec engine
      v
 binary evaluation ABI
    /       |       \
-  /        |        \
- v         v         v
+  v        v        v
 interp     VM      native
 ```
 
-## Current State
+**This is a design target, not the current implementation.**
 
-Nezha has been split from the Aiki Alpha 3 baseline and renamed as its own working repository.
+## Current development status
 
-The source extension is `.nez`.
+The repository contains a working `.nez` language implementation and a handwritten evaluator. The first development cut separated and renamed the Aiki descendant; the project builds and exercises lexer, parser, formatter, and evaluation paths.
 
-The command binary is `nezha`.
+The ongoing work is to reduce inherited Aiki machinery and inventory the evaluation acts needed by the surviving language. The evaluation-character inventory remains provisional. The declarative `eval.spec` engine, binary evaluation ABI, and independent interpreter/VM/native realizations proposed above have **not** been implemented in this baseline.
 
-The first milestone established that the renamed tree builds and that lexer, parser, formatter, and evaluator paths work over `.nez` source.
+This is an early development baseline (`dev-v0.0.1`), not a claim of a completed semantic architecture.
 
-## Primary Design Notes
+## Build and run
 
-See:
-
-- `engineering/proposals/active/nezha-evaluation-architecture-proposal.md`
-- `engineering/ai/README.md`
-
-The proposal describes the evaluation architecture and cut sequence.
-
-The AI contract describes how AI-generated changes should be bounded, reviewed, and gated.
-
-## Basic Commands
-
-Build:
+Build the `nezha` command:
 
 ```sh
 make build
@@ -71,7 +63,7 @@ Evaluate an expression:
 ./nezha -e '1 + 2 * 3'
 ```
 
-Inspect lexer/parser/formatter/evaluator stages:
+Inspect language processing stages:
 
 ```sh
 ./nezha debug -stage lex path/to/file.nez
@@ -80,17 +72,32 @@ Inspect lexer/parser/formatter/evaluator stages:
 ./nezha debug -stage all path/to/file.nez
 ```
 
-Run the canonical language reference corpus:
+Run reference specimens and validation:
 
 ```sh
 make reference
-```
-
-Each specimen under `reference/` is executable and commented to show the grammar and evaluation affordances it realizes.
-
-Validate:
-
-```sh
 make validate-lang
 make cleanroom
 ```
+
+The commented `.nez` specimens under `reference/` document executable examples of the current language.
+
+## An experimental block-based interface
+
+Oh, and there is a block-based user interface thrown in as an experiment. The `blockly/` directory contains a Blockly editor wrapped in a Wails desktop application, allowing programs to be assembled visually and translated into Nezha source. It is an exploratory alternative to writing `.nez` files, not a second language or a central part of the evaluation architecture.
+
+With Wails and the required desktop dependencies installed, try:
+
+```sh
+make blockly
+```
+
+## Design and contributor guidance
+
+- [Evaluation architecture proposal](engineering/proposals/active/nezha-evaluation-architecture-proposal.md): hypothesis, semantic boundaries, and development cuts.
+- [Evaluation-character inventory](engineering/proposals/active/evaluation-character-inventory.md): active analysis, not a finalized character set.
+- [AI contribution instructions](engineering/ai/README.md): project rules for bounded, reviewed and validated AI-assisted changes.
+
+## License
+
+BSD 3-Clause. See [LICENSE](LICENSE).
