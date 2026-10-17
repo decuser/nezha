@@ -3,6 +3,7 @@
 # ----------------------------------------------------------------------
 
 /nezha*
+!/nezha-blockly-ui.png
 /nezha.exe
 
 # Historical/local named test binaries (nezha7, nezha8, nezha9, etc.)
